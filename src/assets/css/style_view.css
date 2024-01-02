@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.navbar-brand img {
+    max-height: 50px;
+    vertical-align: middle;
+}
+
+.navbar-brand span {
+    font-weight: bold;
+    font-size: 1.5em;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.navbar-nav .nav-link {
+    color: #fff;
+}
+
+.navbar-nav .nav-item {
+    margin: 0 10px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ccc;
+}
+
+.card {
+    margin: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.button-container {
+    margin-top: 20px;
+}
+
+.button-container input {
+    margin-right: 10px;
+}
+

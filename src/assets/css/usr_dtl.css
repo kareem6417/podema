@@ -1,0 +1,176 @@
+.sidebar-submenu {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.sidebar-item.active .sidebar-submenu {
+    max-height: 1000px;
+}
+
+.sidebar-submenu .sidebar-item {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.4s ease, transform 0.7s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+}
+
+.sidebar-item.active .sidebar-submenu .sidebar-item {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.sidebar-submenu .sidebar-link i {
+    margin-right: 10px;
+}
+
+.container {
+    margin: 20px;
+}
+
+.card {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 10px;
+}
+
+.sidebar-item.active .sidebar-submenu .sidebar-item {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.device-info {
+    margin-top: 20px;
+}
+
+.device-info table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.device-info th,
+.device-info td {
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+.device-info th {
+    background-color: #f2f2f2;
+}
+
+.inspection-form {
+    margin-top: 20px;
+}
+
+.inspection-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.inspection-form input[type="text"],
+.inspection-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.inspection-form button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.inspection-form button:hover {
+    background-color: #45a049;
+}
+
+.device-info,
+.inspection-form {
+    margin-top: 20px;
+}
+
+.device-info table,
+.inspection-form table {
+    margin-top: 10px;
+}
+
+.device-info th,
+.device-info td,
+.inspection-form th,
+.inspection-form td {
+    padding: 10px;
+}
+
+.device-info th {
+    background-color: #f2f2f2;
+}
+
+.expand-btn {
+    cursor: pointer;
+    background-color: lightgray;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.assessment-content,
+.inspeksi-content {
+    display: none;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+}
+
+.device-info .assessment-content table tr th[colspan="2"],
+.inspection-form .inspeksi-content table tr th[colspan="2"] {
+    text-align: center;
+    background-color: #f2f2f2;
+}
+
+.device-info h3,
+.inspection-form h3 {
+    background-color: #f2f2f2;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.back-button {
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 10px; /* Menambahkan jarak antara tombol kembali dan elemen di atasnya */
+}
+
+.back-icon {
+    margin-right: 2px; /* Menambahkan jarak antara ikon dan teks */
+}

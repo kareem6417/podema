@@ -1,0 +1,74 @@
+.card {
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    input[type="file"] {
+      height: 40px;
+      padding: 8px;
+    }
+
+    .btn-group {
+      margin-top: 20px;
+      text-align: right;
+      margin-right: 10px;
+    }
+
+    input[type="submit"],
+    input[type="reset"] {
+      width: auto;
+      padding: 10px 30px;
+      margin-right: 20px;
+    }
+
+    .btn-primary {
+      background-color: #007bfa; /* Warna biru, sesuaikan dengan preferensi Anda */
+      border-color: #007bff;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d; /* Warna abu-abu, sesuaikan dengan preferensi Anda */
+      border-color: #6c757d;
+      color: #fff; /* Teks putih agar terlihat lebih jelas */
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      opacity: 3.8; /* Efek transparansi ketika kursor mengarah pada tombol */
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+    background-color: #333; /* Warna gelap */
+    color: #fff; /* Warna teks putih */
+  }
+
+  /* Ganti warna isian ketika diisi */
+    input[type="text"]:not(:placeholder-shown),
+    input[type="date"]:not(:placeholder-shown),
+    select:not(:placeholder-shown) {
+    background-color: #fff; /* Warna terang */
+    color: #333; /* Warna teks gelap */
+  }
+  

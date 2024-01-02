@@ -1,0 +1,95 @@
+/* Gaya submenu */
+    .sidebar-submenu {
+        max-height: 0;
+        overflow: hidden;
+    }
+
+    .sidebar-item.active .sidebar-submenu {
+        max-height: 1000px;
+    }
+
+    .sidebar-submenu .sidebar-item {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.4s ease, transform 0.7s ease;
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+    }
+
+    .sidebar-item.active .sidebar-submenu .sidebar-item {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .sidebar-submenu .sidebar-link i {
+        margin-right: 10px;
+    }
+
+    .search-form {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .search-label {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        pointer-events: none;
+    }
+
+    .search-form input[type="text"] {
+        padding: 7px 11px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 200px;
+        font-size: 12px;
+        margin: 1px;
+    }
+
+    .search-form input[type="text"]:focus {
+        outline: none;
+        border-color: #6495ED;
+        box-shadow: 0 0 4px rgba(43, 107, 167, 0.8);
+    }
+
+    .search-form input[type="text"]:focus+.search-label {
+        transform: translateY(-150%);
+        font-size: 12px;
+        color: #999;
+    }
+
+    .search-info {
+        display: none;
+        color: #1749a5;
+        font-size: 12px;
+        margin-top: 5px;
+        transition: all 0.2s ease;
+    }
+
+    .filter-form {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .filter-form label {
+        margin-right: 10px;
+    }
+
+    .filter-form select {
+        margin-right: 10px;
+    }
+
+    .apply-button {
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+    
