@@ -30,7 +30,7 @@ if (isset($_POST['nik']) && isset($_POST['password'])) {
         $row = $result->fetch_assoc();
         if ($password == $row['password']) {
             $_SESSION['nik'] = $nik;
-            header("Location: admin.php");
+            header("Location: /src/code-php/admin.php");
             exit();
         } else {
             echo "Login failed. Password does not match.<br>";
@@ -50,8 +50,8 @@ if (isset($_POST['nik']) && isset($_POST['password'])) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Portal Device Management Application</title>
-  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
-  <link rel="stylesheet" href="../assets/css/styles.min.css" />
+  <link rel="shortcut icon" type="image/png" href="/src/assets/images/logos/favicon.png" />
+  <link rel="stylesheet" href="/src/assets/css/styles.min.css" />
   <style>
     .popup {
       display: none;
@@ -115,7 +115,7 @@ if (isset($_POST['nik']) && isset($_POST['password'])) {
                   <img src="../assets/images/logos/logo.png" width="180" alt="">
                 </a>
                 <p class="text-center">Portal Device Management Application</p>
-                <form method="POST" action="authentication-login.php">
+                <form method="POST" action="index.php">
                   <div class="mb-3">
                     <label for="nik" class="form-label">NIK</label>
                     <input type="text" class="form-control" id="nik" name="nik"
