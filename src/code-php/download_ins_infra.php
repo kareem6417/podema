@@ -1,6 +1,10 @@
 <?php
 
+echo "1";
+
 require_once('../fpdf/fpdf.php');
+
+echo "2";
 
 $host = "mandiricoal.net";
 $user = "podema";
@@ -10,6 +14,8 @@ $conn = new mysqli($host, $user, $pass, $db);
 
 $query = $conn->prepare("SELECT fi.*, s.screenshot_name FROM form_inspeksi fi JOIN screenshots s ON fi.no = s.form_no WHERE fi.no = (SELECT MAX(no) FROM form_inspeksi)");
 $query->execute();
+
+echo "3";
 
 if ($query->error) {
     die("Query failed: " . $query->error);
