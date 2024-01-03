@@ -1,6 +1,6 @@
 <?php
 
-require_once('../fpdf/fpdf.php');
+require_once('src/fpdf/fpdf.php');
 
 $host = "mandiricoal.net";
 $user = "podema";
