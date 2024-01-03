@@ -34,7 +34,7 @@ $sql = "INSERT INTO assess_pc (date, name, company, divisi, serialnumber, merk, 
         VALUES ('$date', '$name', '$company', '$divisi', '$serialnumber', '$merk', '$typepc', '$os', '$processor', '$vga', '$age', '$issue', '$ram', '$storage', '$typemonitor', '$sizemonitor', '$score')";
 
 if ($conn->query($sql) === TRUE) {
-    $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/podema/src/File Upload PC/";
+    $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload PC/";
     $file = $_FILES['upload_file']['name'];
     $path = pathinfo($file);
     $filename = $path['filename'];

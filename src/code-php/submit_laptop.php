@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute()) {
         $form_no = $conn->insert_id;
 
-        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/podema/src/screenshot/";
+        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
         if(isset($_FILES['screenshot_file']['name']) && count($_FILES['screenshot_file']['name']) > 0) {
             foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {            
@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
-            $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/podema/src/File Upload Inspeksi/";
+            $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload Inspeksi/";
         
             // Upload file lainnya
             $file = $_FILES['upload_file']['name'];
