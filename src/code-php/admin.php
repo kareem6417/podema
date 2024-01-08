@@ -513,6 +513,21 @@ $conn->close();
                         <form class="popup-form" id="addUserForm" action="../code-php/add_user.php" method="post" onsubmit="saveUser(); return false;">
                             <input type="hidden" name="roles_id" id="roles_id" value="2">
 
+                            <label for="nik">NIK:</label>
+                            <div class="input-group">
+                                <input type="text" name="nik" id="nik" class="form-control" required>
+                                <div class="input-group-append">
+                                <span class="input-group-text" onclick="searchNIK()">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                </div>
+                            </div>
+                            <div id="nik-result"></div>
+                            <br>
+
+                            <label for="name">Name:</label>
+                            <input type="text" name="name" id="name" class="form-control" required>
+
                             <label for="company">Company:</label>
                             <select name="company" id="company" class="form-control">
                                 <option value="pam">PT. Prima Andalan Mandiri</option>
@@ -536,21 +551,6 @@ $conn->close();
                                 <option value="gms">PT. Global Mining Service</option>
                                 <option value="eam">PT. Edika Agung mandiri</option>
                             </select>
-
-                            <label for="nik">NIK:</label>
-                            <div class="input-group">
-                                <input type="text" name="nik" id="nik" class="form-control" required>
-                                <div class="input-group-append">
-                                <span class="input-group-text" onclick="searchNIK()">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                                </div>
-                            </div>
-                            <div id="nik-result"></div>
-                            <br>
-
-                            <label for="name">Name:</label>
-                            <input type="text" name="name" id="name" class="form-control" required>
 
                             <label for="department">Department:</label>
                             <input type="text" name="department" id="department" class="form-control" required>
