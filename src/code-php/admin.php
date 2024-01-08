@@ -736,10 +736,12 @@ $conn->close();
             document.getElementById('name').value = userData['CNAME']|| '';
             document.getElementById('department').value = userData['ORGTX'] || '';
             document.getElementById('email').value=userData['UMAIL'] || '';
+            document.getElementById('company').value=userData['ABKTX']
         } else {
             document.getElementById('name').value = '';
             document.getElementById('department').value = '';
             document.getElementById('email').value = '';
+            document.getElementById('company').value= '';
         }
     }
 
