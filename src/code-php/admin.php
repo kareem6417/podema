@@ -732,8 +732,8 @@ $conn->close();
     function handleResponse(data) {
         if (data.length > 0) {
             var userData = data[0];
-            document.getElementById('name').value = userData[1] || '';
-            document.getElementById('department').value = userData[7] || '';
+            document.getElementById('name').value = userData['employee']['CNAME']|| '';
+            document.getElementById('department').value = userData['employee']['ORGTX'] || '';
         } else {
             document.getElementById('name').value = '';
             document.getElementById('department').value = '';
