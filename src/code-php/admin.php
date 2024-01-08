@@ -722,7 +722,7 @@ $conn->close();
 
               fetch("http://mandiricoal.co.id:1880/master/employee/bukrs/" + getBukrsFromCompany(selectedCompany), requestOptions)
                 .then(response => response.text())
-                .then(result => console.log(result))
+                .then(result => handleResponse(result))
                 .catch(error => console.log('error', error));
         } else {
             // Handle empty NIK
