@@ -29,16 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (!empty($filterCompany)) {
         $companyOptions = [
-            'pam' => 'PT Prima Andalan Mandiri',
-            'mipho' => 'PT. Mandiri Intiperkasa - HO',
-            'mipsite' => 'PT. Mandiri Intiperkasa - Site',
-            'mkpho' => 'PT. Mandala Karya Prima - HO',
-            'mkpsite' => 'PT. Mandala Karya Prima - Site',
-            'mpmho' => 'PT. Maritim Prima Mandiri - HO',
-            'mpmsite' => 'PT. Maritim Prima Mandiri - Site',
-            'mandiriland' => 'PT. Mandiriland',
-            'gms' => 'PT. Global Mining Service',
-            'eam' => 'PT. Edika Agung Mandiri',
+          'PAM' => 'PT. Prima Andalan Mandiri',
+          'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
+          'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
+          'MKP HO' => 'PT. Mandala Karya Prima - HO',
+          'MKP Site' => 'PT. Mandala Karya Prima - Site',
+          'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
+          'MPM Site' => 'PT. Maritim Prima Mandiri - Site',
+          'MHA HO' => 'PT. Mandiri Herindo Adiperkasa - HO',
+          'MHA Site' => 'PT. Mandiri Herindo Adiperkasa - Site',
+          'mandiriland' => 'PT. Mandiriland',
+          'GMS' => 'PT. Global Mining Service',
+          'eam' => 'PT. Edika Agung Mandiri',
         ];
 
         if (array_key_exists($filterCompany, $companyOptions)) {
@@ -492,14 +494,14 @@ $conn->close();
                     </select>
                     <select id="filterCompany" name="filterCompany">
                       <option value="" <?= empty($filterCompany) ? 'selected' : '' ?>>All Companies</option>
-                      <option value="mipho" <?= ($filterCompany == 'mipho') ? 'selected' : '' ?>>MIP - HO</option>
-                      <option value="mipsite" <?= ($filterCompany == 'mipsite') ? 'selected' : '' ?>>MIP - Site</option>
-                      <option value="mkpho" <?= ($filterCompany == 'mkpho') ? 'selected' : '' ?>>MKP - HO</option>
-                      <option value="mkpsite" <?= ($filterCompany == 'mkpsite') ? 'selected' : '' ?>>MKP - Site</option>
-                      <option value="mpmho" <?= ($filterCompany == 'mpmho') ? 'selected' : '' ?>>MPM - HO</option>
-                      <option value="mpmsite" <?= ($filterCompany == 'mpmsite') ? 'selected' : '' ?>>MPM - Site</option>
-                      <option value="mhaho" <?= ($filterCompany == 'mhaho') ? 'selected' : '' ?>>MHA - HO</option>
-                      <option value="mhasite" <?= ($filterCompany == 'mhasite') ? 'selected' : '' ?>>MHA - Site</option>
+                      <option value="MIP HO" <?= ($filterCompany == 'mipho') ? 'selected' : '' ?>>MIP - HO</option>
+                      <option value="MIP Site" <?= ($filterCompany == 'mipsite') ? 'selected' : '' ?>>MIP - Site</option>
+                      <option value="MKP HO" <?= ($filterCompany == 'mkpho') ? 'selected' : '' ?>>MKP - HO</option>
+                      <option value="MKP Site" <?= ($filterCompany == 'mkpsite') ? 'selected' : '' ?>>MKP - Site</option>
+                      <option value="MPM HO" <?= ($filterCompany == 'mpmho') ? 'selected' : '' ?>>MPM - HO</option>
+                      <option value="MPM Site" <?= ($filterCompany == 'mpmsite') ? 'selected' : '' ?>>MPM - Site</option>
+                      <option value="MHA HO" <?= ($filterCompany == 'mhaho') ? 'selected' : '' ?>>MHA - HO</option>
+                      <option value="MHA Site" <?= ($filterCompany == 'mhasite') ? 'selected' : '' ?>>MHA - Site</option>
                       <option value="mandiriland" <?= ($filterCompany == 'mandiriland') ? 'selected' : '' ?>>MandiriLand</option>
                       <option value="gms" <?= ($filterCompany == 'gms') ? 'selected' : '' ?>>GMS</option>
                       <option value="eam" <?= ($filterCompany == 'eam') ? 'selected' : '' ?>>Edika</option>
@@ -515,20 +517,20 @@ $conn->close();
                             <select name="company" id="company" class="form-control">
                                 <option value="pam">PT. Prima Andalan Mandiri</option>
                                 <optgroup label="PT Mandiri Intiperkasa">
-                                    <option value="mipho">PT. Mandiri Intiperkasa - HO</option>
-                                    <option value="mipsite">PT. Mandiri Intiperkasa - Site</option>
+                                    <option value="MIP HO">PT. Mandiri Intiperkasa - HO</option>
+                                    <option value="MIP Site">PT. Mandiri Intiperkasa - Site</option>
                                 </optgroup>
                                 <optgroup label="PT Mandala Karya Prima">
-                                    <option value="mkpho">PT. Mandala Karya Prima - HO</option>
-                                    <option value="mkpsite">PT. Mandala Karya Prima - Site</option>
+                                    <option value="MKP HO">PT. Mandala Karya Prima - HO</option>
+                                    <option value="MKP Site">PT. Mandala Karya Prima - Site</option>
                                 </optgroup>
                                 <optgroup label="PT Maritim Prima Mandiri">
-                                    <option value="mpmho">PT. Maritim Prima Mandiri - HO</option>
-                                    <option value="mpmsite">PT. Maritim Prima Mandiri - Site</option>
+                                    <option value="MPM HO">PT. Maritim Prima Mandiri - HO</option>
+                                    <option value="MPM Site">PT. Maritim Prima Mandiri - Site</option>
                                 </optgroup>
                                 <optgroup label="PT Mandiri Herindo Adiperkasa">
-                                    <option value="mhaho">PT. Mandiri Herindo Adiperkasa - HO</option>
-                                    <option value="mhasite">PT. Mandiri Herindo Adiperkasa - Site</option>
+                                    <option value="MHA HO">PT. Mandiri Herindo Adiperkasa - HO</option>
+                                    <option value="MHA Site">PT. Mandiri Herindo Adiperkasa - Site</option>
                                 </optgroup>
                                 <option value="mandiriland">PT. Mandiriland</option>
                                 <option value="gms">PT. Global Mining Service</option>
