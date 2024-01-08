@@ -709,9 +709,7 @@ $conn->close();
 
             var apiEndpoint = getApiEndpoint(selectedCompany);
 
-            fetch(`${apiEndpoint}?bukrs=${getBukrsFromCompany(selectedCompany)}&search=${nik}`, {
-              headers: {'Access-Control-Allow-Origin': '*'}
-            })
+            fetch(`${apiEndpoint}?bukrs=${getBukrsFromCompany(selectedCompany)}&search=${nik}`)
                 .then(response => response.json())
                 .then(data => handleResponse(data))
                 .catch(error => {
