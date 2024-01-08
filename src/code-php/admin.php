@@ -730,6 +730,7 @@ $conn->close();
     }
 
     function handleResponse(data) {
+      console.log(data);
         if (data.length > 0) {
             var userData = data[0];
             document.getElementById('name').value = userData['employee']['CNAME']|| '';
