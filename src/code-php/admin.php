@@ -528,7 +528,7 @@ $conn->close();
                             <input type="text" name="name" id="name" class="form-control" required>
 
                             <label for="company">Company:</label>
-                            <select name="company" id="company" class="form-control">
+                            <!-- <select name="company" id="company" class="form-control">
                                 <option value="pam">PT. Prima Andalan Mandiri</option>
                                 <optgroup label="PT Mandiri Intiperkasa">
                                     <option value="MIP HO">PT. Mandiri Intiperkasa - HO</option>
@@ -549,7 +549,8 @@ $conn->close();
                                 <option value="mandiriland">PT. Mandiriland</option>
                                 <option value="gms">PT. Global Mining Service</option>
                                 <option value="eam">PT. Edika Agung mandiri</option>
-                            </select>
+                            </select> -->
+                            <input type="text" name="company" id="company" class="form-control" required>
 
                             <label for="department">Department:</label>
                             <input type="text" name="department" id="department" class="form-control" required>
