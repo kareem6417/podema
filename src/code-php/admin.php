@@ -731,10 +731,10 @@ $conn->close();
 
     function handleResponse(data) {
       console.log(data);
-        if (data.length > 0) {
-            var userData = data[0];
-            document.getElementById('name').value = userData['employee']['CNAME']|| '';
-            document.getElementById('department').value = userData['employee']['ORGTX'] || '';
+        if (data['employee'].length > 0) {
+            var userData = data['employee'][0];
+            document.getElementById('name').value = userData['CNAME']|| '';
+            document.getElementById('department').value = userData['ORGTX'] || '';
         } else {
             document.getElementById('name').value = '';
             document.getElementById('department').value = '';
