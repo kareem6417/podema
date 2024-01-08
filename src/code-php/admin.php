@@ -523,7 +523,6 @@ $conn->close();
                                 </div>
                             </div>
                             <div id="nik-result"></div>
-                            <br>
 
                             <label for="name">Name:</label>
                             <input type="text" name="name" id="name" class="form-control" required>
