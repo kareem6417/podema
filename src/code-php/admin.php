@@ -720,7 +720,7 @@ $conn->close();
                 redirect: 'follow'
               };
 
-              fetch("http://mandiricoal.co.id:1880/master/employee/bukrs/" + getBukrsFromCompany(selectedCompany), requestOptions)
+              fetch("http://mandiricoal.co.id:1880/master/employee/pernr/" + nik, requestOptions)
                 .then(response => response.text())
                 .then(result => handleResponse(JSON.parse(result)))
                 .catch(error => console.log('error', error));
@@ -732,12 +732,14 @@ $conn->close();
     function handleResponse(data) {
       console.log(data);
         if (data['employee'].length > 0) {
-            var userData = data['employee'][0];
+            var userData = data['employee'];
             document.getElementById('name').value = userData['CNAME']|| '';
             document.getElementById('department').value = userData['ORGTX'] || '';
+            document.getElementById('email').value=userData['UMAIL'] || '';
         } else {
             document.getElementById('name').value = '';
             document.getElementById('department').value = '';
+            document.getElementById('email').value = '';
         }
     }
 
