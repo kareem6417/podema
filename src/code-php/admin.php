@@ -780,17 +780,17 @@ $conn->close();
 
     function getApiEndpoint(selectedCompany) {
         switch (selectedCompany) {
-            case 'mipho':
-            case 'mipsite':
+            case 'MIP HO':
+            case 'MIP Site':
                 return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            case 'mkpho':
-            case 'mkpsite':
+            case 'MKP HO':
+            case 'MKP Site':
                 return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            case 'mpmho':
-            case 'mpmsite':
+            case 'MPM HO':
+            case 'MPM Site':
                 return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            case 'mhaho':
-            case 'mhasite':
+            case 'MHA HO':
+            case 'MHA Site':
                 return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
             case 'gms':
                 return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
@@ -801,17 +801,17 @@ $conn->close();
 
     function getBukrsFromCompany(selectedCompany) {
         switch (selectedCompany) {
-            case 'mipho':
-            case 'mipsite':
+            case 'MIP HO':
+            case 'MIP Site':
                 return '0100';
-            case 'mkpho':
-            case 'mkpsite':
+            case 'MKP HO':
+            case 'MKP Site':
                 return '0200';
-            case 'mpmho':
-            case 'mpmsite':
+            case 'MPM HO':
+            case 'MPM Site':
                 return '0500';
-            case 'mhaho':
-            case 'mhasite':
+            case 'MHA HO':
+            case 'MHA Site':
                 return '0300';
             case 'gms':
                 return '0400';
