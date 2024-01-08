@@ -711,12 +711,19 @@ $conn->close();
 
             var apiEndpoint = getApiEndpoint(selectedCompany);
 
-            fetch(`${apiEndpoint}?bukrs=${getBukrsFromCompany(selectedCompany)}&search=${nik}`)
-                .then(response => response.json())
-                .then(data => handleResponse(data))
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                });
+            var myHeaders = new Headers();
+              myHeaders.append("api_key", "ca6cda3462809fc894801c6f84e0cd8ecff93afb");
+
+              var requestOptions = {
+                method: 'GET',
+                headers: myHeaders,
+                redirect: 'follow'
+              };
+
+              fetch("http://mandiricoal.co.id:1880/master/employee/burks/" + getBukrsFromCompany(selectedCompany), requestOptions)
+                .then(response => response.text())
+                .then(result => console.log(result))
+                .catch(error => console.log('error', error));
         } else {
             // Handle empty NIK
         }
