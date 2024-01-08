@@ -732,7 +732,7 @@ $conn->close();
     function handleResponse(data) {
       console.log(data);
         if (data['employee'].length > 0) {
-            var userData = data['employee'];
+            var userData = data[0]['employee'];
             document.getElementById('name').value = userData['CNAME']|| '';
             document.getElementById('department').value = userData['ORGTX'] || '';
             document.getElementById('email').value=userData['UMAIL'] || '';
