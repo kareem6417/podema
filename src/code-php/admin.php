@@ -720,7 +720,7 @@ $conn->close();
                 redirect: 'follow'
               };
 
-              fetch("http://mandiricoal.co.id:1880/master/employee/burks/" + getBukrsFromCompany(selectedCompany), requestOptions)
+              fetch("http://mandiricoal.co.id:1880/master/employee/bukrs/" + getBukrsFromCompany(selectedCompany), requestOptions)
                 .then(response => response.text())
                 .then(result => console.log(result))
                 .catch(error => console.log('error', error));
@@ -785,26 +785,26 @@ $conn->close();
         xhr.send(formData);
     }
 
-    function getApiEndpoint(selectedCompany) {
-        switch (selectedCompany) {
-            case 'MIP HO':
-            case 'MIP Site':
-                return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            case 'MKP HO':
-            case 'MKP Site':
-                return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            case 'MPM HO':
-            case 'MPM Site':
-                return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            case 'MHA HO':
-            case 'MHA Site':
-                return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            case 'gms':
-                return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
-            default:
-                return '';
-        }
-    }
+    // function getApiEndpoint(selectedCompany) {
+    //     switch (selectedCompany) {
+    //         case 'MIP HO':
+    //         case 'MIP Site':
+    //             return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
+    //         case 'MKP HO':
+    //         case 'MKP Site':
+    //             return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
+    //         case 'MPM HO':
+    //         case 'MPM Site':
+    //             return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
+    //         case 'MHA HO':
+    //         case 'MHA Site':
+    //             return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
+    //         case 'gms':
+    //             return 'https://sisakty.mandiricoal.co.id/controller/userController.php';
+    //         default:
+    //             return '';
+    //     }
+    // }
 
     function getBukrsFromCompany(selectedCompany) {
         switch (selectedCompany) {
