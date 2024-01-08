@@ -709,7 +709,7 @@ $conn->close();
         if (nik !== '') {
             var selectedCompany = document.getElementById('company').value;
 
-            var apiEndpoint = getApiEndpoint(selectedCompany);
+            // var apiEndpoint = getApiEndpoint(selectedCompany);
 
             var myHeaders = new Headers();
               myHeaders.append("api_key", "ca6cda3462809fc894801c6f84e0cd8ecff93afb");
