@@ -133,7 +133,7 @@ if (isset($_POST['nik']) && isset($_POST['password'])) {
                         Show Password
                       </label>
                     </div>
-                    <a class="text-primary fw-bold" href="./index.html"></a>
+                    <a class="text-primary fw-bold" href="./index.php"></a>
                   </div>
                   <button type="submit"
                     class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
