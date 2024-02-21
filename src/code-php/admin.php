@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
-    header("location: authentication-login.php");
+    header("location: ./index.php");
     exit();
 }
 
@@ -460,7 +460,7 @@ $conn->close();
                       <i class="ti ti-mail fs-6"></i>
                       <p class="mb-0 fs-3">My Device</p>
                     </a>
-                    <a href="./authentication-login.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                    <a href="index.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                   </div>
                 </div>
               </li>
