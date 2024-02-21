@@ -2,8 +2,8 @@
 session_start();
 
 if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
-  header("location: authentication-login.php");
-  exit();
+    header("location: ./index.php");
+    exit();
 }
 
 $host = "mandiricoal.net";
