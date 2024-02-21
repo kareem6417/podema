@@ -30,7 +30,7 @@ if (isset($_POST['nik']) && isset($_POST['password'])) {
         $row = $result->fetch_assoc();
         if ($password == $row['password']) {
             $_SESSION['nik'] = $nik;
-            header("Location: admin.php");
+            header("Location: ./src/code-php/admin.php");
             exit();
         } else {
             echo "Login failed. Password does not match.<br>";
@@ -111,11 +111,11 @@ if (isset($_POST['nik']) && isset($_POST['password'])) {
           <div class="col-md-8 col-lg-6 col-xxl-3">
             <div class="card mb-0">
               <div class="card-body">
-                <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                <a href="./index.php" class="text-nowrap logo-img text-center d-block py-3 w-100">
                   <img src="src/assets/images/logos/logo.png" width="180" alt="">
                 </a>
                 <p class="text-center">Portal Device Management Application</p>
-                <form method="POST" action="authentication-login.php">
+                <form method="POST" action="./index.php">
                   <div class="mb-3">
                     <label for="nik" class="form-label">NIK</label>
                     <input type="text" class="form-control" id="nik" name="nik"
