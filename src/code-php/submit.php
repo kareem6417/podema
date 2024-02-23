@@ -11,13 +11,14 @@ $batterylife = $_POST["batterylife"];
 $age = $_POST["age"];
 $issue = $_POST["issue"];
 $ram = $_POST["ram"];
+$vga = $_POST[ "vga" ]; 
 $storage = $_POST["storage"];
 $keyboard = $_POST["keyboard"];
 $screen = $_POST["screen"];
 $touchpad = $_POST["touchpad"];
 $audio = $_POST["audio"];
 $body = $_POST["body"];
-$score = $os + $processor + $batterylife + $age + $issue + $ram + $storage + $keyboard + $screen + $touchpad + $audio + $body;
+$score = $os + $processor + $batterylife + $age + $issue + $ram + $vga + $storage + $keyboard + $screen + $touchpad + $audio + $body;
 
 $host = "mandiricoal.net";
 $user = "podema"; 

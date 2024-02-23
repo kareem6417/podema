@@ -559,9 +559,9 @@ foreach ($users as $user) {
               </div>
               <br>
               <div class="form-group">
-                <label for="upload_file" style="margin-bottom: 10px;">Unggah File<span style="color: crimson;">*</span></label>
-                <input type="file" id="upload_file" name="upload_file" class="form-control" accept=".zip, .rar" required>
-                <small>*Note: <br> Sebagai bahan verifikasi mohon upload file berformat .zip atau .rar dari hasil Belarc, <br>dan file tidak lebih dari 100 KB</small>
+                  <label for="upload_file" style="margin-bottom: 10px;">Unggah File<span style="color: crimson;"></span></label>
+                  <input type="file" id="upload_file" name="upload_file" class="form-control" accept=".zip, .rar">
+                  <small>*Note: <br> Sebagai bahan verifikasi mohon upload file berformat .zip atau .rar dari hasil Belarc, <br>dan file tidak lebih dari 100 KB</small>
               </div>
               <div class="btn-group">
                 <input type="submit" value="Submit" class="btn btn-primary">
