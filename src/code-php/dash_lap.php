@@ -88,7 +88,7 @@ try {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Portal Device Management Application</title>
-  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/icon.png" />
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -255,7 +255,7 @@ try {
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="" class="text-nowrap logo-img">
             <br>
-            <img src="../assets/images/logos/logo.png" width="180" alt="" />
+            <img src="../assets/images/logos/logos.png" width="220" alt="" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>
