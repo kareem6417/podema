@@ -32,8 +32,8 @@ if (!$conn) {
     echo "Koneksi Berhasil";
 }
 
-$sql = "INSERT INTO assess_laptop (date, name, company, divisi, type, serialnumber, os, processor, batterylife, age, issue, ram, storage, keyboard, screen, touchpad, audio, body, score)
-        VALUES ('$date', '$name', '$company', '$divisi', '$type', '$serialnumber', '$os', '$processor', '$batterylife', '$age', '$issue', '$ram', '$storage', '$keyboard', '$screen', '$touchpad', '$audio', '$body', '$score')";
+$sql = "INSERT INTO assess_laptop (date, name, company, divisi, type, serialnumber, os, processor, batterylife, age, issue, ram, vga, storage, keyboard, screen, touchpad, audio, body, score)
+        VALUES ('$date', '$name', '$company', '$divisi', '$type', '$serialnumber', '$os', '$processor', '$batterylife', '$age', '$vga' ,'$issue', '$ram', '$storage', '$keyboard', '$screen', '$touchpad', '$audio', '$body', '$score')";
 
 if ($conn->query($sql) === TRUE) {
     $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload Laptop/";
