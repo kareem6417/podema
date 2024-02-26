@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute()) {
         $form_no = $conn->insert_id;
 
-        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
+        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/screenshot/";
 
         if(isset($_FILES['screenshot_file']['name']) && count($_FILES['screenshot_file']['name']) > 0) {
             foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {            

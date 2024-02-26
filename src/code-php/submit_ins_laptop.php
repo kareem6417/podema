@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }   
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/File Upload Inspeksi/";
+        $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/File Upload Inspeksi/";
     
         // Upload file lainnya
         $file = $_FILES['upload_file']['name'];
@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/screenshot/";
+    $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/screenshot/";
 
     // Loop melalui setiap file screenshot yang diunggah
     foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
