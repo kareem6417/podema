@@ -119,6 +119,7 @@ $data = [
     ['Device Age', $query['age_name'], $query['age']],
     ['Issue Related Software', $query['issue_name'], $query['issue']],
     ['RAM', $query['ram_name'], $query['ram']],
+    ['VGA', $query['vga_name'], $query['vga']],
     ['Storage', $query['storage_name'], $query['storage']],
     ['Keyboard', $query['keyboard_name'], $query['keyboard']],
     ['Screen', $query['screen_name'], $query['screen']],
@@ -146,7 +147,7 @@ $pdf->SetX(15);
 if ($totalScore > 100) {
     $recommendation = 'Berdasarkan pada hasil diatas, direkomendasikan untuk mengganti perangkat Anda dengan yang baru.';
 } else {
-    $recommendation = 'Berdasarkan pada hasil diatas, dinyatakan bahwa perangkat Anda masih dapat digunakan.' .
+    $recommendation = 'Berdasarkan pada hasil diatas, dinyatakan bahwa perangkat Anda masih dapat digunakan.' . "\n" .
                       'Oleh karena itu, tim IT akan melakukan peningkatan sesuai dengan kebutuhan perangkat Anda.';
 }
 
