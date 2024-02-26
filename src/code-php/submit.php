@@ -53,8 +53,10 @@ if ($conn->query($sql) === TRUE) {
             echo '<meta http-equiv="refresh" content="0;url=view.php">';
             exit();
         } else {
+            echo $target_dir;
             echo "Terjadi kesalahan saat mengunggah file.";
         }
+        
     }
 } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
