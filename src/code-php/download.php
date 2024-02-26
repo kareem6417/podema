@@ -148,7 +148,7 @@ $pdf->SetX(15);
 if ($totalScore > 100) {
     $recommendation = 'Berdasarkan pada hasil diatas, direkomendasikan untuk mengganti perangkat Anda dengan yang baru.';
 } else {
-    $recommendation = 'Berdasarkan pada hasil diatas, dinyatakan bahwa perangkat Anda masih dapat digunakan.' . "\n" .
+    $recommendation = 'Berdasarkan pada hasil diatas, dinyatakan bahwa perangkat Anda masih dapat digunakan. <br>' . "\n" .
                       'Oleh karena itu, tim IT akan melakukan peningkatan sesuai dengan kebutuhan perangkat Anda.';
 }
 
