@@ -9,7 +9,7 @@ $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 
 $result = mysqli_query($conn, "SELECT assess_laptop.*, operating_sistem_laptop.os_name, processor_laptop.processor_name, batterylife_laptop.battery_name, device_age_laptop.age_name, issue_software_laptop.issue_name, ram_laptop.ram_name, 
-                              storage_laptop.storage_name, keyboard_laptop.keyboard_name, screen_laptop.screen_name, touchpad_laptop.touchpad_name, audio_laptop.audio_name, body_laptop.body_name
+                              vga_laptop.vga_name, storage_laptop.storage_name, keyboard_laptop.keyboard_name, screen_laptop.screen_name, touchpad_laptop.touchpad_name, audio_laptop.audio_name, body_laptop.body_name
                               FROM assess_laptop
                               JOIN operating_sistem_laptop ON assess_laptop.os = operating_sistem_laptop.os_score
                               JOIN processor_laptop ON assess_laptop.processor = processor_laptop.processor_score
@@ -17,6 +17,7 @@ $result = mysqli_query($conn, "SELECT assess_laptop.*, operating_sistem_laptop.o
                               JOIN device_age_laptop ON assess_laptop.age = device_age_laptop.age_score
                               JOIN issue_software_laptop ON assess_laptop.issue = issue_software_laptop.issue_score
                               JOIN ram_laptop ON assess_laptop.ram = ram_laptop.ram_score
+                              JOIN vga_laptop ON assess_laptop.vga = vga_laptop.vga_score
                               JOIN storage_laptop ON assess_laptop.storage = storage_laptop.storage_score
                               JOIN keyboard_laptop ON assess_laptop.keyboard = keyboard_laptop.keyboard_score
                               JOIN screen_laptop ON assess_laptop.screen = screen_laptop.screen_score
@@ -62,7 +63,7 @@ $pdf->SetFont('helvetica', 'B', 10);
 
 $name = $query['name'];
 
-$totalScore = $query['os'] + $query['processor'] + $query['batterylife'] + $query['age'] + $query['ram'] + $query['storage'] + $query['keyboard'] + $query['screen'] + $query['issue'] + $query['touchpad'] + $query['audio'] + $query['body'];
+$totalScore = $query['os'] + $query['processor'] + $query['batterylife'] + $query['age'] + $query['ram'] + $query['vga'] + $query['storage'] + $query['keyboard'] + $query['screen'] + $query['issue'] + $query['touchpad'] + $query['audio'] + $query['body'];
 
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 10);
