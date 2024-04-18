@@ -10,6 +10,7 @@ $conn = new mysqli($host, $user, $pass, $db);
 
 $query = $conn->prepare("SELECT fi.*, 
                             s.screenshot_name, 
+                            a.age_name, a.age_score,
                             cl.casing_lap_name, cl.casing_lap_score,
                             ip.layar_lap_name, ip.layar_lap_score,
                             el.engsel_lap_name, el.engsel_lap_score,
@@ -24,6 +25,7 @@ $query = $conn->prepare("SELECT fi.*,
                             sl.software_lap_name, sl.software_lap_score
                     FROM form_inspeksi fi 
                     JOIN screenshots s ON fi.no = s.form_no
+                    JOIN device_age_laptop a ON fi.age = a.age_score
                     JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_score
                     JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_score
                     JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_score
@@ -183,7 +185,7 @@ class MYPDF extends FPDF {
     }
 
     function RowNeedsFill() {
-        return $this->GetY() % 20 === 0; // Change to whatever row interval you want to fill
+        return $this->GetY() % 20 === 0;
     }
 }
 
@@ -257,6 +259,7 @@ $pdf->addTableRow('Item', 'Detail', 'Skor');
 
 $pdf->SetFont('helvetica', '', 9);
 
+$pdf->addTableRow('Usia Perangkat', $row['age_name'], $row['age_score']);
 $pdf->addTableRow('Casing', $row['casing_lap_name'], $row['casing_lap_score']);
 $pdf->addTableRow('Layar', $row['layar_lap_name'], $row['layar_lap_score']);
 $pdf->addTableRow('Engsel', $row['engsel_lap_name'], $row['engsel_lap_score']);
@@ -270,7 +273,7 @@ $pdf->addTableRow('Port', $row['port_lap_name'], $row['port_lap_score']);
 $pdf->addTableRow('Audio', $row['audio_lap_name'], $row['audio_lap_score']);
 $pdf->addTableRow('Software', $row['software_lap_name'], $row['software_lap_score']);
 
-$totalScore = $row['casing_lap_score'] + $row['layar_lap_score'] + $row['engsel_lap_score'] +$row['keyboard_lap_score'] + $row['touchpad_lap_score'] + $row['booting_lap_score'] + $row['multi_lap_score'] + $row['tampung_lap_score'] + $row['isi_lap_score'] + $row['port_lap_score'] + $row['audio_lap_score'] + $row['software_lap_score'];
+$totalScore = $row['age_score'] + $row['casing_lap_score'] + $row['layar_lap_score'] + $row['engsel_lap_score'] +$row['keyboard_lap_score'] + $row['touchpad_lap_score'] + $row['booting_lap_score'] + $row['multi_lap_score'] + $row['tampung_lap_score'] + $row['isi_lap_score'] + $row['port_lap_score'] + $row['audio_lap_score'] + $row['software_lap_score'];
 $pdf->SetFont('helvetica', 'B', 11);
 $pdf->addTableRow('Total Skor', '', $totalScore);
 

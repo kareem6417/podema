@@ -21,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $serialnumber = isset($_POST["serialnumber"]) ? $_POST["serialnumber"] : '';
     $informasi_keluhan = isset($_POST["informasi_keluhan"]) ? $_POST["informasi_keluhan"] : '';
     $hasil_pemeriksaan = isset($_POST["hasil_pemeriksaan"]) ? $_POST["hasil_pemeriksaan"] : '';
+    $age = isset($_POST["age"]) ? $_POST["age"] : '';
     $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
     $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
     $engsel_lap = isset($_POST["engsel_lap"]) ? $_POST["engsel_lap"] : '';
@@ -35,17 +36,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $software_lap = isset($_POST["software_lap"]) ? $_POST["software_lap"] : '';
     $rekomendasi = isset($_POST["rekomendasi"]) ? $_POST["rekomendasi"] : '';
 
-    $score = $casing_lap + $layar_lap + $engsel_lap + $keyboard_lap + $touchpad_lap + $booting_lap + $multi_lap + $tampung_lap + $isi_lap + $port_lap + $audio_lap + $software_lap;
+    $score = $age + $casing_lap + $layar_lap + $engsel_lap + $keyboard_lap + $touchpad_lap + $booting_lap + $multi_lap + $tampung_lap + $isi_lap + $port_lap + $audio_lap + $software_lap;
 
     $conn->begin_transaction();
 
-    $stmt = $conn->prepare("INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssssssssssssssssssss", $date, $jenis, $merk, $lokasi, $nama_user, $status, $serialnumber, $informasi_keluhan, $hasil_pemeriksaan, $rekomendasi, $casing_lap, $layar_lap, $engsel_lap, $keyboard_lap, $touchpad_lap, $booting_lap, $multi_lap, $tampung_lap, $isi_lap, $port_lap, $audio_lap, $software_lap, $score);
+    $stmt = $conn->prepare("INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssssssssssssssssssss", $date, $jenis, $merk, $lokasi, $nama_user, $status, $serialnumber, $informasi_keluhan, $hasil_pemeriksaan, $rekomendasi, $age, $casing_lap, $layar_lap, $engsel_lap, $keyboard_lap, $touchpad_lap, $booting_lap, $multi_lap, $tampung_lap, $isi_lap, $port_lap, $audio_lap, $software_lap, $score);
 
     if ($stmt->execute()) {
         $form_no = $conn->insert_id;
 
-        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/screenshot/";
+        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
         if(isset($_FILES['screenshot_file']['name']) && count($_FILES['screenshot_file']['name']) > 0) {
             foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {            
@@ -80,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
-            $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/File Upload Inspeksi/";
+            $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload Inspeksi/";
         
             // Upload file lainnya
             $file = $_FILES['upload_file']['name'];
