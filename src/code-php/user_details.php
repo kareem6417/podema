@@ -192,10 +192,10 @@ $conn->close();
     <aside class="left-sidebar">
       <!-- Sidebar scroll-->
       <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between">
+        <div class="brand-logo d-flex align-items-center justify-content-center">
           <a href="" class="text-nowrap logo-img">
             <br>
-            <img src="../assets/images/logos/logo.png" width="180" alt="" />
+            <img src="../assets/images/logos/logos.png" width="160" alt="" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>
