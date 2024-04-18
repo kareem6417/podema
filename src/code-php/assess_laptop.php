@@ -122,7 +122,7 @@ foreach ($users as $user) {
     <aside class="left-sidebar">
       <!-- Sidebar scroll-->
       <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between">
+        <div class="brand-logo d-flex align-items-center justify-content-center">
           <a href="" class="text-nowrap logo-img">
             <br>
             <img src="../assets/images/logos/logos.png" width="180" alt="" />
