@@ -402,6 +402,18 @@ foreach ($users as $user) {
                 <textarea id="informasi_keluhan" name="informasi_keluhan" style="height: 75px; width: 100%;" required></textarea>
               <br>
               <br>
+                <label for="age">Usia Perangkat<span style="color: crimson;">*</span></label>
+                <select id="age" name="age" style="height: 50px;">
+                  <option value="">--- Pilih ---</option>
+                    <?php
+                      $ageOptions = fetchData("device_age_laptop");
+                      foreach ($ageOptions as $ageOption) {
+                          echo '<option value="' . $ageOption['age_score'] . '">' . $ageOption['age_name'] . '</option>';
+                      }
+                    ?>
+                </select>
+              <br>
+              <br>
                 <label for="casing_lap">Casing<span style="color: crimson;">*</span></label>
                 <select id="casing_lap" name="casing_lap" style="height: 50px;">
                   <option value="">--- Pilih ---</option>
@@ -644,7 +656,7 @@ foreach ($users as $user) {
         var selectedDevice = this.value;
         var elementsToSubmit = getElementsToSubmit(selectedDevice);
 
-        var allElements = ['informasi_keluhan', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'];
+        var allElements = ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'];
 
         allElements.forEach(function(elementId) {
             var element = document.getElementById(elementId);
@@ -658,7 +670,7 @@ foreach ($users as $user) {
 
     function getElementsToSubmit(jenisPerangkat) {
         var relevantElements = {
-            'Laptop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
+            'Laptop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
             'PC Desktop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
             'Monitor': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
             'Printer': ['informasi_keluhan', 'casing_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file']
