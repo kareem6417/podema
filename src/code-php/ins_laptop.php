@@ -342,7 +342,7 @@ foreach ($users as $user) {
       <div class="container-fluid">
         <div class="card">
           <h1 class="card-title fw-semibold mb-4">Device Inspection</h1>
-          <form id="assessmentForm" method="post" action="submit_laptop.php" class="content" enctype="multipart/form-data">
+          <form id="assessmentForm" method="post" action="submit_ins_laptop.php" class="content" enctype="multipart/form-data">
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
