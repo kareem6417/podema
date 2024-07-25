@@ -117,26 +117,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/screenshot/";
+    // $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/screenshot/";
 
-    // Loop melalui setiap file screenshot yang diunggah
-    foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
-        $file_name = $_FILES['screenshot_file']['name'][$key];
-        $file_size = $_FILES['screenshot_file']['size'][$key];
-        $file_tmp = $_FILES['screenshot_file']['tmp_name'][$key];
-        $file_type = $_FILES['screenshot_file']['type'][$key];
+    // // Loop melalui setiap file screenshot yang diunggah
+    // foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
+    //     $file_name = $_FILES['screenshot_file']['name'][$key];
+    //     $file_size = $_FILES['screenshot_file']['size'][$key];
+    //     $file_tmp = $_FILES['screenshot_file']['tmp_name'][$key];
+    //     $file_type = $_FILES['screenshot_file']['type'][$key];
 
-        $target_screenshot_file = $target_screenshot_dir . $file_name;
+    //     $target_screenshot_file = $target_screenshot_dir . $file_name;
 
-        // Pindahkan file dari lokasi sementara ke direktori tujuan
-        if (move_uploaded_file($file_tmp, $target_screenshot_file)) {
-            echo "File screenshot berhasil diunggah.";
-        } else {
-            $error_message = "Terjadi kesalahan saat mengunggah file screenshot.";
-            echo $error_message;
-            error_log($error_message, 0); // Menyimpan pesan error ke file log
-        }
-    }
+    //     // Pindahkan file dari lokasi sementara ke direktori tujuan
+    //     if (move_uploaded_file($file_tmp, $target_screenshot_file)) {
+    //         echo "File screenshot berhasil diunggah.";
+    //     } else {
+    //         $error_message = "Terjadi kesalahan saat mengunggah file screenshot.";
+    //         echo $error_message;
+    //         error_log($error_message, 0); // Menyimpan pesan error ke file log
+    //     }
+    // }
 
     if ($sql != '') {
         if ($conn->query($sql) === TRUE) {
