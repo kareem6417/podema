@@ -353,7 +353,7 @@ $pdf->Cell(95, 10, '', 0, 1, 'C');
 $current_user_id = $row['user_id']; 
 
 // Query untuk mendapatkan nama pengguna dari ID
-$user_query = $conn->prepare("SELECT name FROM users WHERE user_id = ?");
+$user_query = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
 $user_query->bind_param("i", $current_user_id);
 $user_query->execute();
 $user_result = $user_query->get_result();
