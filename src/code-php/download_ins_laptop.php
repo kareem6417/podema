@@ -367,26 +367,13 @@ if ($user_result && $user_result->num_rows > 0) {
 
 $user_query->close();
 
-// Pastikan nama pengguna dari form_inspeksi diambil dengan benar
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(15);
-
-// Menampilkan nama pengguna yang melakukan inspeksi
-$pdf->Cell(85, 10, 'Diperiksa Oleh:', 0, 0, 'L'); 
-$pdf->Cell(0, 10, $inspected_by, 0, 1, 'R'); 
-
-// Menambahkan garis di atas nama
-$pdf->Line(15, $pdf->GetY() - 4, $pdf->GetPageWidth() - 15, $pdf->GetY() - 4);
-
-// Menampilkan nama pengguna dari form_inspeksi
-$pdf->SetX(15);
-$pdf->Cell(85, 10, 'Nama Pengguna:', 0, 0, 'L'); 
-$pdf->Cell(0, 10, $user_name, 0, 1, 'R');
-
-// Menambahkan garis di atas nama
-$pdf->Line(15, $pdf->GetY() - 4, $pdf->GetPageWidth() - 15, $pdf->GetY() - 4);
-
-// Menampilkan halaman terakhir dengan format yang sesuai
+$pdf->Cell(47.5, 10, $inspected_by, 'T', 0, 'L');
+$pdf->Cell(5, 10, '', 0, 0, 'C'); 
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetX(95);
+$pdf->Cell(47.5, 10, $user_name, 'T', 1, 'C');
 $pdf->AliasNbPages();
 
 $filename = "Inspection-Devices.pdf";
