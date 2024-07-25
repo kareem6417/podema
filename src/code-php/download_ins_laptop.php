@@ -224,7 +224,7 @@ $pdf->SetFont('helvetica', 'B', 11);
 $pdf->Cell($cellWidth * 2, 10, 'Lokasi/Area Penggunaan:', 1, 0, 'L', false);
 $pdf->SetFont('helvetica', '', 11);
 $pdf->Cell($cellWidth * 2, 10, $row['lokasi'], 1, 1, 'L', false);
-$pdf->Ln(10);
+$pdf->Ln(5);
 
 // Informasi Keluhan
 $complaints = explode("\n", $row['informasi_keluhan']);
