@@ -8,37 +8,35 @@ $pass = "Jam10pagi#";
 $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 
-$query = $conn->prepare("SELECT * FROM form_inspeksi WHERE no = (SELECT MAX(no) FROM form_inspeksi)");
-                    //         s.screenshot_name, 
-                    //         a.age_name, a.age_score,
-                    //         cl.casing_lap_name, cl.casing_lap_score,
-                    //         ip.layar_lap_name, ip.layar_lap_score,
-                    //         el.engsel_lap_name, el.engsel_lap_score,
-                    //         kl.keyboard_lap_name, kl.keyboard_lap_score,
-                    //         tl1.touchpad_lap_name, tl1.touchpad_lap_score,
-                    //         bl.booting_lap_name, bl.booting_lap_score,
-                    //         ml.multi_lap_name, ml.multi_lap_score,
-                    //         tl2.tampung_lap_name, tl2.tampung_lap_score,
-                    //         il.isi_lap_name, il.isi_lap_score,
-                    //         pl.port_lap_name, pl.port_lap_score,
-                    //         al.audio_lap_name, al.audio_lap_score,
-                    //         sl.software_lap_name, sl.software_lap_score
-                    // FROM form_inspeksi fi 
-                    // JOIN screenshots s ON fi.no = s.form_no
-                    // JOIN device_age_laptop a ON fi.age = a.age_score
-                    // JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_score
-                    // JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_score
-                    // JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_score
-                    // JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_score
-                    // JOIN ins_touchpad_lap tl1 ON fi.touchpad_lap = tl1.touchpad_lap_score
-                    // JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_score
-                    // JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_score
-                    // JOIN ins_tampung_lap tl2 ON fi.tampung_lap = tl2.tampung_lap_score
-                    // JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_score
-                    // JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_score
-                    // JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_score
-                    // JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_score
-                    // WHERE fi.no = (SELECT MAX(no) FROM form_inspeksi)");
+$query = $conn->prepare("SELECT fi.*, 
+                            a.age_name, a.age_score,
+                            cl.casing_lap_name, cl.casing_lap_score,
+                            ip.layar_lap_name, ip.layar_lap_score,
+                            el.engsel_lap_name, el.engsel_lap_score,
+                            kl.keyboard_lap_name, kl.keyboard_lap_score,
+                            tl1.touchpad_lap_name, tl1.touchpad_lap_score,
+                            bl.booting_lap_name, bl.booting_lap_score,
+                            ml.multi_lap_name, ml.multi_lap_score,
+                            tl2.tampung_lap_name, tl2.tampung_lap_score,
+                            il.isi_lap_name, il.isi_lap_score,
+                            pl.port_lap_name, pl.port_lap_score,
+                            al.audio_lap_name, al.audio_lap_score,
+                            sl.software_lap_name, sl.software_lap_score
+                    FROM form_inspeksi fi 
+                    JOIN device_age_laptop a ON fi.age = a.age_score
+                    JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_score
+                    JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_score
+                    JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_score
+                    JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_score
+                    JOIN ins_touchpad_lap tl1 ON fi.touchpad_lap = tl1.touchpad_lap_score
+                    JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_score
+                    JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_score
+                    JOIN ins_tampung_lap tl2 ON fi.tampung_lap = tl2.tampung_lap_score
+                    JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_score
+                    JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_score
+                    JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_score
+                    JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_score
+                    WHERE fi.no = (SELECT MAX(no) FROM form_inspeksi)");
 
 if (!$query) {
     die("Error in query preparation: " . $conn->error);
