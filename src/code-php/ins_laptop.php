@@ -557,12 +557,10 @@ foreach ($users as $user) {
                     ?>
                 </select>
                 <br>
-                <br>
               </div>
               <div class="form-group">
                 <label for="hasil_pemeriksaan">Hasil Pemeriksaan Lainnya:<span style="color: crimson;">*</span></label>
                 <textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" style="height: 75px; width: 100%;"></textarea>
-                <br>
                 <br>
                 <!-- <label for="screenshot">Screenshot:<span style="color: crimson;">*</span></label>
                   <div id="screenshot" style="max-width: 100%; margin: 0;">
