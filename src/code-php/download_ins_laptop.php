@@ -233,7 +233,7 @@ $pdf->Cell(0, 10, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L')
 $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 10, $complaint, 'B');
+    $pdf->Cell(0, 5, $complaint, 'B');
     $pdf->Ln();
 }
 
