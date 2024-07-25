@@ -224,7 +224,7 @@ $pdf->SetFont('helvetica', 'B', 11);
 $pdf->Cell($cellWidth * 2, 10, 'Lokasi/Area Penggunaan:', 1, 0, 'L', false);
 $pdf->SetFont('helvetica', '', 11);
 $pdf->Cell($cellWidth * 2, 10, $row['lokasi'], 1, 1, 'L', false);
-$pdf->Ln(5);
+$pdf->Ln(3);
 
 // Informasi Keluhan
 $complaints = explode("\n", $row['informasi_keluhan']);
@@ -233,7 +233,7 @@ $pdf->Cell(0, 10, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L')
 $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 5, $complaint, 'B');
+    $pdf->Cell(0, 7, $complaint, 'B');
     $pdf->Ln();
 }
 
@@ -245,11 +245,11 @@ $pdf->Cell(0, 5, 'Hasil Pemeriksaan:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 10, $complaint, 'B');
+    $pdf->Cell(0, 7, $complaint, 'B');
     $pdf->Ln();
 }
 
-$pdf->Ln(3);
+$pdf->Ln(5);
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetFillColor(173, 216, 230);
