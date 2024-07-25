@@ -350,22 +350,24 @@ $pdf->Cell(95, 10, '', 0, 0, 'C');
 $pdf->Cell(5, 10, '', 0, 0, 'C'); 
 $pdf->Cell(95, 10, '', 0, 1, 'C');
 
-$current_user_id = $row['user_id']; // Asumsi ada kolom 'user_id' di tabel 'form_inspeksi' yang menyimpan ID pengguna yang melakukan inspeksi
+$current_user_id = $row['user_id']; 
 
 // Query untuk mendapatkan nama pengguna dari ID
-$user_query = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
+$user_query = $conn->prepare("SELECT name FROM users WHERE user_id = ?");
 $user_query->bind_param("i", $current_user_id);
 $user_query->execute();
 $user_result = $user_query->get_result();
 
 if ($user_result && $user_result->num_rows > 0) {
     $user_row = $user_result->fetch_assoc();
-    $inspected_by = $user_row['username']; // Nama pengguna yang melakukan inspeksi
+    $inspected_by = $user_row['name']; // Nama pengguna yang melakukan inspeksi
 } else {
-    $inspected_by = 'N/A'; // Jika tidak ditemukan, beri nilai default
+    $inspected_by = 'ITE Division'; // Jika tidak ditemukan, beri nilai default
 }
 
 $user_query->close();
+
+$user_name = $row['name']; 
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(15);
