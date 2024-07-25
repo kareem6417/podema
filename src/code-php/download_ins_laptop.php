@@ -158,114 +158,32 @@ class MYPDF extends FPDF {
     
     function resizeAndInsertImage($imagePath) {
         list($width, $height) = getimagesize($imagePath);
-        $maxWidth = 184; // Maximum width for the image
-        $maxHeight = 120; // Maximum height for the image
-
-        $ratio = min($maxWidth / $width, $maxHeight / $height);
-        $newWidth = $width * $ratio;
-        $newHeight = $height * $ratio;
-
-        $this->Image($imagePath, 13, null, $newWidth, $newHeight);
-        $this->Ln(10); // Add some space after each image
-    }
+        $maxWidth = 184; // Mengurangi lebar gambar
+        $maxHeight = 152; // Mengurangi tinggi gambar
+        $ratio = $width / $height;
     
-    var $widths;
-    var $aligns;
-
-    function SetWidths($w) {
-        $this->widths=$w;
-    }
-
-    function SetAligns($a) {
-        $this->aligns=$a;
-    }
-
-    function Row($data) {
-        $nb=0;
-        for($i=0;$i<count($data);$i++)
-            $nb=max($nb,$this->NbLines($this->widths[$i],$data[$i]));
-        $h=5*$nb;
-        $this->CheckPageBreak($h);
-        for($i=0;$i<count($data);$i++)
-        {
-            $w=$this->widths[$i];
-            $a=isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
-            $x=$this->GetX();
-            $y=$this->GetY();
-            $this->Rect($x,$y,$w,$h);
-            $this->MultiCell($w,5,$data[$i],0,$a);
-            $this->SetXY($x+$w,$y);
+        if ($width > $height) {
+            $newWidth = $maxWidth;
+            $newHeight = $maxWidth / $ratio;
+        } else {
+            $newHeight = $maxHeight;
+            $newWidth = $maxHeight * $ratio;
         }
-        $this->Ln($h);
+    
+        $this->Image($imagePath, 10, null, $newWidth, $newHeight);
     }
 
-    function CheckPageBreak($h) {
-        if($this->GetY()+$h>$this->PageBreakTrigger)
-            $this->AddPage($this->CurOrientation);
-    }
-
-    function NbLines($w, $txt) {
-        $cw=&$this->CurrentFont['cw'];
-        if($w==0)
-            $w=$this->w-$this->rMargin-$this->x;
-        $wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
-        $s=str_replace("\r",'',$txt);
-        $nb=strlen($s);
-        if($nb>0 && $s[$nb-1]=="\n")
-            $nb--;
-        $sep=-1;
-        $i=0;
-        $j=0;
-        $l=0;
-        $nl=1;
-        while($i<$nb)
-        {
-            $c=$s[$i];
-            if($c=="\n")
-            {
-                $i++;
-                $sep=-1;
-                $j=$i;
-                $l=0;
-                $nl++;
-                continue;
-            }
-            if($c==' ')
-                $sep=$i;
-            $l+=$cw[$c];
-            if($l>$wmax)
-            {
-                if($sep==-1)
-                {
-                    if($i==$j)
-                        $i++;
-                }
-                else
-                    $i=$sep+1;
-                $sep=-1;
-                $j=$i;
-                $l=0;
-                $nl++;
-            }
-            else
-                $i++;
-        }
-        return $nl;
-    }
-
-    var $columnWidths = [10, 150, 20]; // Set the column widths
+    private $columnWidths = array(30, 140, 20);
 
     function addTableRow($item, $detail, $skor) {
         $fill = $this->RowNeedsFill();
         $this->Cell($this->columnWidths[0], 10, $item, 1, 0, 'C', $fill);
-        $this->MultiCell($this->columnWidths[1], 10, $detail, 1, 'C', $fill);
+        $this->Cell($this->columnWidths[1], 10, $detail, 1, 0, 'C', $fill);
         $this->Cell($this->columnWidths[2], 10, $skor, 1, 1, 'C', $fill);
     }
 
     function RowNeedsFill() {
-        static $fill = false;
-        $fill = !$fill;
-        return $fill;
+        return $this->GetY() % 20 === 0;
     }
 }
 
@@ -273,30 +191,176 @@ $pdf = new MYPDF($screenshot_files, $nomorInspeksi);
 $pdf->AliasNbPages();
 $pdf->AddPage();
 
-$pdf->SetWidths(array(10, 150, 20));
-$pdf->SetFont('Arial','',8);
-$pdf->SetFillColor(200,220,255);
+$pageWidth = $pdf->GetPageWidth();
+$cellWidth = $pageWidth / 4;
+$maxTableWidth = $pageWidth * 0.90; 
+$cellWidth = $maxTableWidth / 4; 
+$pdf->SetLineWidth(0); 
 
-$headers = array('No', 'Deskripsi', 'Skor');
-$widths = array(10, 150, 20);
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->Cell($cellWidth, 10, 'Tanggal:', 1, 0, 'L', false);
+$pdf->SetFont('helvetica', '', 11);
+$pdf->Cell($cellWidth, 10, $row['date'], 1, 0, 'L', false);
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->Cell($cellWidth, 10, 'Nama pengguna:', 1, 0, 'L', false);
+$pdf->SetFont('helvetica', '', 11);
+$pdf->Cell($cellWidth, 10, $row['nama_user'], 1, 1, 'L', false); 
 
-$pdf->Row($headers);
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->Cell($cellWidth, 10, 'Tipe Perangkat:', 1, 0, 'L', false); 
+$pdf->SetFont('helvetica', '', 11);
+$pdf->Cell($cellWidth, 10, $row['jenis'], 1, 0, 'L', false);
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->Cell($cellWidth, 10, 'Divisi:', 1, 0, 'L', false); 
+$pdf->SetFont('helvetica', '', 11);
+$pdf->Cell($cellWidth, 10, $row['status'], 1, 1, 'L', false); 
 
-$pdf->addTableRow('1', $row['age_name'], $row['age_score']);
-$pdf->addTableRow('2', $row['casing_lap_name'], $row['casing_lap_score']);
-$pdf->addTableRow('3', $row['layar_lap_name'], $row['layar_lap_score']);
-$pdf->addTableRow('4', $row['engsel_lap_name'], $row['engsel_lap_score']);
-$pdf->addTableRow('5', $row['keyboard_lap_name'], $row['keyboard_lap_score']);
-$pdf->addTableRow('6', $row['touchpad_lap_name'], $row['touchpad_lap_score']);
-$pdf->addTableRow('7', $row['booting_lap_name'], $row['booting_lap_score']);
-$pdf->addTableRow('8', $row['multi_lap_name'], $row['multi_lap_score']);
-$pdf->addTableRow('9', $row['tampung_lap_name'], $row['tampung_lap_score']);
-$pdf->addTableRow('10', $row['isi_lap_name'], $row['isi_lap_score']);
-$pdf->addTableRow('11', $row['port_lap_name'], $row['port_lap_score']);
-$pdf->addTableRow('12', $row['audio_lap_name'], $row['audio_lap_score']);
-$pdf->addTableRow('13', $row['software_lap_name'], $row['software_lap_score']);
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->Cell($cellWidth * 2, 10, 'Merk/Nomor Serial:', 1, 0, 'L', false);
+$pdf->SetFont('helvetica', '', 11);
+$pdf->Cell($cellWidth * 2, 10, $row['merk'] . ' / ' . $row['serialnumber'], 1, 1, 'L', false); 
 
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->Cell($cellWidth * 2, 10, 'Lokasi/Area Penggunaan:', 1, 0, 'L', false);
+$pdf->SetFont('helvetica', '', 11);
+$pdf->Cell($cellWidth * 2, 10, $row['lokasi'], 1, 1, 'L', false);
+$pdf->Ln(10);
+
+// Informasi Keluhan
+$complaints = explode("\n", $row['informasi_keluhan']);
+$pdf->SetFont('Arial', 'B', 11);
+$pdf->Cell(0, 10, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L');
+$pdf->SetFont('Arial', '', 11);
+
+foreach ($complaints as $complaint) {
+    $pdf->Cell(0, 10, $complaint, 'B');
+    $pdf->Ln();
+}
+
+// Hasil Pemeriksaan
+$pdf->Ln(5);
+$complaints = explode("\n", $row['hasil_pemeriksaan']);
+$pdf->SetFont('Arial', 'B', 11);
+$pdf->Cell(0, 10, 'Hasil Pemeriksaan:', 0, 1, 'L');
+$pdf->SetFont('Arial', '', 11);
+
+foreach ($complaints as $complaint) {
+    $pdf->Cell(0, 10, $complaint, 'B');
+    $pdf->Ln();
+}
+
+$pdf->Ln(5);
+
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetFillColor(173, 216, 230);
+$pdf->addTableRow('Item', 'Detail', 'Skor');
+
+$pdf->SetFont('helvetica', '', 9);
+
+$pdf->addTableRow('Usia Perangkat', $row['age_name'], $row['age_score']);
+$pdf->addTableRow('Casing', $row['casing_lap_name'], $row['casing_lap_score']);
+$pdf->addTableRow('Layar', $row['layar_lap_name'], $row['layar_lap_score']);
+$pdf->addTableRow('Engsel', $row['engsel_lap_name'], $row['engsel_lap_score']);
+$pdf->addTableRow('Keyboard', $row['keyboard_lap_name'], $row['keyboard_lap_score']);
+$pdf->addTableRow('Touchpad', $row['touchpad_lap_name'], $row['touchpad_lap_score']);
+$pdf->addTableRow('Proses Booting', $row['booting_lap_name'], $row['booting_lap_score']);
+$pdf->addTableRow('Multitasking Apps', $row['multi_lap_name'], $row['multi_lap_score']);
+$pdf->addTableRow('Kapasitas Baterai', $row['tampung_lap_name'], $row['tampung_lap_score']);
+$pdf->addTableRow('Waktu Pengisian Baterai', $row['isi_lap_name'], $row['isi_lap_score']);
+$pdf->addTableRow('Port', $row['port_lap_name'], $row['port_lap_score']);
+$pdf->addTableRow('Audio', $row['audio_lap_name'], $row['audio_lap_score']);
+$pdf->addTableRow('Software', $row['software_lap_name'], $row['software_lap_score']);
+
+$totalScore = $row['age_score'] + $row['casing_lap_score'] + $row['layar_lap_score'] + $row['engsel_lap_score'] +$row['keyboard_lap_score'] + $row['touchpad_lap_score'] + $row['booting_lap_score'] + $row['multi_lap_score'] + $row['tampung_lap_score'] + $row['isi_lap_score'] + $row['port_lap_score'] + $row['audio_lap_score'] + $row['software_lap_score'];
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->addTableRow('Total Skor', '', $totalScore);
+
+// Rekomendasi
+$pdf->Ln(5);
+$complaints = explode("\n", $row['rekomendasi']);
+$pdf->SetFont('Arial', 'B', 11);
+$pdf->Cell(0, 10, 'Rekomendasi:', 0, 1, 'L');
+$pdf->SetFont('Arial', '', 11);
+
+foreach ($complaints as $complaint) {
+    $pdf->Cell(0, 10, $complaint, 'B');
+    $pdf->Ln();
+}
+
+$pdf->Ln(5);
 $pdf->AddScreenshots($target_screenshot_dir, $row['no']);
 
-$pdf->Output();
+$current_inspection_id = $row['no'];
+$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
+
+// Mendapatkan daftar file screenshot terbaru di direktori
+$latest_screenshot = null;
+$latest_timestamp = 0;
+
+if ($handle = opendir($target_screenshot_dir)) {
+    while (false !== ($entry = readdir($handle))) {
+        if ($entry != "." && $entry != "..") {
+            $screenshot_path = $target_screenshot_dir . $entry;
+            $timestamp = filemtime($screenshot_path);
+
+            if ($timestamp > $latest_timestamp) {
+                $latest_timestamp = $timestamp;
+                $latest_screenshot = $entry;
+            }
+        }
+    }
+    closedir($handle);
+}
+
+if ($latest_screenshot !== null && !in_array($latest_screenshot, $screenshot_files)) {
+    $screenshot_path = $target_screenshot_dir . $latest_screenshot;
+    list($width, $height) = getimagesize($screenshot_path);
+    $maxWidth = 84; // Mengurangi lebar gambar
+    $maxHeight = 52; // Mengurangi tinggi gambar
+    $ratio = $width / $height;
+
+    if ($width > $height) {
+        $newWidth = $maxWidth;
+        $newHeight = $maxWidth / $ratio;
+    } else {
+        $newHeight = $maxHeight;
+        $newWidth = $maxHeight * $ratio;
+    }
+
+    $pdf->Image($screenshot_path, 10, null, $newWidth, $newHeight);
+    $screenshot_files[] = $latest_screenshot;
+}
+
+$pdf->Ln(10);
+$pdf->SetFont('helvetica', 'B', 10);
+$location = '    Jakarta,'; 
+$currentDate = date('d F Y'); 
+$locationWidth = $pdf->GetStringWidth($location);
+$dateWidth = $pdf->GetStringWidth($currentDate);
+$totalWidth = $locationWidth + $dateWidth + 5; 
+
+$pdf->SetX(10); 
+$pdf->Cell($locationWidth, 5, $location, 0, 0, 'L'); 
+$pdf->Cell(1, 1, '', 0, 0, 'C'); 
+$pdf->Cell($dateWidth, 5, $currentDate, 0, 1, 'L'); 
+
+$pdf->Ln(15); 
+
+$pdf->Cell(95, 10, '', 0, 0, 'C');
+$pdf->Cell(5, 10, '', 0, 0, 'C'); 
+$pdf->Cell(95, 10, '', 0, 1, 'C');
+
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetX(15);
+$pdf->Cell(47.5, 10, 'Diperiksa Oleh', 'T', 0, 'L');
+$pdf->Cell(5, 10, '', 0, 0, 'C'); 
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetX(95);
+$pdf->Cell(47.5, 10, 'Nama Pengguna', 'T', 1, 'C');
+$pdf->AliasNbPages();
+
+$filename = "Inspection-Devices.pdf";
+$pdf->Output($filename, 'D');
+echo '<a href="Inspection-Devices.pdf">Download</a>';
+exit;
 ?>
