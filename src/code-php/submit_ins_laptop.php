@@ -91,31 +91,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$casing_lap', '$ink_pad', '$score')";
     }   
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload Inspeksi";
+    // if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //     $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload Inspeksi";
     
-        // Upload file lainnya
-        $file = $_FILES['upload_file']['name'];
-        $path = pathinfo($file);
-        $filename = $path['filename'];
-        $ext = $path['extension'];
-        $temp_name = $_FILES['upload_file']['tmp_name'];
-        $path_filename_ext = $target_dir . $filename . '.' . $ext;
+    //     // Upload file lainnya
+    //     $file = $_FILES['upload_file']['name'];
+    //     $path = pathinfo($file);
+    //     $filename = $path['filename'];
+    //     $ext = $path['extension'];
+    //     $temp_name = $_FILES['upload_file']['tmp_name'];
+    //     $path_filename_ext = $target_dir . $filename . '.' . $ext;
     
-        if (file_exists($path_filename_ext)) {
-            $error_message = "Maaf, file sudah ada.";
-            echo $error_message;
-            error_log($error_message, 0);
-        } else {
-            if (move_uploaded_file($temp_name, $path_filename_ext)) {
-                echo "File Anda berhasil diunggah.";
-            } else {
-                $error_message = "Terjadi kesalahan saat mengunggah file.";
-                echo $error_message;
-                error_log($error_message, 0);
-            }
-        }
-    }
+    //     if (file_exists($path_filename_ext)) {
+    //         $error_message = "Maaf, file sudah ada.";
+    //         echo $error_message;
+    //         error_log($error_message, 0);
+    //     } else {
+    //         if (move_uploaded_file($temp_name, $path_filename_ext)) {
+    //             echo "File Anda berhasil diunggah.";
+    //         } else {
+    //             $error_message = "Terjadi kesalahan saat mengunggah file.";
+    //             echo $error_message;
+    //             error_log($error_message, 0);
+    //         }
+    //     }
+    // }
 
     // $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/screenshot/";
 

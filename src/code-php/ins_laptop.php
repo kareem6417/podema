@@ -585,11 +585,11 @@ foreach ($users as $user) {
                   <label for="rekomendasi">Rekomendasi:<span style="color: crimson;">*</span></label>
                   <textarea id="rekomendasi" name="rekomendasi" style="height: 75px; width: 100%;"></textarea>
                   <br>
-                  <br>
+                  <!-- <br>
                   <label for="upload_file" style="margin-bottom: 10px;">Upload File<span style="color: crimson;">*</span></label>
                   <input type="file" id="upload_file" name="upload_file" class="form-control" accept=".zip, .rar" required>
                   <small>*Note: <br> Sebagai bahan verifikasi mohon upload file berformat .zip atau .rar dari hasil Belarc, <br>dan file tidak lebih dari 100 KB</small>
-                  <br>
+                  <br> -->
 
               </div>
               <div class="btn-group">
