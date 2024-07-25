@@ -229,7 +229,7 @@ $pdf->Ln(3);
 // Informasi Keluhan
 $complaints = explode("\n", $row['informasi_keluhan']);
 $pdf->SetFont('Arial', 'B', 11);
-$pdf->Cell(0, 10, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L');
+$pdf->Cell(0, 7, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
@@ -241,7 +241,7 @@ foreach ($complaints as $complaint) {
 $pdf->Ln(5);
 $complaints = explode("\n", $row['hasil_pemeriksaan']);
 $pdf->SetFont('Arial', 'B', 11);
-$pdf->Cell(0, 5, 'Hasil Pemeriksaan:', 0, 1, 'L');
+$pdf->Cell(0, 7, 'Hasil Pemeriksaan:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
@@ -279,11 +279,11 @@ $pdf->addTableRow('Total Skor', '', $totalScore);
 $pdf->Ln(5);
 $complaints = explode("\n", $row['rekomendasi']);
 $pdf->SetFont('Arial', 'B', 11);
-$pdf->Cell(0, 10, 'Rekomendasi:', 0, 1, 'L');
+$pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 10, $complaint, 'B');
+    $pdf->Cell(0, 7, $complaint, 'B');
     $pdf->Ln();
 }
 
