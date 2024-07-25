@@ -241,7 +241,7 @@ foreach ($complaints as $complaint) {
 $pdf->Ln(5);
 $complaints = explode("\n", $row['hasil_pemeriksaan']);
 $pdf->SetFont('Arial', 'B', 11);
-$pdf->Cell(0, 10, 'Hasil Pemeriksaan:', 0, 1, 'L');
+$pdf->Cell(0, 5, 'Hasil Pemeriksaan:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
@@ -249,7 +249,7 @@ foreach ($complaints as $complaint) {
     $pdf->Ln();
 }
 
-$pdf->Ln(5);
+$pdf->Ln(3);
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetFillColor(173, 216, 230);
