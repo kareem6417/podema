@@ -360,7 +360,7 @@ $user_result = $user_query->get_result();
 
 if ($user_result && $user_result->num_rows > 0) {
     $user_row = $user_result->fetch_assoc();
-    $inspected_by = $user_row['name']; // Nama pengguna yang melakukan inspeksi
+    $inspected_by = $user_row['username']; // Perbaiki di sini
 } else {
     $inspected_by = 'ITE Division'; // Jika tidak ditemukan, beri nilai default
 }
@@ -372,8 +372,7 @@ $user_name = $row['name'];
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(15);
 $pdf->Cell(47.5, 10, $inspected_by, 'T', 0, 'L');
-$pdf->Cell(5, 10, '', 0, 0, 'C'); 
-$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(5, 10, '', 0, 0, 'C');
 $pdf->SetX(95);
 $pdf->Cell(47.5, 10, $user_name, 'T', 1, 'C');
 $pdf->AliasNbPages();
