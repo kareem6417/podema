@@ -352,11 +352,11 @@ $pdf->Cell(95, 10, '', 0, 1, 'C');
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(15);
-$pdf->Cell(47.5, 10, 'ITE Division', 'T', 0, 'L');
+$pdf->Cell(47.5, 7, 'ITE Division', 'T', 0, 'L');
 $pdf->Cell(5, 10, '', 0, 0, 'C'); 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(95);
-$pdf->Cell(47.5, 10, $row['nama_user'], 'T', 1, 'C');
+$pdf->Cell(47.5, 7, $row['nama_user'], 'T', 1, 'L');
 $pdf->AliasNbPages();
 
 $filename = "Inspection-Devices.pdf";
