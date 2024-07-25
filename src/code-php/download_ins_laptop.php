@@ -178,7 +178,7 @@ class MYPDF extends FPDF {
     function addTableRow($item, $detail, $skor) {
         $fill = $this->RowNeedsFill();
         $this->Cell($this->columnWidths[0], 10, $item, 1, 0, 'C', $fill);
-        $this->Cell($this->columnWidths[1], 10, $detail, 1, 0, 'C', $fill);
+        $this->MultiCell($this->columnWidths[1], 10, $detail, 1, 'C', $fill);
         $this->Cell($this->columnWidths[2], 10, $skor, 1, 1, 'C', $fill);
     }
 
