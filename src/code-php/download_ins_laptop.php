@@ -224,7 +224,7 @@ $pdf->SetFont('helvetica', 'B', 11);
 $pdf->Cell($cellWidth * 2, 10, 'Lokasi/Area Penggunaan:', 1, 0, 'L', false);
 $pdf->SetFont('helvetica', '', 11);
 $pdf->Cell($cellWidth * 2, 10, $row['lokasi'], 1, 1, 'L', false);
-$pdf->Ln(2);
+$pdf->Ln(5);
 
 // Informasi Keluhan
 $complaints = explode("\n", $row['informasi_keluhan']);
@@ -234,11 +234,11 @@ $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
     $pdf->Cell(0, 10, $complaint, 'B');
-    $pdf->Ln(2);
+    $pdf->Ln();
 }
 
 // Hasil Pemeriksaan
-$pdf->Ln(2);
+$pdf->Ln(5);
 $complaints = explode("\n", $row['hasil_pemeriksaan']);
 $pdf->SetFont('Arial', 'B', 11);
 $pdf->Cell(0, 10, 'Hasil Pemeriksaan:', 0, 1, 'L');
@@ -246,10 +246,10 @@ $pdf->SetFont('Arial', '', 11);
 
 foreach ($complaints as $complaint) {
     $pdf->Cell(0, 10, $complaint, 'B');
-    $pdf->Ln(2);
+    $pdf->Ln();
 }
 
-$pdf->Ln(4);
+$pdf->Ln(5);
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetFillColor(173, 216, 230);
@@ -276,7 +276,7 @@ $pdf->SetFont('helvetica', 'B', 11);
 $pdf->addTableRow('Total Skor', '', $totalScore);
 
 // Rekomendasi
-$pdf->Ln(1);
+$pdf->Ln(5);
 $complaints = explode("\n", $row['rekomendasi']);
 $pdf->SetFont('Arial', 'B', 11);
 $pdf->Cell(0, 10, 'Rekomendasi:', 0, 1, 'L');
