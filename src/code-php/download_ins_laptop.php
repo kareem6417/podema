@@ -178,7 +178,7 @@ class MYPDF extends FPDF {
     function addTableRow($item, $detail, $skor) {
         $fill = $this->RowNeedsFill();
         $this->Cell($this->columnWidths[0], 10, $item, 1, 0, 'C', $fill);
-        $this->MultiCell($this->columnWidths[1], 10, $detail, 1, 'C', $fill);
+        $this->Cell($this->columnWidths[1], 10, $detail, 1, 0, 'C', $fill);
         $this->Cell($this->columnWidths[2], 10, $skor, 1, 1, 'C', $fill);
     }
 
@@ -266,7 +266,7 @@ $pdf->addTableRow('Touchpad', $row['touchpad_lap_name'], $row['touchpad_lap_scor
 $pdf->addTableRow('Proses Booting', $row['booting_lap_name'], $row['booting_lap_score']);
 $pdf->addTableRow('Multitasking Apps', $row['multi_lap_name'], $row['multi_lap_score']);
 $pdf->addTableRow('Kapasitas Baterai', $row['tampung_lap_name'], $row['tampung_lap_score']);
-$pdf->addTableRow('Waktu Pengisian Baterai', $row['isi_lap_name'], $row['isi_lap_score']);
+$pdf->addTableRow('Waktu Charging', $row['isi_lap_name'], $row['isi_lap_score']);
 $pdf->addTableRow('Port', $row['port_lap_name'], $row['port_lap_score']);
 $pdf->addTableRow('Audio', $row['audio_lap_name'], $row['audio_lap_score']);
 $pdf->addTableRow('Software', $row['software_lap_name'], $row['software_lap_score']);
