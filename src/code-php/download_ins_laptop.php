@@ -130,48 +130,48 @@ class MYPDF extends FPDF {
         $this->Cell(0,10,''.$this->PageNo().'/{nb}',0,0,'C');
     }
     
-    function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
-        $screenshotTitleShown = false; 
-        $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
-        $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
-        $query->bind_param("i", $current_inspection_id);
-        $query->execute();
-        $result = $query->get_result();
+    // function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
+    //     $screenshotTitleShown = false; 
+    //     $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
+    //     $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
+    //     $query->bind_param("i", $current_inspection_id);
+    //     $query->execute();
+    //     $result = $query->get_result();
     
-        if ($result) {
-            while ($row = $result->fetch_assoc()) {
-                $screenshot = $row['screenshot_name'];
-                $screenshot_path = $target_screenshot_dir . $screenshot;
+    //     if ($result) {
+    //         while ($row = $result->fetch_assoc()) {
+    //             $screenshot = $row['screenshot_name'];
+    //             $screenshot_path = $target_screenshot_dir . $screenshot;
     
-                if (!$screenshotTitleShown) { 
-                    $this->SetFont('helvetica', 'B', 11);
-                    $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
-                    $this->Ln(5);
-                    $screenshotTitleShown = true;
-                }
-                $this->resizeAndInsertImage($screenshot_path);
-            }
-        }
-        $query->close();
-        $conn->close();
-    }     
+    //             if (!$screenshotTitleShown) { 
+    //                 $this->SetFont('helvetica', 'B', 11);
+    //                 $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
+    //                 $this->Ln(5);
+    //                 $screenshotTitleShown = true;
+    //             }
+    //             $this->resizeAndInsertImage($screenshot_path);
+    //         }
+    //     }
+    //     $query->close();
+    //     $conn->close();
+    // }     
     
-    function resizeAndInsertImage($imagePath) {
-        list($width, $height) = getimagesize($imagePath);
-        $maxWidth = 184; // Mengurangi lebar gambar
-        $maxHeight = 152; // Mengurangi tinggi gambar
-        $ratio = $width / $height;
+    // function resizeAndInsertImage($imagePath) {
+    //     list($width, $height) = getimagesize($imagePath);
+    //     $maxWidth = 184; // Mengurangi lebar gambar
+    //     $maxHeight = 152; // Mengurangi tinggi gambar
+    //     $ratio = $width / $height;
     
-        if ($width > $height) {
-            $newWidth = $maxWidth;
-            $newHeight = $maxWidth / $ratio;
-        } else {
-            $newHeight = $maxHeight;
-            $newWidth = $maxHeight * $ratio;
-        }
+    //     if ($width > $height) {
+    //         $newWidth = $maxWidth;
+    //         $newHeight = $maxWidth / $ratio;
+    //     } else {
+    //         $newHeight = $maxHeight;
+    //         $newWidth = $maxHeight * $ratio;
+    //     }
     
-        $this->Image($imagePath, 10, null, $newWidth, $newHeight);
-    }
+    //     $this->Image($imagePath, 10, null, $newWidth, $newHeight);
+    // }
 
     private $columnWidths = array(30, 140, 20);
 
@@ -350,31 +350,13 @@ $pdf->Cell(95, 10, '', 0, 0, 'C');
 $pdf->Cell(5, 10, '', 0, 0, 'C'); 
 $pdf->Cell(95, 10, '', 0, 1, 'C');
 
-$current_user_id = $row['user_id']; 
-
-// Query untuk mendapatkan nama pengguna dari ID
-$user_query = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
-$user_query->bind_param("i", $current_user_id);
-$user_query->execute();
-$user_result = $user_query->get_result();
-
-if ($user_result && $user_result->num_rows > 0) {
-    $user_row = $user_result->fetch_assoc();
-    $inspected_by = $user_row['username']; // Perbaiki di sini
-} else {
-    $inspected_by = 'ITE Division'; // Jika tidak ditemukan, beri nilai default
-}
-
-$user_query->close();
-
-$user_name = $row['name']; 
-
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(15);
-$pdf->Cell(47.5, 10, $inspected_by, 'T', 0, 'L');
-$pdf->Cell(5, 10, '', 0, 0, 'C');
+$pdf->Cell(47.5, 10, 'ITE Division', 'T', 0, 'L');
+$pdf->Cell(5, 10, '', 0, 0, 'C'); 
+$pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(95);
-$pdf->Cell(47.5, 10, $user_name, 'T', 1, 'C');
+$pdf->Cell(47.5, 10, $row['nama_user'], 'T', 1, 'C');
 $pdf->AliasNbPages();
 
 $filename = "Inspection-Devices.pdf";
