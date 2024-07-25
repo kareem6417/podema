@@ -183,7 +183,27 @@ class MYPDF extends FPDF {
     }
 
     function RowNeedsFill() {
-        return $this->GetY() % 20 === 0;
+        static $fill = false;
+        $fill = !$fill;
+        return $fill;
+    }
+
+    function BasicTable($header, $data) {
+        $this->SetFillColor(224, 235, 255);
+        $this->SetTextColor(0);
+        $this->SetDrawColor(128, 128, 128);
+        $this->SetLineWidth(0.3);
+        $this->SetFont('','B');
+
+        $this->Cell($this->columnWidths[0],7,$header[0],1,0,'C', true);
+        $this->Cell($this->columnWidths[1],7,$header[1],1,0,'C', true);
+        $this->Cell($this->columnWidths[2],7,$header[2],1,0,'C', true);
+        $this->Ln();
+        $this->SetFont('');
+
+        foreach($data as $row) {
+            $this->addTableRow($row[0], $row[1], $row[2]);
+        }
     }
 }
 
