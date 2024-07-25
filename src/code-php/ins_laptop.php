@@ -564,7 +564,7 @@ foreach ($users as $user) {
                 <textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" style="height: 75px; width: 100%;"></textarea>
                 <br>
                 <br>
-                <label for="screenshot">Screenshot:<span style="color: crimson;">*</span></label>
+                <!-- <label for="screenshot">Screenshot:<span style="color: crimson;">*</span></label>
                   <div id="screenshot" style="max-width: 100%; margin: 0;">
                       <input type="file" id="screenshot_file" name="screenshot_file[]" accept="image/*" style="display: none;" multiple>
                       <button type="button" id="screenshot_upload_button" class="upload-button" style="cursor: pointer; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-bottom: 10px; width: 10%; display: inline-block;">Upload</button>
@@ -580,7 +580,7 @@ foreach ($users as $user) {
                           display: block;
                           margin-bottom: 10px;
                       }
-                  </style>
+                  </style> -->
 
                   <label for="rekomendasi">Rekomendasi:<span style="color: crimson;">*</span></label>
                   <textarea id="rekomendasi" name="rekomendasi" style="height: 75px; width: 100%;"></textarea>
@@ -625,38 +625,39 @@ foreach ($users as $user) {
         });
     });
 
-    document.getElementById('screenshot_file').addEventListener('change', function() {
-        var input = this;
-        var previewContainer = document.getElementById('screenshot_preview_container');
+    // document.getElementById('screenshot_file').addEventListener('change', function() {
+    //     var input = this;
+    //     var previewContainer = document.getElementById('screenshot_preview_container');
 
-        if (input.files && input.files.length > 0) {
-            for (var i = 0; i < input.files.length; i++) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var img = document.createElement('img');
-                    img.src = e.target.result;
-                    previewContainer.appendChild(img);
-                }
-                reader.readAsDataURL(input.files[i]);
-            }
-        }
-    });
+    //     if (input.files && input.files.length > 0) {
+    //         for (var i = 0; i < input.files.length; i++) {
+    //             var reader = new FileReader();
+    //             reader.onload = function(e) {
+    //                 var img = document.createElement('img');
+    //                 img.src = e.target.result;
+    //                 previewContainer.appendChild(img);
+    //             }
+    //             reader.readAsDataURL(input.files[i]);
+    //         }
+    //     }
+    // });
 
-    document.getElementById('reset_button').addEventListener('click', function() {
-        var previewContainer = document.getElementById('screenshot_preview_container');
-        previewContainer.innerHTML = '';
-        document.getElementById('screenshot_file').value = '';
-    });
+    // document.getElementById('reset_button').addEventListener('click', function() {
+    //     var previewContainer = document.getElementById('screenshot_preview_container');
+    //     previewContainer.innerHTML = '';
+    //     document.getElementById('screenshot_file').value = '';
+    // });
 
-    document.getElementById('screenshot_upload_button').addEventListener('click', function() {
-        document.getElementById('screenshot_file').click();
-    });
+    // document.getElementById('screenshot_upload_button').addEventListener('click', function() {
+    //     document.getElementById('screenshot_file').click();
+    // });
 
     document.getElementById('jenis').addEventListener('change', function() {
         var selectedDevice = this.value;
         var elementsToSubmit = getElementsToSubmit(selectedDevice);
+        var allElements = ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'];
 
-        var allElements = ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'];
+        // var allElements = ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file']; ini yang awal
 
         allElements.forEach(function(elementId) {
             var element = document.getElementById(elementId);
@@ -670,11 +671,19 @@ foreach ($users as $user) {
 
     function getElementsToSubmit(jenisPerangkat) {
         var relevantElements = {
-            'Laptop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
-            'PC Desktop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
-            'Monitor': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
-            'Printer': ['informasi_keluhan', 'casing_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file']
+            'Laptop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'],
+            'PC Desktop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'],
+            'Monitor': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'],
+            'Printer': ['informasi_keluhan', 'casing_lap', 'ink_pad', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file']
         };
+
+    // function getElementsToSubmit(jenisPerangkat) {
+    //     var relevantElements = {
+    //         'Laptop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
+    //         'PC Desktop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
+    //         'Monitor': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
+    //         'Printer': ['informasi_keluhan', 'casing_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file']
+    //     }; ini yang lama
 
         return relevantElements[jenisPerangkat] || [];
     }
