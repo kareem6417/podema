@@ -370,19 +370,26 @@ $user_query->close();
 // Pastikan nama pengguna dari form_inspeksi diambil dengan benar
 $user_name = $row['nama_user']; 
 
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetX(15);
-$pdf->Cell(47.5, 10, 'Diperiksa Oleh:', 'T', 0, 'L');
-$pdf->Cell(5, 10, '', 0, 0, 'C'); 
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(95, 10, $inspected_by, 0, 1, 'L'); // Nama pengguna yang melakukan inspeksi
+// $pdf->SetFont('helvetica', 'B', 10);
+// $pdf->SetX(15);
+// $pdf->Cell(47.5, 10, 'Diperiksa Oleh', 'T', 0, 'L');
+// $pdf->Cell(5, 10, '', 0, 0, 'C'); 
+// $pdf->SetFont('helvetica', 'B', 10);
+// $pdf->SetX(95);
+// $pdf->Cell(47.5, 10, 'Nama Pengguna', 'T', 1, 'C');
+// $pdf->AliasNbPages();
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(15);
-$pdf->Cell(47.5, 10, 'Nama Pengguna:', 'T', 0, 'L');
+$pdf->Cell(95, 10, $inspected_by, 0, 1, 'L'); // Nama pengguna yang melakukan inspeksi
 $pdf->Cell(5, 10, '', 0, 0, 'C'); 
 $pdf->SetFont('helvetica', '', 10);
+
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetX(15);
 $pdf->Cell(95, 10, $user_name, 0, 1, 'L'); // Nama pengguna dari form_inspeksi
+$pdf->Cell(5, 10, '', 0, 0, 'C'); 
+$pdf->SetFont('helvetica', '', 10);
 
 $pdf->AliasNbPages();
 
