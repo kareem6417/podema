@@ -7,6 +7,25 @@ $db = "podema";
 
 $conn = new mysqli($host, $user, $pass, $db);
 
+if (!$conn) {
+    die("Koneksi database gagal: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $jenis = isset($_POST["jenis"]) ? $_POST["jenis"] : '';
+    $date = isset($_POST["date"]) ? $_POST["date"] : '';
+    $merk = isset($_POST["merk"]) ? $_POST["merk"] : '';
+    $lokasi = isset($_POST["lokasi"]) ? $_POST["lokasi"] : '';
+    $status = isset($_POST["status"]) ? $_POST["status"] : '';
+    $serialnumber = isset($_POST["serialnumber"]) ? $_POST["serialnumber"] : '';
+    $informasi_keluhan = isset($_POST["informasi_keluhan"]) ? $_POST["informasi_keluhan"] : '';
+    $hasil_pemeriksaan = isset($_POST["hasil_pemeriksaan"]) ? $_POST["hasil_pemeriksaan"] : '';
+    $rekomendasi = isset($_POST["rekomendasi"]) ? $_POST["rekomendasi"] : '';
+    $nama_user = isset($_POST["nama_user"]) ? $_POST["nama_user"] : '';
+    $score = 0;
+
+    $sql = '';
+
 
     if ($jenis == "PC Desktop") {
         try {
@@ -43,6 +62,7 @@ $conn = new mysqli($host, $user, $pass, $db);
             error_log($error_message, 0); // Menyimpan pesan error ke file log
         }
     }
+}
 }
 
 $conn->close();
