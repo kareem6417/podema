@@ -44,8 +44,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, booting_lap, multi_lap, port_lap, audio_lap, software_lap, score)
                 VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$booting_lap', '$multi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
-        echo $sql;
-        die;
 
         } catch (\Throwable $th) {
         echo $th -> getMessage();
