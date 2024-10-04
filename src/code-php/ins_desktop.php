@@ -342,7 +342,7 @@ foreach ($users as $user) {
       <div class="container-fluid">
         <div class="card">
           <h1 class="card-title fw-semibold mb-4">Device Inspection</h1>
-          <form id="assessmentForm" method="post" action="submit_inspeksi.php" class="content" enctype="multipart/form-data">
+          <form id="assessmentForm" method="post" action="submit_ins_laptop.php" class="content" enctype="multipart/form-data">
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -432,6 +432,18 @@ foreach ($users as $user) {
               <div class="form-group">
                 <label for="informasi_keluhan" id="informasi_keluhan_label">Informasi Keluhan/Permasalahan yang disampaikan:<span style="color: crimson;">*</span></label>
                 <textarea id="informasi_keluhan" name="informasi_keluhan" style="height: 75px; width: 100%;" required></textarea>
+              <br>
+              <br>
+              <label for="age">Usia Perangkat<span style="color: crimson;">*</span></label>
+                <select id="age" name="age" style="height: 50px;">
+                  <option value="">--- Pilih ---</option>
+                    <?php
+                      $ageOptions = fetchData("device_age_laptop");
+                      foreach ($ageOptions as $ageOption) {
+                          echo '<option value="' . $ageOption['age_score'] . '">' . $ageOption['age_name'] . '</option>';
+                      }
+                    ?>
+                </select>
               <br>
               <br>
                 <label for="casing_lap">Casing<span style="color: crimson;">*</span></label>
@@ -584,7 +596,7 @@ foreach ($users as $user) {
                           var selectedDevice = this.value;
                           var elementsToSubmit = getElementsToSubmit(selectedDevice);
 
-                          var allElements = ['informasi_keluhan', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'];
+                          var allElements = ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'];
 
                           allElements.forEach(function(elementId) {
                               var element = document.getElementById(elementId);
@@ -598,8 +610,8 @@ foreach ($users as $user) {
 
                       function getElementsToSubmit(jenisPerangkat) {
                           var relevantElements = {
-                              'Laptop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
-                              'PC Desktop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
+                              'Laptop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
+                              'PC Desktop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
                               'Monitor': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
                               'Printer': ['informasi_keluhan', 'casing_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file']
                           };

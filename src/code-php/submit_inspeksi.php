@@ -28,6 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($jenis == "Laptop") {
         // elemen Laptop
+        $age = isset($_POST["age"]) ? $_POST["age"] : '';
         $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
         $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
         $engsel_lap = isset($_POST["engsel_lap"]) ? $_POST["engsel_lap"] : '';
@@ -50,6 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($jenis == "PC Desktop") {
         // elemen PC Desktop
+        $age = isset($_POST["age"]) ? $_POST["age"] : '';
         $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
         $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
         $keyboard_lap = isset($_POST["keyboard_lap"]) ? $_POST["keyboard_lap"] : '';
