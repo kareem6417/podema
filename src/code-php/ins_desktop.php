@@ -523,27 +523,26 @@ foreach ($users as $user) {
                 <label for="hasil_pemeriksaan">Hasil Pemeriksaan Lainnya:<span style="color: crimson;">*</span></label>
                 <textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" style="height: 75px; width: 100%;"></textarea>
                 <br>
-                <br>
+                <!-- <br>
                 <label for="screenshot">Screenshot:<span style="color: crimson;">*</span></label>
                   <div id="screenshot" style="max-width: 100%; margin: 0;">
                       <input type="file" id="screenshot_file" name="screenshot_file[]" accept="image/*" style="display: none;" multiple>
                       <button type="button" id="screenshot_upload_button" class="upload-button" style="cursor: pointer; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-bottom: 10px; width: 10%; display: inline-block;">Upload</button>
                       <button type="button" id="reset_button" class="reset-button" style="cursor: pointer; background-color: #FF5722; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-bottom: 10px; width: 10%; display: inline-block;">Reset</button>
                       <div id="screenshot_preview_container" style="max-width: 100%; overflow-x: auto; width: 100%; display: inline-block;">
-                          <!-- Preview images will be shown here -->
-                      </div>
-                  </div>
+                    </div>
+                  </div> -->
 
-                  <style>
+                  <!-- <style>
                       #screenshot_preview_container img {
                           max-width: 100%;
                           height: auto;
                           display: block;
                           margin-bottom: 10px;
                       }
-                  </style>
+                  </style> -->
 
-                  <script>
+                  <!-- <script>
                       document.getElementById('screenshot_file').addEventListener('change', function() {
                           var input = this;
                           var previewContainer = document.getElementById('screenshot_preview_container');
@@ -570,16 +569,16 @@ foreach ($users as $user) {
                       document.getElementById('screenshot_upload_button').addEventListener('click', function() {
                           document.getElementById('screenshot_file').click(); // Trigger the file input click event
                       });
-                  </script>
+                  </script> -->
 
                   <label for="rekomendasi">Rekomendasi:<span style="color: crimson;">*</span></label>
                   <textarea id="rekomendasi" name="rekomendasi" style="height: 75px; width: 100%;"></textarea>
                   <br>
-                  <br>
+                  <!-- <br>
                   <label for="upload_file" style="margin-bottom: 10px;">Upload File<span style="color: crimson;">*</span></label>
                   <input type="file" id="upload_file" name="upload_file" class="form-control" accept=".zip, .rar" required>
                   <small>*Note: <br> Sebagai bahan verifikasi mohon upload file berformat .zip atau .rar dari hasil Belarc, <br>dan file tidak lebih dari 100 KB</small>
-                  <br>
+                  <br> -->
                   <script>
                       document.getElementById('jenis').addEventListener('change', function() {
                           var selectedDevice = this.value;
