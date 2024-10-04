@@ -45,8 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Hitung skor
         $score = $age + $casing_lap + $layar_lap + $engsel_lap + $keyboard_lap + $touchpad_lap + $booting_lap + $multi_lap + $tampung_lap + $isi_lap + $port_lap + $audio_lap + $software_lap;
         
-        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score)
-            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$casing_lap', '$layar_lap', '$engsel_lap', '$keyboard_lap', '$touchpad_lap', '$booting_lap', '$multi_lap', '$tampung_lap', '$isi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
+        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score)
+            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$engsel_lap', '$keyboard_lap', '$touchpad_lap', '$booting_lap', '$multi_lap', '$tampung_lap', '$isi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
     }
 
     if ($jenis == "PC Desktop") {
@@ -62,10 +62,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $software_lap = isset($_POST["software_lap"]) ? $_POST["software_lap"] : '';
 
         // Hitung skor
-        $score = $casing_lap + $layar_lap + $keyboard_lap + $booting_lap + $multi_lap + $port_lap + $audio_lap + $software_lap;
+        $score = $age + $casing_lap + $layar_lap + $keyboard_lap + $booting_lap + $multi_lap + $port_lap + $audio_lap + $software_lap;
         
-        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, casing_lap, layar_lap, keyboard_lap, booting_lap, multi_lap, port_lap, audio_lap, software_lap, score)
-            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$casing_lap', '$layar_lap', '$keyboard_lap', '$booting_lap', '$multi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
+        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, age, hasil_pemeriksaan, rekomendasi, casing_lap, layar_lap, keyboard_lap, booting_lap, multi_lap, port_lap, audio_lap, software_lap, score)
+            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$age', '$hasil_pemeriksaan', '$rekomendasi', '$casing_lap', '$layar_lap', '$keyboard_lap', '$booting_lap', '$multi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
     }
 
     if ($jenis == "Monitor") {
@@ -90,82 +90,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, casing_lap, ink_pad, score)
             VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$casing_lap', '$ink_pad', '$score')";
-    }
+    }   
+
+    // if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //     $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload Inspeksi";
     
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        
-        $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/File Upload Inspeksi/";
+    //     // Upload file lainnya
+    //     $file = $_FILES['upload_file']['name'];
+    //     $path = pathinfo($file);
+    //     $filename = $path['filename'];
+    //     $ext = $path['extension'];
+    //     $temp_name = $_FILES['upload_file']['tmp_name'];
+    //     $path_filename_ext = $target_dir . $filename . '.' . $ext;
     
-        // Upload file lainnya
-        $file = $_FILES['upload_file']['name'];
-        $path = pathinfo($file);
-        $filename = $path['filename'];
-        $ext = $path['extension'];
-        $temp_name = $_FILES['upload_file']['tmp_name'];
-        $path_filename_ext = $target_dir . $filename . '.' . $ext;
-    
-        if (file_exists($path_filename_ext)) {
-            $error_message = "Maaf, file sudah ada.";
+    //     if (file_exists($path_filename_ext)) {
+    //         $error_message = "Maaf, file sudah ada.";
+    //         echo $error_message;
+    //         error_log($error_message, 0);
+    //     } else {
+    //         if (move_uploaded_file($temp_name, $path_filename_ext)) {
+    //             echo "File Anda berhasil diunggah.";
+    //         } else {
+    //             $error_message = "Terjadi kesalahan saat mengunggah file.";
+    //             echo $error_message;
+    //             error_log($error_message, 0);
+    //         }
+    //     }
+    // }
+
+    // $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/screenshot/";
+
+    // // Loop melalui setiap file screenshot yang diunggah
+    // foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
+    //     $file_name = $_FILES['screenshot_file']['name'][$key];
+    //     $file_size = $_FILES['screenshot_file']['size'][$key];
+    //     $file_tmp = $_FILES['screenshot_file']['tmp_name'][$key];
+    //     $file_type = $_FILES['screenshot_file']['type'][$key];
+
+    //     $target_screenshot_file = $target_screenshot_dir . $file_name;
+
+    //     // Pindahkan file dari lokasi sementara ke direktori tujuan
+    //     if (move_uploaded_file($file_tmp, $target_screenshot_file)) {
+    //         echo "File screenshot berhasil diunggah.";
+    //     } else {
+    //         $error_message = "Terjadi kesalahan saat mengunggah file screenshot.";
+    //         echo $error_message;
+    //         error_log($error_message, 0); // Menyimpan pesan error ke file log
+    //     }
+    // }
+
+    if ($sql != '') {
+        if ($conn->query($sql) === TRUE) {
+            echo "Data berhasil disimpan.";
+            echo "<script>window.location.href='viewinspeksi.php';</script>"; // Pengalihan halaman
+            exit(); // Pastikan untuk keluar dari skrip
+        } else {
+            $error_message = "Error: " . $sql . "<br>" . $conn->error;
             echo $error_message;
             error_log($error_message, 0); // Menyimpan pesan error ke file log
-        } else {
-            if (move_uploaded_file($temp_name, $path_filename_ext)) {
-                echo "File Anda berhasil diunggah.";
-            } else {
-                $error_message = "Terjadi kesalahan saat mengunggah file.";
-                echo $error_message;
-                error_log($error_message, 0); // Menyimpan pesan error ke file log
-            }
         }
-    }
-
-    if ($conn->query($sql) === TRUE) {
-        $form_no = $conn->insert_id;
-
-        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/screenshot/";
-
-        if(isset($_FILES['screenshot_file']['name']) && count($_FILES['screenshot_file']['name']) > 0) {
-            foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {            
-
-                $file_name = $_FILES['screenshot_file']['name'][$key];
-                $target_screenshot_file = $target_screenshot_dir . $file_name;
-
-                if ($_FILES['screenshot_file']['error'][$key] !== UPLOAD_ERR_OK) {
-                    $error_message = "Terjadi kesalahan saat mengunggah file screenshot. Kode kesalahan: " . $_FILES['screenshot_file']['error'][$key];
-                    echo $error_message;
-                    error_log($error_message, 0);
-                }                
-
-                if (move_uploaded_file($_FILES['screenshot_file']['tmp_name'][$key], $target_screenshot_file)) {
-                    echo "File screenshot berhasil diunggah.";
-
-                    // Memasukkan data ke dalam tabel screenshot
-                    $screenshot_name = $_FILES['screenshot_file']['name'][$key];
-                    $stmt_screenshot = $conn->prepare("INSERT INTO screenshots (form_no, screenshot_name) VALUES (?, ?)");
-                    $stmt_screenshot->bind_param("is", $form_no, $screenshot_name);
-                    $stmt_screenshot->execute();
-                    $stmt_screenshot->close();
-                } else {
-                    $error_message = "Terjadi kesalahan saat mengunggah file screenshot.";
-                    echo $error_message;
-                    error_log($error_message, 0);
-                }
-            }
-        } else {
-            echo "Tidak ada screenshot yang diunggah.";
-        }
-
-        $conn->commit();
-        
-        echo "Data berhasil disimpan.";
-        echo "<script>window.location.href='viewinspeksi.php';</script>";
-        exit();
-    } else {
-        $error_message = "Error: " . $conn->error;
-        echo $error_message;
-        error_log($error_message, 0);
-
-        $conn->rollback(); // Rollback jika ada kesalahan
     }
 }
 
