@@ -49,25 +49,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$engsel_lap', '$keyboard_lap', '$touchpad_lap', '$booting_lap', '$multi_lap', '$tampung_lap', '$isi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
     }
 
-    if ($jenis == "PC Desktop") {
-        // elemen PC Desktop
-        $age = isset($_POST["age"]) ? $_POST["age"] : '';
-        $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
-        $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
-        $keyboard_lap = isset($_POST["keyboard_lap"]) ? $_POST["keyboard_lap"] : '';
-        $booting_lap = isset($_POST["booting_lap"]) ? $_POST["booting_lap"] : '';
-        $multi_lap = isset($_POST["multi_lap"]) ? $_POST["multi_lap"] : '';
-        $port_lap = isset($_POST["port_lap"]) ? $_POST["port_lap"] : '';
-        $audio_lap = isset($_POST["audio_lap"]) ? $_POST["audio_lap"] : '';
-        $software_lap = isset($_POST["software_lap"]) ? $_POST["software_lap"] : '';
-
-        // Hitung skor
-        $score = $age + $casing_lap + $layar_lap + $keyboard_lap + $booting_lap + $multi_lap + $port_lap + $audio_lap + $software_lap;
-        
-        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, keyboard_lap, booting_lap, multi_lap, port_lap, audio_lap, software_lap, score)
-            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$keyboard_lap', '$booting_lap', '$multi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
+    try {
+        if ($jenis == "PC Desktop") {
+            // elemen PC Desktop
+            $age = isset($_POST["age"]) ? $_POST["age"] : '';
+            $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
+            $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
+            $keyboard_lap = isset($_POST["keyboard_lap"]) ? $_POST["keyboard_lap"] : '';
+            $booting_lap = isset($_POST["booting_lap"]) ? $_POST["booting_lap"] : '';
+            $multi_lap = isset($_POST["multi_lap"]) ? $_POST["multi_lap"] : '';
+            $port_lap = isset($_POST["port_lap"]) ? $_POST["port_lap"] : '';
+            $audio_lap = isset($_POST["audio_lap"]) ? $_POST["audio_lap"] : '';
+            $software_lap = isset($_POST["software_lap"]) ? $_POST["software_lap"] : '';
+    
+            // Hitung skor
+            $score = $age + $casing_lap + $layar_lap + $keyboard_lap + $booting_lap + $multi_lap + $port_lap + $audio_lap + $software_lap;
+            
+            $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, keyboard_lap, booting_lap, multi_lap, port_lap, audio_lap, software_lap, score)
+                VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$keyboard_lap', '$booting_lap', '$multi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
+        }
+        } catch (\Throwable $th) {
+        throw $th;
     }
-
+   
     if ($jenis == "Monitor") {
         // elemen Monitor
         $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
