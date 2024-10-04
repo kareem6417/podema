@@ -49,8 +49,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$engsel_lap', '$keyboard_lap', '$touchpad_lap', '$booting_lap', '$multi_lap', '$tampung_lap', '$isi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
     }
 
-    try {
-        if ($jenis == "PC Desktop") {
+    
+    if ($jenis == "PC Desktop") {
+        try {
             // elemen PC Desktop
             $age = isset($_POST["age"]) ? $_POST["age"] : '';
             $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
@@ -67,10 +68,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, keyboard_lap, booting_lap, multi_lap, port_lap, audio_lap, software_lap, score)
                 VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$keyboard_lap', '$booting_lap', '$multi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
-        }
+
         } catch (\Throwable $th) {
         throw $th;
     }
+}
    
     if ($jenis == "Monitor") {
         // elemen Monitor
