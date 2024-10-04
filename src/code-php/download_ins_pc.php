@@ -9,16 +9,16 @@ $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 
 $query = $conn->prepare("SELECT fi.*, 
-                                s.screenshot_name, 
-                                cl.casing_lap_name, cl.casing_lap_score, 
-                                ip.layar_lap_name, ip.layar_lap_score,
-                                bl.booting_lap_name, bl.booting_lap_score,
-                                ml.multi_lap_name, ml.multi_lap_score,
-                                pl.port_lap_name, pl.port_lap_score,
-                                al.audio_lap_name, al.audio_lap_score,
-                                sl.software_lap_name, sl.software_lap_score
+                            a.age_name, a.age_score,
+                            cl.casing_lap_name, cl.casing_lap_score, 
+                            ip.layar_lap_name, ip.layar_lap_score,
+                            bl.booting_lap_name, bl.booting_lap_score,
+                            ml.multi_lap_name, ml.multi_lap_score,
+                            pl.port_lap_name, pl.port_lap_score,
+                            al.audio_lap_name, al.audio_lap_score,
+                            sl.software_lap_name, sl.software_lap_score
                         FROM form_inspeksi fi 
-                        JOIN screenshots s ON fi.no = s.form_no 
+                        JOIN device_age_laptop a ON fi.age = a.age_score
                         JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_score 
                         JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_score 
                         JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_score
