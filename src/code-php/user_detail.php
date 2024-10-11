@@ -107,6 +107,8 @@ if (isset($_GET['user_id']) && isset($_GET['name'])) {
     echo "Tidak ada ID pengguna atau nama yang diberikan.";
 }
 
+  
+
 //inspeksi
 if (isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
@@ -135,9 +137,28 @@ if (isset($_GET['user_id'])) {
 
         $_SESSION['name'] = $name;
 
-        $form_inspeksi_sql = "SELECT * 
-                              FROM form_inspeksi 
-                              WHERE nama_user = ?";
+        $form_inspeksi_sql = "SELECT fi.*, age.age_name, age.age_score, casing_lap.casing_lap_name, casing_lap.casing_lap_score, 
+                          layar_lap.layar_lap_name, layar_lap.layar_lap_score, engsel_lap.engsel_lap_name, engsel_lap.engsel_lap_score, 
+                          keyboard_lap.keyboard_lap_name, keyboard_lap.keyboard_lap_score, touchpad_lap.touchpad_lap_name, touchpad_lap.touchpad_lap_score,
+                          booting_lap.booting_lap_name, booting_lap.booting_lap_score, multi_lap.multi_lap_name, multi_lap.multi_lap_score, 
+                          tampung_lap.tampung_lap_name, tampung_lap.tampung_lap_score, isi_lap.isi_lap_name, isi_lap.isi_lap_score, 
+                          port_lap.port_lap_name, port_lap.port_lap_score, audio_lap.audio_lap_name, audio_lap.audio_lap_score, 
+                          software_lap.software_lap_name, software_lap.software_lap_score 
+                      FROM form_inspeksi fi
+                      LEFT JOIN device_age_laptop age ON fi.age = age.age_id
+                      LEFT JOIN ins_casing_lap casing_lap ON fi.casing_lap = casing_lap.casing_lap_id
+                      LEFT JOIN ins_layar_lap layar_lap ON fi.layar_lap = layar_lap.layar_lap_id
+                      LEFT JOIN ins_engsel_lap engsel_lap ON fi.engsel_lap = engsel_lap.engsel_lap_id
+                      LEFT JOIN ins_keyboard_lap keyboard_lap ON fi.keyboard_lap = keyboard_lap.keyboard_lap_id
+                      LEFT JOIN ins_touchpad_lap touchpad_lap ON fi.touchpad_lap = touchpad_lap.touchpad_lap_id
+                      LEFT JOIN ins_booting_lap booting_lap ON fi.booting_lap = booting_lap.booting_lap_id
+                      LEFT JOIN ins_multi_lap multi_lap ON fi.multi_lap = multi_lap.multi_lap_id
+                      LEFT JOIN ins_tampung_lap tampung_lap ON fi.tampung_lap = tampung_lap.tampung_lap_id
+                      LEFT JOIN ins_isi_lap isi_lap ON fi.isi_lap = isi_lap.isi_lap_id
+                      LEFT JOIN ins_port_lap port_lap ON fi.port_lap = port_lap.port_lap_id
+                      LEFT JOIN ins_audio_lap audio_lap ON fi.audio_lap = audio_lap.audio_lap_id
+                      LEFT JOIN ins_software_lap software_lap ON fi.software_lap = software_lap.software_lap_id
+                      WHERE fi.nama_user = ?";
 
         $form_inspeksi_stmt = $conn->prepare($form_inspeksi_sql);
         if ($form_inspeksi_stmt === false) {
@@ -529,47 +550,61 @@ $conn->close();
                   ?>
               </div>
               <div class="inspection-form">
-                  <h3>Form Inspeksi</h3>
-                  <?php
-                  if (isset($form_inspeksi_result)) {
-                      if ($form_inspeksi_result->num_rows > 0) {
-                          $count = 1;
-                          while ($form_inspeksi_row = $form_inspeksi_result->fetch_assoc()) {
-                              echo "<div class='expand-btn' onclick='toggleInspeksi(" . $count . ")'>Inspeksi ke-" . $count . "</div>";
+                <h3>Form Inspeksi</h3>
+                <?php
+                if (isset($form_inspeksi_result)) {
+                    if ($form_inspeksi_result->num_rows > 0) {
+                        $count = 1;
+                        while ($form_inspeksi_row = $form_inspeksi_result->fetch_assoc()) {
+                            echo "<div class='expand-btn' onclick='toggleInspeksi(" . $count . ")'>Inspeksi ke-" . $count . "</div>";
 
-                              echo "<div class='inspeksi-content' id='inspeksi-" . $count . "'>";
-                              echo "<table>";
-                              echo "<tr><th colspan='2'>Inspeksi ke-" . $count . "</th></tr>";
-                              echo "<tr><td>No</td><td>" . $form_inspeksi_row["no"] . "</td></tr>";
-                              echo "<tr><td>Date</td><td>" . $form_inspeksi_row["date"] . "</td></tr>";
-                              echo "<tr><td>Nama Pengguna</td><td>" . $form_inspeksi_row["nama_user"] . "</td></tr>";
-                              echo "<tr><td>Jenis</td><td>" . $form_inspeksi_row["jenis"] . "</td></tr>";
-                              echo "<tr><td>Status</td><td>" . $form_inspeksi_row["status"] . "</td></tr>";
-                              echo "<tr><td>Merk</td><td>" . $form_inspeksi_row["merk"] . "</td></tr>";
-                              echo "<tr><td>Serial Number</td><td>" . $form_inspeksi_row["serialnumber"] . "</td></tr>";
-                              echo "<tr><td>Lokasi</td><td>" . $form_inspeksi_row["lokasi"] . "</td></tr>";
-                              echo "<tr><td>Informasi Keluhan</td><td>" . $form_inspeksi_row["informasi_keluhan"] . "</td></tr>";
-                              $hasil_pemeriksaan = explode("\n", $form_inspeksi_row["hasil_pemeriksaan"]);
-                              $hasil_pemeriksaan_text = implode("<br>", $hasil_pemeriksaan);
-                              echo "<tr><td>Hasil Pemeriksaan</td><td>" . $hasil_pemeriksaan_text . "</td></tr>";
-                              $rekomendasi = explode("\n", $form_inspeksi_row["rekomendasi"]);
-                              $rekomendasi_text = implode("<br>", $rekomendasi);
-                              echo "<tr><td>Rekomendasi</td><td>" . $rekomendasi_text . "</td></tr>";
-                              echo "</table>";
-                              echo "</table>";
-                              echo "</div>";
-                              echo "<br>";
+                            echo "<div class='inspeksi-content' id='inspeksi-" . $count . "'>";
+                            echo "<table>";
+                            echo "<tr><th colspan='2'>Inspeksi ke-" . $count . "</th></tr>";
+                            echo "<tr><td>No</td><td>" . $form_inspeksi_row["no"] . "</td></tr>";
+                            echo "<tr><td>Tanggal</td><td>" . $form_inspeksi_row["date"] . "</td></tr>";
+                            echo "<tr><td>Nama Pengguna</td><td>" . $form_inspeksi_row["nama_user"] . "</td></tr>";
+                            echo "<tr><td>Jenis</td><td>" . $form_inspeksi_row["jenis"] . "</td></tr>";
+                            echo "<tr><td>Status</td><td>" . $form_inspeksi_row["status"] . "</td></tr>";
+                            echo "<tr><td>Merk</td><td>" . $form_inspeksi_row["merk"] . "</td></tr>";
+                            echo "<tr><td>Serial Number</td><td>" . $form_inspeksi_row["serialnumber"] . "</td></tr>";
+                            echo "<tr><td>Lokasi</td><td>" . $form_inspeksi_row["lokasi"] . "</td></tr>";
+                            echo "<tr><td>Informasi Keluhan</td><td>" . $form_inspeksi_row["informasi_keluhan"] . "</td></tr>";
+                            
+                            $hasil_pemeriksaan = explode("\n", $form_inspeksi_row["hasil_pemeriksaan"]);
+                            $hasil_pemeriksaan_text = implode("<br>", $hasil_pemeriksaan);
+                            echo "<tr><td>Hasil Pemeriksaan</td><td>" . $hasil_pemeriksaan_text . "</td></tr>";
+                            
+                            $rekomendasi = explode("\n", $form_inspeksi_row["rekomendasi"]);
+                            $rekomendasi_text = implode("<br>", $rekomendasi);
+                            echo "<tr><td>Rekomendasi</td><td>" . $rekomendasi_text . "</td></tr>";
+                            echo "<tr><td>Usia Perangkat</td><td>" . $form_inspeksi_row["age_name"] . " (Skor: " . $form_inspeksi_row["age_score"] . ")</td></tr>";
+                            echo "<tr><td>Casing</td><td>" . $form_inspeksi_row["casing_lap_name"] . " (Skor: " . $form_inspeksi_row["casing_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Layar</td><td>" . $form_inspeksi_row["layar_lap_name"] . " (Skor: " . $form_inspeksi_row["layar_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Engsel</td><td>" . $form_inspeksi_row["engsel_lap_name"] . " (Skor: " . $form_inspeksi_row["engsel_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Keyboard</td><td>" . $form_inspeksi_row["keyboard_lap_name"] . " (Skor: " . $form_inspeksi_row["keyboard_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Touchpad</td><td>" . $form_inspeksi_row["touchpad_lap_name"] . " (Skor: " . $form_inspeksi_row["touchpad_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Proses Booting</td><td>" . $form_inspeksi_row["booting_lap_name"] . " (Skor: " . $form_inspeksi_row["booting_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Multi Tasking</td><td>" . $form_inspeksi_row["multi_lap_name"] . " (Skor: " . $form_inspeksi_row["multi_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Kapasitas Baterai</td><td>" . $form_inspeksi_row["tampung_lap_name"] . " (Skor: " . $form_inspeksi_row["tampung_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Waktu Pengisian Baterai</td><td>" . $form_inspeksi_row["isi_lap_name"] . " (Skor: " . $form_inspeksi_row["isi_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Port</td><td>" . $form_inspeksi_row["port_lap_name"] . " (Skor: " . $form_inspeksi_row["port_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Audio</td><td>" . $form_inspeksi_row["audio_lap_name"] . " (Skor: " . $form_inspeksi_row["audio_lap_score"] . ")</td></tr>";
+                            echo "<tr><td>Software</td><td>" . $form_inspeksi_row["software_lap_name"] . " (Skor: " . $form_inspeksi_row["software_lap_score"] . ")</td></tr>";
+                            echo "</table>";
+                            echo "</div>";
+                            echo "<br>";
 
-                              $count++;
-                          }
-                      } else {
-                          echo "Data Form Inspeksi tidak ditemukan.";
-                      }
-                  } else {
-                      echo "Terjadi kesalahan saat menjalankan query Form Inspeksi.";
-                  }
-                  ?>
-              </div>
+                            $count++;
+                        }
+                    } else {
+                        echo "Data Form Inspeksi tidak ditemukan.";
+                    }
+                } else {
+                    echo "Terjadi kesalahan saat menjalankan query Form Inspeksi.";
+                }
+                ?>
+            </div>
             </div>
             <br>
             <br>
