@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
           'PAM' => 'PT. Prima Andalan Mandiri',
           'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
           'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
+          'MIP Site Staff' => 'PT. Mandiri Intiperkasa - Site',
           'MKP HO' => 'PT. Mandala Karya Prima - HO',
           'MKP Site' => 'PT. Mandala Karya Prima - Site',
           'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
@@ -45,29 +46,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         if (array_key_exists($filterCompany, $companyOptions)) {
           $query .= " AND company = '" . $companyOptions[$filterCompany] . "'";
-      } else {
+        } else {
           echo "Invalid filterCompany: $filterCompany";
-      }
-  }
+        }
+    }
 
-        $query .= " ORDER BY user_id DESC LIMIT $limit";
+    $query .= " ORDER BY user_id DESC LIMIT $limit";
 
-        $result = $conn->query($query);
-  if (!$result) {
-      echo "Error: " . $conn->error;
-  }
+    $result = $conn->query($query);
+    if (!$result) {
+        echo "Error: " . $conn->error;
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nik = $_POST['nik'];
-    // $password = md5($_POST['password']);
     $name = $_POST['name'];
     $company = $_POST['company'];
     $department = $_POST['department'];
     $email = $_POST['email'];
 
+    // Menyesuaikan nilai company jika dibutuhkan
+    if (strpos($company, 'MIP Site') !== false) {
+        $company = 'MIP Site';
+    } elseif (strpos($company, 'MIP HO') !== false) {
+        $company = 'MIP HO';
+    } elseif (strpos($company, 'PAM HO') !== false) {
+        $company = 'PAM';
+    } elseif (strpos($company, 'GMS') !== false) {
+        $company = 'GMS';
+    }
+
     $stmt = $conn->prepare("INSERT INTO users (nik, name, company, department, email) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $nik, $name, $company, $department, $email);
+    $stmt->bind_param("sssss", $nik, $name, $company, $department, $email);
     if ($stmt->execute()) {
         echo json_encode(array('success' => true, 'message' => 'Success! You have added a new user.'));
         exit();
@@ -611,6 +622,8 @@ $conn->close();
                               'PAM' => 'PT. Prima Andalan Mandiri',
                               'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
                               'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
+                              'MIP Site Staff' => 'PT. Mandiri Intiperkasa - Site',
+                              'MIP Site NonStaff' => 'PT. Mandiri Intiperkasa - Site',
                               'MKP HO' => 'PT. Mandala Karya Prima - HO',
                               'MKP Site' => 'PT. Mandala Karya Prima - Site',
                               'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
