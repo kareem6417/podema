@@ -455,6 +455,8 @@ $conn->close();
                           'PAM' => 'PT. Prima Andalan Mandiri',
                           'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
                           'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
+                          'MIP Site Staff' => 'PT. Mandiri Intiperkasa - Site',
+                          'MIP Site NonStaff' => 'PT. Mandiri Intiperkasa - Site',
                           'MKP HO' => 'PT. Mandala Karya Prima - HO',
                           'MKP Site' => 'PT. Mandala Karya Prima - Site',
                           'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
