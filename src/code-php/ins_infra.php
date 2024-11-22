@@ -417,7 +417,7 @@ foreach ($users as $user) {
                 <textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" style="height: 75px; width: 100%;"></textarea>
                 <br>
                 <br>
-                <!-- <label for="screenshot">Screenshot:<span style="color: crimson;">*</span></label>
+                <label for="screenshot">Screenshot:<span style="color: crimson;">*</span></label>
                   <div id="screenshot" style="max-width: 100%; margin: 0;">
                       <input type="file" id="screenshot_file" name="screenshot_file[]" accept="image/*" style="display: none;" multiple>
                       <button type="button" id="screenshot_upload_button" class="upload-button" style="cursor: pointer; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-bottom: 10px; width: 10%; display: inline-block;">Upload</button>
@@ -432,7 +432,7 @@ foreach ($users as $user) {
                           display: block;
                           margin-bottom: 10px;
                       }
-                  </style> -->
+                  </style>
                   <label for="rekomendasi">Rekomendasi:<span style="color: crimson;">*</span></label>
                   <textarea id="rekomendasi" name="rekomendasi" style="height: 75px; width: 100%;"></textarea>
                   <br>
