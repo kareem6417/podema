@@ -206,14 +206,14 @@ foreach ($complaints as $complaint) {
 
 // Hasil Pemeriksaan
 $pdf->Ln(5);
-$complaints = explode("\n", $row['hasil_pemeriksaan']);
 $pdf->SetFont('Arial', 'B', 11);
 $pdf->Cell(0, 10, 'Hasil Pemeriksaan:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
 
+$complaints = explode("\n", $row['hasil_pemeriksaan']);
 foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 10, $complaint, 'B');
-    $pdf->Ln();
+    $pdf->MultiCell(0, 10, $complaint, 'B', 'L');
+    $pdf->Ln(2); // Jarak antar baris
 }
 
 $pdf->Ln(5);
