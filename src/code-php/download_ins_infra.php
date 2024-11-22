@@ -34,7 +34,7 @@ $createDate = date('m/Y');
 $nomorInspeksi = sprintf("%03d", $runningNumber) . "/MIP/INS/" . $createDate;
 
 $screenshot_files = [];
-$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
+$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/screenshot/";
 
 if ($handle = opendir($target_screenshot_dir)) {
     while (false !== ($entry = readdir($handle))) {
@@ -230,7 +230,7 @@ $pdf->Ln(5);
 $pdf->AddScreenshots($target_screenshot_dir, $row['no']);
 
 $current_inspection_id = $row['no'];
-$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
+$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/screenshot/";
 
 // Mendapatkan daftar file screenshot terbaru di direktori
 $latest_screenshot = null;
