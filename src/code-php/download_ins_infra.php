@@ -9,23 +9,23 @@ $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 
 // $query = $conn->prepare("SELECT fi.*, s.screenshot_name FROM form_inspeksi fi JOIN screenshots s ON fi.no = s.form_no WHERE fi.no = (SELECT MAX(no) FROM form_inspeksi)");
-// $query->execute();
+$query->execute();
 
-// if ($query->error) {
-//     die("Query failed: " . $query->error);
-// }
+if ($query->error) {
+    die("Query failed: " . $query->error);
+}
 
-// $result = $query->get_result();
+$result = $query->get_result();
 
-// if ($result) {
-//     if ($result->num_rows > 0) {
-//         $row = $result->fetch_assoc();
-//     } else {
-//         die("No data found in the form_inspeksi table.");
-//     }
-// } else {
-//     die("Result set error: " . $conn->error);
-// }
+if ($result) {
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+    } else {
+        die("No data found in the form_inspeksi table.");
+    }
+} else {
+    die("Result set error: " . $conn->error);
+}
 
 $runningNumber = $row['no'] + 1;
 
@@ -46,14 +46,14 @@ $nomorInspeksi = sprintf("%03d", $runningNumber) . "/MIP/INS/" . $createDate;
 // }
 
 class MYPDF extends FPDF {
-    // private $screenshot_files;
+    private $screenshot_files;
     private $nomorInspeksi;
 
-    // public function __construct($screenshot_files, $nomorInspeksi) {
-    //     parent::__construct();
-    //     $this->screenshot_files = $screenshot_files;
-    //     $this->nomorInspeksi = $nomorInspeksi;
-    // }
+    public function __construct($screenshot_files, $nomorInspeksi) {
+        parent::__construct();
+        $this->screenshot_files = $screenshot_files;
+        $this->nomorInspeksi = $nomorInspeksi;
+    }
 
     function Header() {
         $this->Image('../assets/images/logos/mandiri.png',10,8,33);
@@ -93,48 +93,48 @@ class MYPDF extends FPDF {
         $this->Cell(0,10,''.$this->PageNo().'/{nb}',0,0,'C');
     }
     
-    // function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
-    //     $screenshotTitleShown = false; 
-    //     $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
-    //     $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
-    //     $query->bind_param("i", $current_inspection_id);
-    //     $query->execute();
-    //     $result = $query->get_result();
+//     function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
+//         $screenshotTitleShown = false; 
+//         $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
+//         $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
+//         $query->bind_param("i", $current_inspection_id);
+//         $query->execute();
+//         $result = $query->get_result();
     
-    //     if ($result) {
-    //         while ($row = $result->fetch_assoc()) {
-    //             $screenshot = $row['screenshot_name'];
-    //             $screenshot_path = $target_screenshot_dir . $screenshot;
+//         if ($result) {
+//             while ($row = $result->fetch_assoc()) {
+//                 $screenshot = $row['screenshot_name'];
+//                 $screenshot_path = $target_screenshot_dir . $screenshot;
     
-    //             if (!$screenshotTitleShown) { 
-    //                 $this->SetFont('helvetica', 'B', 11);
-    //                 $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
-    //                 $this->Ln(5);
-    //                 $screenshotTitleShown = true;
-    //             }
-    //             $this->resizeAndInsertImage($screenshot_path);
-    //         }
-    //     }
-    //     $query->close();
-    //     $conn->close();
-    // }     
+//                 if (!$screenshotTitleShown) { 
+//                     $this->SetFont('helvetica', 'B', 11);
+//                     $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
+//                     $this->Ln(5);
+//                     $screenshotTitleShown = true;
+//                 }
+//                 $this->resizeAndInsertImage($screenshot_path);
+//             }
+//         }
+//         $query->close();
+//         $conn->close();
+//     }     
     
-    // function resizeAndInsertImage($imagePath) {
-    //     list($width, $height) = getimagesize($imagePath);
-    //     $maxWidth = 104; // Mengurangi lebar gambar
-    //     $maxHeight = 82; // Mengurangi tinggi gambar
-    //     $ratio = $width / $height;
+//     function resizeAndInsertImage($imagePath) {
+//         list($width, $height) = getimagesize($imagePath);
+//         $maxWidth = 104; // Mengurangi lebar gambar
+//         $maxHeight = 82; // Mengurangi tinggi gambar
+//         $ratio = $width / $height;
     
-    //     if ($width > $height) {
-    //         $newWidth = $maxWidth;
-    //         $newHeight = $maxWidth / $ratio;
-    //     } else {
-    //         $newHeight = $maxHeight;
-    //         $newWidth = $maxHeight * $ratio;
-    //     }
+//         if ($width > $height) {
+//             $newWidth = $maxWidth;
+//             $newHeight = $maxWidth / $ratio;
+//         } else {
+//             $newHeight = $maxHeight;
+//             $newWidth = $maxHeight * $ratio;
+//         }
     
-    //     $this->Image($imagePath, 10, null, $newWidth, $newHeight);
-    // }
+//         $this->Image($imagePath, 10, null, $newWidth, $newHeight);
+//     }
 }
 
 $pdf = new MYPDF($screenshot_files, $nomorInspeksi);
@@ -229,10 +229,10 @@ foreach ($complaints as $key => $complaint) {
 $pdf->Ln(5);
 // $pdf->AddScreenshots($target_screenshot_dir, $row['no']);
 
-// $current_inspection_id = $row['no'];
-// $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
+$current_inspection_id = $row['no'];
+$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
-// // Mendapatkan daftar file screenshot terbaru di direktori
+// Mendapatkan daftar file screenshot terbaru di direktori
 // $latest_screenshot = null;
 // $latest_timestamp = 0;
 
