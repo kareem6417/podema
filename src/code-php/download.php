@@ -81,11 +81,8 @@ class PDF extends FPDF {
         $nb = 0;
         for($i=0; $i<count($data); $i++)
             $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
-        
-        // ================================================================= //
-        // PERUBAHAN 1: Tinggi baris diubah dari 5 menjadi 7                 //
-        // ================================================================= //
-        $h = 7 * $nb; 
+
+        $h = 10 * $nb; 
         
         $this->CheckPageBreak($h);
         
@@ -97,11 +94,7 @@ class PDF extends FPDF {
             $y = $this->GetY();
             
             $this->Rect($x, $y, $w, $h);
-            
-            // ================================================================= //
-            // PERUBAHAN 2: Tinggi MultiCell diubah dari 5 menjadi 7             //
-            // ================================================================= //
-            $this->MultiCell($w, 7, $data[$i], 0, $a);
+            $this->MultiCell($w, 10, $data[$i], 0, $a);
             
             $this->SetXY($x + $w, $y);
         }
