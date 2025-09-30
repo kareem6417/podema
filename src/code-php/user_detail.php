@@ -522,12 +522,12 @@ function display_data_with_score($name, $score) {
                                 <div class="assessment-content" id="content-ins-<?php echo $count; ?>">
                                     <table class="table table-striped table-bordered mt-2">
                                         <tr><td style="width: 40%;">No. Inspeksi</td><td><?php echo htmlspecialchars($row["no"]); ?></td></tr>
-                                        <tr><td>Merk / SN</td><td><?php echo htmlspecialchars($row["merk"]); ?> / <?php echo htmlspecialchars($row["serialnumber"]); ?></td></tr>
+                                        <tr><td>Merk / Serial Number</td><td><?php echo htmlspecialchars($row["merk"]); ?> / <?php echo htmlspecialchars($row["serialnumber"]); ?></td></tr>
                                         <tr><td>Lokasi</td><td><?php echo htmlspecialchars($row["lokasi"]); ?></td></tr>
                                         <tr><td>Informasi Keluhan</td><td><?php echo nl2br(htmlspecialchars($row["informasi_keluhan"])); ?></td></tr>
                                         <tr><td>Hasil Pemeriksaan</td><td><?php echo nl2br(htmlspecialchars($row["hasil_pemeriksaan"])); ?></td></tr>
                                         <tr><td>Rekomendasi</td><td><?php echo nl2br(htmlspecialchars($row["rekomendasi"])); ?></td></tr>
-                                        <tr><td>Usia Perangkat</td><td><?php echo display_data_with_score($row["age_name"], $row["age_score"]); ?></td></tr>
+                                        <tr><td>Usia Perangkat</td><td><?php echo display_data_with_score($row["age_lap_name"], $row["age_lap_score"]); ?></td></tr>
                                         <tr><td>Casing</td><td><?php echo display_data_with_score($row["casing_lap_name"], $row["casing_lap_score"]); ?></td></tr>
                                         <tr><td>Layar</td><td><?php echo display_data_with_score($row["layar_lap_name"], $row["layar_lap_score"]); ?></td></tr>
                                         <tr><td>Keyboard</td><td><?php echo display_data_with_score($row["keyboard_lap_name"], $row["keyboard_lap_score"]); ?></td></tr>
