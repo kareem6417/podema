@@ -376,126 +376,135 @@ $conn->close();
         </nav>
       </header></form>
       <!--  Header End -->
-      <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
-    <aside class="left-sidebar">
-      </aside>
-    <div class="body-wrapper">
-      <header class="app-header">
-        </header>
       <div class="container-fluid">
+        <!--  Row 1 -->
             <div class="card-body">
-                <div class="back-button" onclick="window.history.back()">
+                <div class="back-button" onclick="goBack()">
+                    <!-- <i class="ti ti-arrow-big-left-line-filled"></i> Back -->
                     <i class="ti ti-circle-arrow-left-filled"></i> Back
                 </div>
                 <br>
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title fw-semibold mb-4">User Detail</h5>
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr>
-                                    <th style="width: 150px;">NIK</th>
-                                    <td><?php echo htmlspecialchars($nik); ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Name</th>
-                                    <td><?php echo htmlspecialchars($name); ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Email</th>
-                                    <td><?php echo htmlspecialchars($email); ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Company</th>
-                                    <td>
-                                        <?php
-                                            $companyOptions = [
-                                                'PAM' => 'PT. Prima Andalan Mandiri', 'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
-                                                'MIP Site' => 'PT. Mandiri Intiperkasa - Site', 'MIP Site Staff' => 'PT. Mandiri Intiperkasa - Site',
-                                                'MIP Site NonStaff' => 'PT. Mandiri Intiperkasa - Site', 'MKP HO' => 'PT. Mandala Karya Prima - HO',
-                                                'MKP Site' => 'PT. Mandala Karya Prima - Site', 'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
-                                                'MPM Site' => 'PT. Maritim Prima Mandiri - Site', 'mandiriland' => 'PT. Mandiriland',
-                                                'GMS' => 'PT. Global Mining Service', 'eam' => 'PT. Edika Agung Mandiri',
-                                            ];
-                                            echo isset($companyOptions[$company]) ? $companyOptions[$company] : htmlspecialchars($company);
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Department</th>
-                                    <td><?php echo htmlspecialchars($department); ?></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="d-sm-flex d-block align-items-center justify-content-center mb-9">
+                    <div class="mb-3 mb-sm-0">
+                        <h5 class="card-title fw-semibold">User Detail, <em><u><?php echo isset($_SESSION['name']) ? $_SESSION['name'] : ""; ?></u></em></h5>
                     </div>
                 </div>
+                <div id="chart"></div>
+                <table>
+                  <tr>
+                      <td>NIK:</td>
+                      <td><?php echo isset($nik) ? $nik : ""; ?></td>
+                  </tr>
+                  <tr>
+                      <td>Name:</td>
+                      <td><?php echo isset($name) ? $name : ""; ?></td>
+                  </tr>
+                  <tr>
+                      <td>Email:</td>
+                      <td><?php echo isset($email) ? $email : ""; ?></td>
+                  </tr>
+                  <tr>
+                    <?php
+                        $companyOptions = [
+                          'PAM' => 'PT. Prima Andalan Mandiri',
+                          'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
+                          'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
+                          'MIP Site Staff' => 'PT. Mandiri Intiperkasa - Site',
+                          'MIP Site NonStaff' => 'PT. Mandiri Intiperkasa - Site',
+                          'MKP HO' => 'PT. Mandala Karya Prima - HO',
+                          'MKP Site' => 'PT. Mandala Karya Prima - Site',
+                          'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
+                          'MPM Site' => 'PT. Maritim Prima Mandiri - Site',
+                          'mandiriland' => 'PT. Mandiriland',
+                          'GMS' => 'PT. Global Mining Service',
+                          'eam' => 'PT. Edika Agung Mandiri',
+                      ];                  
+                    ?>
+                      <td>Company:</td>
+                      <td><?php echo isset($company) ? $companyOptions[$company] : ""; ?></td>
+                    </tr>
+                  <tr>
+                      <td>Department:</td>
+                      <td><?php echo isset($department) ? $department : ""; ?></td>
+                  </tr>
+              </table>
 
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title fw-semibold mb-4">Device History</h5>
+                <!-- Display User Table -->
+                <div class="device-info">
+                  <h3>Informasi Perangkat</h3>
+                  <?php
+                  if (isset($assessment_result)) {
+                      if ($assessment_result->num_rows > 0) {
+                          $count = 1;
+                          while ($assessment_row = $assessment_result->fetch_assoc()) {
+                              echo "<div class='expand-btn' onclick='toggleAssessment(" . $count . ")'>Assessment Laptop ke-" . $count . "</div>";
 
-                        <h6 class="fw-semibold mb-3">Laptop Assessments</h6>
-                        <?php if ($assessment_result->num_rows > 0): ?>
-                            <?php $count = 1; while ($row = $assessment_result->fetch_assoc()): ?>
-                                <div class="expand-btn" onclick="toggleAssessment('lap-<?php echo $count; ?>')">
-                                    Assessment #<?php echo $count; ?> (<?php echo htmlspecialchars($row['date']); ?>) - Score: <?php echo htmlspecialchars($row['score']); ?>
-                                </div>
-                                <div class="assessment-content" id="assessment-lap-<?php echo $count; ?>">
-                                    <table class="table table-striped table-bordered">
-                                        <tr><th colspan="2"><?php echo htmlspecialchars($row["type"]); ?> / <?php echo htmlspecialchars($row["serialnumber"]); ?></th></tr>
-                                        <tr><td style="width: 40%;">Sistem Operasi</td><td><?php echo htmlspecialchars($row["os"]); ?></td></tr>
-                                        <tr><td>Processor</td><td><?php echo htmlspecialchars($row["processor"]); ?></td></tr>
-                                        <tr><td>Ketahanan Baterai</td><td><?php echo htmlspecialchars($row["batterylife"]); ?></td></tr>
-                                        <tr><td>Usia Perangkat</td><td><?php echo htmlspecialchars($row["age"]); ?></td></tr>
-                                        <tr><td>Isu Terkait Software</td><td><?php echo htmlspecialchars($row["issue"]); ?></td></tr>
-                                        <tr><td>RAM</td><td><?php echo htmlspecialchars($row["ram"]); ?></td></tr>
-                                        <tr><td>VGA</td><td><?php echo htmlspecialchars($row["vga"]); ?></td></tr>
-                                        <tr><td>Penyimpanan</td><td><?php echo htmlspecialchars($row["storage"]); ?></td></tr>
-                                        <tr><td>Keyboard</td><td><?php echo htmlspecialchars($row["keyboard"]); ?></td></tr>
-                                        <tr><td>Layar</td><td><?php echo htmlspecialchars($row["screen"]); ?></td></tr>
-                                        <tr><td>Touchpad</td><td><?php echo htmlspecialchars($row["touchpad"]); ?></td></tr>
-                                        <tr><td>Audio</td><td><?php echo htmlspecialchars($row["audio"]); ?></td></tr>
-                                        <tr><td>Rangka (Body)</td><td><?php echo htmlspecialchars($row["body"]); ?></td></tr>
-                                        <tr><td><b>Score</b></td><td><b><?php echo htmlspecialchars($row["score"]); ?></b></td></tr>
-                                    </table>
-                                </div>
-                                <br>
-                            <?php $count++; endwhile; ?>
-                        <?php else: ?>
-                            <p class="text-muted">Tidak ada riwayat assessment laptop ditemukan.</p>
-                        <?php endif; ?>
+                              echo "<div class='assessment-content' id='assessment-" . $count . "'>";
+                              echo "<table>";
+                              echo "<tr><th colspan='2'>" . $assessment_row["type"] . " / " . $assessment_row["serialnumber"] . "</th></tr>";
+                              echo "<tr><td>Tanggal</td><td>" . $assessment_row["date"] . "</td</tr>";
+                              echo "<tr><td>Sistem Operasi</td><td>" . $assessment_row["os"] . "</td></tr>";
+                              echo "<tr><td>Processor</td><td>" . $assessment_row["processor"] . "</td></tr>";
+                              echo "<tr><td>Ketahanan Baterai (Tanpa Daya)</td><td>" . $assessment_row["batterylife"] . "</td></tr>";
+                              echo "<tr><td>Usia Perangkat</td><td>" . $assessment_row["age"] . "</td></tr>";
+                              echo "<tr><td>Isue Terkait Software</td><td>" . $assessment_row["issue"] . "</td></tr>";
+                              echo "<tr><td>RAM</td><td>" . $assessment_row["ram"] . "</td></tr>";
+                              echo "<tr><td>VGA</td><td>" . $assessment_row["vga"] . "</td></tr>";
+                              echo "<tr><td>Penyimpanan</td><td>" . $assessment_row["storage"] . "</td></tr>";
+                              echo "<tr><td>Keyboard</td><td>" . $assessment_row["keyboard"] . "</td></tr>";
+                              echo "<tr><td>Layar</td><td>" . $assessment_row["screen"] . "</td></tr>";
+                              echo "<tr><td>Touchpad</td><td>" . $assessment_row["touchpad"] . "</td></tr>";
+                              echo "<tr><td>Audio</td><td>" . $assessment_row["audio"] . "</td></tr>";
+                              echo "<tr><td>Rangka</td><td>" . $assessment_row["body"] . "</td></tr>";
+                              echo "<tr><td>Score</td><td>" . $assessment_row["score"] . "</td></tr>";
+                              echo "</table>";
+                              echo "</div>";
+                              echo "<br>";
 
-                        <hr>
+                              $count++;
+                          }
+                      } else {
+                          echo "Data Assessment Laptop tidak ditemukan.";
+                      }
+                  } else {
+                      echo "Terjadi kesalahan saat menjalankan query Assessment Laptop.";
+                  }
 
-                        <h6 class="fw-semibold my-3">PC Desktop Assessments</h6>
-                        <?php if ($assessmentpc_result->num_rows > 0): ?>
-                            <?php $count = 1; while ($row = $assessmentpc_result->fetch_assoc()): ?>
-                                <div class="expand-btn" onclick="toggleAssessment('pc-<?php echo $count; ?>')">
-                                    Assessment #<?php echo $count; ?> (<?php echo htmlspecialchars($row['date']); ?>) - Score: <?php echo htmlspecialchars($row['score']); ?>
-                                </div>
-                                <div class="assessment-content" id="assessment-pc-<?php echo $count; ?>">
-                                    <table class="table table-striped table-bordered">
-                                        <tr><th colspan="2"><?php echo htmlspecialchars($row["merk"]); ?> / <?php echo htmlspecialchars($row["serialnumber"]); ?></th></tr>
-                                        <tr><td style="width: 40%;">Tipe PC</td><td><?php echo htmlspecialchars($row["typepc"]); ?></td></tr>
-                                        <tr><td>Sistem Operasi</td><td><?php echo htmlspecialchars($row["os"]); ?></td></tr>
-                                        <tr><td>Processor</td><td><?php echo htmlspecialchars($row["processor"]); ?></td></tr>
-                                        <tr><td>VGA</td><td><?php echo htmlspecialchars($row["vga"]); ?></td></tr>
-                                        <tr><td>Usia Perangkat</td><td><?php echo htmlspecialchars($row["age"]); ?></td></tr>
-                                        <tr><td>Isu Terkait Software</td><td><?php echo htmlspecialchars($row["issue"]); ?></td></tr>
-                                        <tr><td>RAM</td><td><?php echo htmlspecialchars($row["ram"]); ?></td></tr>
-                                        <tr><td>Penyimpanan</td><td><?php echo htmlspecialchars($row["storage"]); ?></td></tr>
-                                        <tr><td>Tipe Monitor</td><td><?php echo htmlspecialchars($row["typemonitor"]); ?></td></tr>
-                                        <tr><td>Ukuran Monitor</td><td><?php echo htmlspecialchars($row["sizemonitor"]); ?></td></tr>
-                                        <tr><td><b>Score</b></td><td><b><?php echo htmlspecialchars($row["score"]); ?></b></td></tr>
-                                    </table>
-                                </div>
-                                <br>
-                            <?php $count++; endwhile; ?>
-                        <?php else: ?>
-                            <p class="text-muted">Tidak ada riwayat assessment PC ditemukan.</p>
-                        <?php endif; ?>
-
-                        <hr>
+                  if (isset($assessmentpc_result)) {
+                      if ($assessmentpc_result->num_rows > 0) {
+                          $count_pc = 1;
+                          while ($assessmentpc_row = $assessmentpc_result->fetch_assoc()) {
+                              echo "<div class='expand-btn' onclick='toggleAssessmentPC(" . $count_pc . ")'>Assessment PC ke-" . $count_pc . "</div>";
+              
+                              echo "<div class='assessment-content' id='assessment-pc-" . $count_pc . "'>";
+                              echo "<table>";
+                              echo "<tr><th colspan='2'>" . $assessmentpc_row["merk"] . " / " . $assessmentpc_row["serialnumber"] . "</th></tr>";
+                              echo "<tr><td>Tanggal</td><td>" . $assessmentpc_row["date"] . "</td</tr>";
+                              echo "<tr><td>Tipe PC</td><td>" . $assessmentpc_row["typepc"] . "</td></tr>";
+                              echo "<tr><td>Sistem Operasi</td><td>" . $assessmentpc_row["os"] . "</td></tr>";
+                              echo "<tr><td>Processor</td><td>" . $assessmentpc_row["processor"] . "</td></tr>";
+                              echo "<tr><td>VGA</td><td>" . $assessmentpc_row["vga"] . "</td></tr>";
+                              echo "<tr><td>Usia Perangkat</td><td>" . $assessmentpc_row["age"] . "</td></tr>";
+                              echo "<tr><td>Isu Terkait Software</td><td>" . $assessmentpc_row["issue"] . "</td></tr>";
+                              echo "<tr><td>RAM</td><td>" . $assessmentpc_row["ram"] . "</td></tr>";
+                              echo "<tr><td>Penyimpanan</td><td>" . $assessmentpc_row["storage"] . "</td></tr>";
+                              echo "<tr><td>Tipe Monitor</td><td>" . $assessmentpc_row["typemonitor"] . "</td></tr>";
+                              echo "<tr><td>Ukuran Monitor</td><td>" . $assessmentpc_row["sizemonitor"] . "</td></tr>";
+                              echo "<tr><td>Score</td><td>" . $assessmentpc_row["score"] . "</td></tr>";
+                              echo "</table>";
+                              echo "</div>";
+                              echo "<br>";
+              
+                              $count_pc++;
+                          }
+                      } else {
+                          echo "Data Assessment PC tidak ditemukan.";
+                      }
+                  } else {
+                      echo "Terjadi kesalahan saat menjalankan query Assessment PC.";
+                  }
+                  ?>
+              </div>
               <div class="inspection-form">
                 <h3>Form Inspeksi</h3>
                 <?php
