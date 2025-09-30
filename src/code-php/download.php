@@ -53,7 +53,7 @@ class PDF extends FPDF {
     function Header() {
         $this->Image('../assets/images/logos/mandiri.png',10,8,33);
         $this->SetFont('helvetica','B',16);
-        $this->Cell(0,10,'PC DESKTOP REPLACEMENT ASSESSMENT',0,1,'C');
+        $this->Cell(0,10,'Laptop REPLACEMENT ASSESSMENT',0,1,'C');
         $this->SetLineWidth(0.5);
         $this->Line(10, $this->GetY() + 15, 200, $this->GetY() + 15); 
         $this->SetLineWidth(0.2);
@@ -167,30 +167,33 @@ $pdf->MultiCell(0, 5, clean_text($recommendation));
 $pdf->Ln(5); 
 
 $pdf->SetFont('helvetica', 'B', 10);
-$location = 'Jakarta, '; 
-$currentDate = date('d F Y');
-$pdf->SetX(15);
-$pdf->Cell(0, 5, $location . $currentDate, 0, 1, 'L');
+$location = '    Jakarta,'; 
+$currentDate = date('d F Y'); 
+$locationWidth = $pdf->GetStringWidth($location);
+$dateWidth = $pdf->GetStringWidth($currentDate);
+$totalWidth = $locationWidth + $dateWidth + 5; 
 
-$pdf->Ln(15); 
+$pdf->SetX(10); 
+$pdf->Cell($locationWidth, 5, $location, 0, 0, 'L'); 
+$pdf->Cell(1, 1, '', 0, 0, 'C'); 
+$pdf->Cell($dateWidth, 5, $currentDate, 0, 1, 'L'); 
+
+$pdf->Ln(20); 
+
+$pdf->Cell(95, 10, '', 0, 0, 'C');
+$pdf->Cell(5, 10, '', 0, 0, 'C'); 
+$pdf->Cell(95, 10, '', 0, 1, 'C');
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(15);
-$pdf->Cell(60, 5, 'Diperiksa Oleh,', 0, 0, 'L');
-$pdf->SetX(-75);
-$pdf->Cell(60, 5, 'Nama Pengguna,', 0, 1, 'L');
-
-$pdf->Ln(15);
-
-$pdf->SetFont('helvetica', 'BU', 10);
-$pdf->SetX(15);
-$pdf->Cell(60, 5, 'IT Support', 0, 0, 'L');
-$pdf->SetX(-75);
-$pdf->Cell(60, 5, clean_text($query['name']), 0, 1, 'L');
-
+$pdf->Cell(47.5, 10, 'Diperiksa Oleh', 'T', 0, 'L');
+$pdf->Cell(5, 10, '', 0, 0, 'C'); 
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetX(95);
+$pdf->Cell(47.5, 10, 'Nama Pengguna', 'T', 1, 'C');
 $pdf->AliasNbPages();
 
-$filename = "Assessment-for-Laptop-Replacement-" . clean_text($query['name']) . ".pdf";
+$filename = "Assessment-for-PC-Replacement-{$query['name']}.pdf";
 $pdf->Output($filename, 'D');
 
 ?>
