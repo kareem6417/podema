@@ -70,55 +70,51 @@ class PDF extends FPDF {
     }
 
     function SetWidths($w) {
-        // Atur lebar kolom
         $this->widths = $w;
     }
 
     function SetAligns($a) {
-        // Atur perataan kolom
         $this->aligns = $a;
     }
 
     function Row($data) {
-        // Hitung tinggi baris
         $nb = 0;
         for($i=0; $i<count($data); $i++)
             $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
-        $h = 5 * $nb; // 5 adalah tinggi per baris
         
-        // Cek jika halaman perlu pindah, sisakan ruang untuk baris
+        // ================================================================= //
+        // PERUBAHAN 1: Tinggi baris diubah dari 5 menjadi 7                 //
+        // ================================================================= //
+        $h = 7 * $nb; 
+        
         $this->CheckPageBreak($h);
         
-        // Gambar sel-sel
         for($i=0; $i<count($data); $i++) {
             $w = $this->widths[$i];
             $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
             
-            // Simpan posisi saat ini
             $x = $this->GetX();
             $y = $this->GetY();
             
-            // Gambar border
             $this->Rect($x, $y, $w, $h);
             
-            // Cetak teks
-            $this->MultiCell($w, 5, $data[$i], 0, $a);
+            // ================================================================= //
+            // PERUBAHAN 2: Tinggi MultiCell diubah dari 5 menjadi 7             //
+            // ================================================================= //
+            $this->MultiCell($w, 7, $data[$i], 0, $a);
             
-            // Posisikan kursor di sebelah kanan sel
             $this->SetXY($x + $w, $y);
         }
-        // Pindah ke baris baru
         $this->Ln($h);
     }
 
     function CheckPageBreak($h) {
-        // Jika tinggi baris akan melewati batas halaman, pindah halaman
         if($this->GetY() + $h > $this->PageBreakTrigger)
             $this->AddPage($this->CurOrientation);
     }
 
     function NbLines($w, $txt) {
-        // Hitung jumlah baris yang akan digunakan oleh sebuah MultiCell
+        // (Fungsi ini tidak berubah)
         $cw = &$this->CurrentFont['cw'];
         if($w==0)
             $w = $this->w-$this->rMargin-$this->x;
