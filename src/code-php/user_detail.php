@@ -527,7 +527,7 @@ function display_data_with_score($name, $score) {
                                         <tr><td>Informasi Keluhan</td><td><?php echo nl2br(htmlspecialchars($row["informasi_keluhan"])); ?></td></tr>
                                         <tr><td>Hasil Pemeriksaan</td><td><?php echo nl2br(htmlspecialchars($row["hasil_pemeriksaan"])); ?></td></tr>
                                         <tr><td>Rekomendasi</td><td><?php echo nl2br(htmlspecialchars($row["rekomendasi"])); ?></td></tr>
-                                        <tr><td>Usia Perangkat</td><td><?php echo display_data_with_score($row["age_lap_name"], $row["age_lap_score"]); ?></td></tr>
+                                        <tr><td>Usia Perangkat</td><td><?php echo display_data_with_score($row["age_name"], $row["age_score"]); ?></td></tr>
                                         <tr><td>Casing</td><td><?php echo display_data_with_score($row["casing_lap_name"], $row["casing_lap_score"]); ?></td></tr>
                                         <tr><td>Layar</td><td><?php echo display_data_with_score($row["layar_lap_name"], $row["layar_lap_score"]); ?></td></tr>
                                         <tr><td>Keyboard</td><td><?php echo display_data_with_score($row["keyboard_lap_name"], $row["keyboard_lap_score"]); ?></td></tr>
