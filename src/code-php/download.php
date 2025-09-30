@@ -1,7 +1,12 @@
 <?php
 
-
 require('../fpdf/fpdf.php');
+
+// Fungsi bantuan untuk membersihkan teks sebelum dimasukkan ke PDF
+function clean_text($string) {
+    // Mengonversi encoding ke yang didukung FPDF dan mengganti karakter yang tidak valid
+    return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $string);
+}
 
 $host = "mandiricoal.net";
 $user = "podema"; 
@@ -13,18 +18,13 @@ if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
 
-// ================================================================= //
-// SOLUSI: Cek koneksi dan sambungkan ulang jika terputus (gone away)//
-// ================================================================= //
 if (!$conn->ping()) {
-    $conn->close(); // Tutup koneksi lama
-    $conn = new mysqli($host, $user, $pass, $db); // Buat koneksi baru
+    $conn->close();
+    $conn = new mysqli($host, $user, $pass, $db);
     if ($conn->connect_error) {
         die("Koneksi ulang gagal: " . $conn->connect_error);
     }
 }
-// ================================================================= //
-
 
 $result = mysqli_query($conn, "SELECT assess_laptop.*, operating_sistem_laptop.os_name, processor_laptop.processor_name, batterylife_laptop.battery_name, device_age_laptop.age_name, issue_software_laptop.issue_name, ram_laptop.ram_name, vga_pc.vga_name,
                               storage_laptop.storage_name, keyboard_laptop.keyboard_name, screen_laptop.screen_name, touchpad_laptop.touchpad_name, audio_laptop.audio_name, body_laptop.body_name
@@ -51,17 +51,22 @@ if (!$result) {
 
 $query = mysqli_fetch_array($result);
 
+if (!$query) {
+    die("Data assessment tidak ditemukan di database.");
+}
+
+
 class PDF extends FPDF {
+    // ================================================================= //
+    // FUNGSI HEADER DIMODIFIKASI - SEMUA KODE GAMBAR/LOGO DIHAPUS     //
+    // ================================================================= //
     function Header() {
-        if (file_exists('../assets/images/logos/mandiri.png')) {
-             $this->Image('../assets/images/logos/mandiri.png',10,8,33);
-        }
         $this->SetFont('helvetica','B',16);
         $this->Cell(0,10,'LAPTOP REPLACEMENT ASSESSMENT',0,1,'C');
         $this->SetLineWidth(0.5);
-        $this->Line(10, $this->GetY() + 15, 200, $this->GetY() + 15); 
+        $this->Line(10, $this->GetY() + 5, 200, $this->GetY() + 5); 
         $this->SetLineWidth(0.2);
-        $this->Ln(20);
+        $this->Ln(15); // Memberi jarak dari header
     }    
 
     function Footer() {
@@ -69,11 +74,6 @@ class PDF extends FPDF {
         $this->SetFont('helvetica','I',8);
         $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
     }
-}
-
-// Tambahan: Pastikan $query tidak kosong sebelum digunakan untuk menghindari error
-if (!$query) {
-    die("Data assessment tidak ditemukan di database.");
 }
 
 
@@ -85,10 +85,11 @@ $totalScore = $query['os'] + $query['processor'] + $query['batterylife'] + $quer
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 10);
 
+// Menggunakan fungsi clean_text untuk data dari database
 $data = [
-    ['Name', $query['name'], 'Date', $query['date']],
-    ['Company', $query['company'], 'Type/Merk', $query['type']],
-    ['Division', $query['divisi'], 'Serial Number', $query['serialnumber']],
+    ['Name', clean_text($query['name']), 'Date', $query['date']],
+    ['Company', clean_text($query['company']), 'Type/Merk', clean_text($query['type'])],
+    ['Division', clean_text($query['divisi']), 'Serial Number', clean_text($query['serialnumber'])],
 ];
 
 $columnWidth = 38;
@@ -113,7 +114,6 @@ $pdf->Ln(4);
 $pdf->SetFont('helvetica', '', 10);
 $pdf->SetX(20);
 $columnWidths = [40, 75, 40]; 
-$columnAlignments = ['C', 'C', 'C']; 
 $header = ['Detail', 'Description', 'Score'];
 $pdf->SetFillColor(176, 224, 230); 
 $pdf->SetTextColor(0);
@@ -121,51 +121,49 @@ $pdf->SetDrawColor(0);
 $pdf->SetLineWidth(0.15); 
 
 for ($i = 0; $i < count($header); $i++) {
-    $pdf->Cell($columnWidths[$i], 10, $header[$i], 1, 0, $columnAlignments[$i], true);
+    $pdf->Cell($columnWidths[$i], 10, $header[$i], 1, 0, 'C', true);
 }
 $pdf->Ln();
 
+// Menggunakan fungsi clean_text untuk data dari database
 $dataTable = [
-    ['Operating System', $query['os_name'], $query['os']],
-    ['Processor', $query['processor_name'], $query['processor']],
-    ['Battery Life', $query['battery_name'], $query['batterylife']],
-    ['Device Age', $query['age_name'], $query['age']],
-    ['Issue Related Software', $query['issue_name'], $query['issue']],
-    ['RAM', $query['ram_name'], $query['ram']],
-    ['VGA', $query['vga_name'], $query['vga']],
-    ['Storage', $query['storage_name'], $query['storage']],
-    ['Keyboard', $query['keyboard_name'], $query['keyboard']],
-    ['Screen', $query['screen_name'], $query['screen']],
-    ['Touchpad', $query['touchpad_name'], $query['touchpad']],
-    ['Audio', $query['audio_name'], $query['audio']],
-    ['Body', $query['body_name'], $query['body']],
+    ['Operating System', clean_text($query['os_name']), $query['os']],
+    ['Processor', clean_text($query['processor_name']), $query['processor']],
+    ['Battery Life', clean_text($query['battery_name']), $query['batterylife']],
+    ['Device Age', clean_text($query['age_name']), $query['age']],
+    ['Issue Related Software', clean_text($query['issue_name']), $query['issue']],
+    ['RAM', clean_text($query['ram_name']), $query['ram']],
+    ['VGA', clean_text($query['vga_name']), $query['vga']],
+    ['Storage', clean_text($query['storage_name']), $query['storage']],
+    ['Keyboard', clean_text($query['keyboard_name']), $query['keyboard']],
+    ['Screen', clean_text($query['screen_name']), $query['screen']],
+    ['Touchpad', clean_text($query['touchpad_name']), $query['touchpad']],
+    ['Audio', clean_text($query['audio_name']), $query['audio']],
+    ['Body', clean_text($query['body_name']), $query['body']],
     ['Total Score', '', $totalScore]
 ];
 
 foreach ($dataTable as $row) {
     $pdf->SetX(20); 
-
     if ($row[0] == 'Total Score') {
         $pdf->Cell($columnWidths[0] + $columnWidths[1], 10, $row[0], 1, 0, 'C');
         $pdf->Cell($columnWidths[2], 10, $row[2], 1, 1, 'C');
     } else {
         $pdf->Cell($columnWidths[0], 10, $row[0], 1, 0, 'C');
-        $pdf->Cell($columnWidths[1], 10, $row[1], 0, 'C');
+        $pdf->Cell($columnWidths[1], 10, $row[1], 1, 0, 'C');
         $pdf->Cell($columnWidths[2], 10, $row[2], 1, 1, 'C');
     }
 }
 
 $pdf->Ln(5);
 
+$recommendation = ($totalScore > 100)
+    ? 'Berdasarkan pada hasil diatas, direkomendasikan untuk mengganti perangkat Anda dengan yang baru.'
+    : 'Berdasarkan pada hasil diatas, dinyatakan bahwa perangkat Anda masih dapat digunakan. Oleh karena itu, tim IT akan melakukan peningkatan sesuai dengan kebutuhan perangkat Anda.';
+
 $pdf->SetFont('helvetica', '', 10);
 $pdf->SetX(15);
-if ($totalScore > 100) {
-    $recommendation = 'Berdasarkan pada hasil diatas, direkomendasikan untuk mengganti perangkat Anda dengan yang baru.';
-} else {
-    $recommendation = 'Berdasarkan pada hasil diatas, dinyatakan bahwa perangkat Anda masih dapat digunakan. Oleh karena itu, tim IT akan melakukan peningkatan sesuai dengan kebutuhan perangkat Anda.';
-}
-
-$pdf->MultiCell(0, 5, $recommendation);
+$pdf->MultiCell(0, 5, clean_text($recommendation));
 
 $pdf->Ln(5); 
 
@@ -191,11 +189,11 @@ $pdf->SetX(15);
 $pdf->Cell(60, 5, 'IT Support', 0, 0, 'L');
 
 $pdf->SetX(-75);
-$pdf->Cell(60, 5, $query['name'], 0, 1, 'L');
+$pdf->Cell(60, 5, clean_text($query['name']), 0, 1, 'L');
 
 $pdf->AliasNbPages();
 
-$filename = "Assessment-for-Laptop-Replacement-{$query['name']}.pdf";
+$filename = "Assessment-for-Laptop-Replacement-" . clean_text($query['name']) . ".pdf";
 $pdf->Output($filename, 'D');
 
 ?>
