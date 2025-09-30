@@ -68,7 +68,7 @@ $pdf->SetFont('helvetica', '', 10);
 
 $data = [
     ['Name', $query['name'], 'Date', $query['date']],
-    ['Company', $query['company'], 'Type/Merk', $query['merk']],
+    ['Company', $query['company'], 'Type/Merk', $query['type']],
     ['Division', $query['divisi'], 'Serial Number', $query['serialnumber']],
 ];
 
