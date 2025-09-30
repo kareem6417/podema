@@ -530,6 +530,15 @@ function display_data_with_score($name, $score) {
                                         <tr><td>Usia Perangkat</td><td><?php echo display_data_with_score($row["age_name"], $row["age_score"]); ?></td></tr>
                                         <tr><td>Casing</td><td><?php echo display_data_with_score($row["casing_lap_name"], $row["casing_lap_score"]); ?></td></tr>
                                         <tr><td>Layar</td><td><?php echo display_data_with_score($row["layar_lap_name"], $row["layar_lap_score"]); ?></td></tr>
+                                        <tr><td>Keyboard</td><td><?php echo display_data_with_score($row["keyboard_lap_name"], $row["keyboard_lap_score"]); ?></td></tr>
+                                        <tr><td>Touchpad</td><td><?php echo display_data_with_score($row["touchpad_lap_name"], $row["touchpad_lap_score"]); ?></td></tr>
+                                        <tr><td>Prosess Booting</td><td><?php echo display_data_with_score($row["booting_lap_name"], $row["booting_lap_score"]); ?></td></tr>
+                                        <tr><td>Multitasking</td><td><?php echo display_data_with_score($row["multi_lap_name"], $row["multi_lap_score"]); ?></td></tr>
+                                        <tr><td>Kapasitas Baterai</td><td><?php echo display_data_with_score($row["tampung_lap_name"], $row["tampung_lap_score"]); ?></td></tr>
+                                        <tr><td>Waktu Pengisian Baterai</td><td><?php echo display_data_with_score($row["isi_lap_name"], $row["isi_lap_score"]); ?></td></tr>
+                                        <tr><td>Port</td><td><?php echo display_data_with_score($row["port_lap_name"], $row["port_lap_score"]); ?></td></tr>
+                                        <tr><td>Audio</td><td><?php echo display_data_with_score($row["audio_lap_name"], $row["audio_lap_score"]); ?></td></tr>
+                                        <tr><td>Software</td><td><?php echo display_data_with_score($row["software_lap_name"], $row["software_lap_score"]); ?></td></tr>                                       
                                         <tr class="table-info"><td><b>Total Score</b></td><td><b><?php echo !empty($row['score']) ? htmlspecialchars($row['score']) : '<em class="text-muted">N/A</em>'; ?></b></td></tr>
                                     </table>
                                 </div>
