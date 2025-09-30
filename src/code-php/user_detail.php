@@ -557,6 +557,18 @@ function display_data_with_score($name, $score) {
         window.history.back();
     }
   </script>
+  <script>
+    function toggleContent(id) {
+        var element = document.getElementById('content-' + id);
+        if (element) { // Cek dulu apakah elemennya ada
+            if (element.style.display === 'none' || element.style.display === '') {
+                element.style.display = 'block';
+            } else {
+                element.style.display = 'none';
+            }
+        }
+    }
+  </script>
 </body>
 
 </html>
