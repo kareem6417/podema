@@ -115,12 +115,9 @@ foreach ($users as $user) {
 </head>
 
 <body>
-  <!--  Body Wrapper -->
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
     <aside class="left-sidebar">
-      <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-center">
           <a href="" class="text-nowrap logo-img">
@@ -131,7 +128,6 @@ foreach ($users as $user) {
             <i class="ti ti-x fs-8"></i>
           </div>
         </div>
-        <!-- Sidebar navigation-->
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
           <ul id="sidebarnav">
             <li class="nav-small-cap">
@@ -286,14 +282,9 @@ foreach ($users as $user) {
           </ul>
 
         </nav>
-        <!-- End Sidebar navigation -->
-      </div>
-      <!-- End Sidebar scroll-->
-    </aside>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
+        </div>
+      </aside>
     <div class="body-wrapper">
-      <!--  Header Start -->
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
           <ul class="navbar-nav">
@@ -338,11 +329,10 @@ foreach ($users as $user) {
           </div>
         </nav>
       </header>
-      <!--  Header End -->
       <div class="container-fluid">
         <div class="card">
           <h1 class="card-title fw-semibold mb-4">Laptop Replacement Assessment</h1>
-          <form id="assessmentForm" method="post" action="submit.php" class="content" enctype="multipart/form-data">
+          <form id="assessmentForm" method="post" action="submit.php" class="content">
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -558,11 +548,6 @@ foreach ($users as $user) {
                 </select>
               </div>
               <br>
-              <div class="form-group">
-                  <label for="upload_file" style="margin-bottom: 10px;">Unggah File<span style="color: crimson;"></span></label>
-                  <input type="file" id="upload_file" name="upload_file" class="form-control" accept=".zip, .rar">
-                  <small>*Note: <br> Sebagai bahan verifikasi mohon upload file berformat .zip atau .rar dari hasil Belarc, <br>dan file tidak lebih dari 100 KB</small>
-              </div>
               <div class="btn-group">
                 <input type="submit" value="Submit" class="btn btn-primary">
                 <input type="reset" value="Reset" class="btn btn-secondary">
