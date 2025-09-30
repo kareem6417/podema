@@ -2,16 +2,11 @@
 
 require('../fpdf/fpdf.php');
 
-// Fungsi bantuan untuk membersihkan teks sebelum dimasukkan ke PDF
 function clean_text($string) {
     if (empty($string)) return '';
     return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $string);
 }
 
-
-// ================================================================= //
-// KONEKSI DATABASE DIPINDAHKAN TEPAT SEBELUM QUERY DIJALANKAN       //
-// ================================================================= //
 $host = "mandiricoal.net";
 $user = "podema"; 
 $pass = "Jam10pagi#";
@@ -54,22 +49,32 @@ if (!$query) {
     die("Data assessment tidak ditemukan di database.");
 }
 
-
 class PDF extends FPDF {
     function Header() {
+        $this->Image('../assets/images/logos/mandiri.png',10,8,33);
         $this->SetFont('helvetica','B',16);
-        $this->Cell(0,10,'LAPTOP REPLACEMENT ASSESSMENT',0,1,'C');
+        $this->Cell(0,10,'PC DESKTOP REPLACEMENT ASSESSMENT',0,1,'C');
         $this->SetLineWidth(0.5);
-        $this->Line(10, $this->GetY() + 5, 200, $this->GetY() + 5); 
+        $this->Line(10, $this->GetY() + 15, 200, $this->GetY() + 15); 
         $this->SetLineWidth(0.2);
-        $this->Ln(15);
+        $this->Ln(20);
     }    
 
     function Footer() {
         $this->SetY(-15);
         $this->SetFont('helvetica','I',8);
         $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+    } 
+
+    private $data; 
+
+    public function AddCustomRow($title, $description, $score) {
+        $this->SetFont('helvetica', '', 7);
+        $this->Cell(80, 10, $title, 0);
+        $this->Cell(80, 10, $description, 0);
+        $this->Cell(40, 10, $score, 0, 1, 'C');
     }
+    
 }
 
 
