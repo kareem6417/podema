@@ -1,5 +1,14 @@
 <?php
 
+// ================================================================= //
+// KODE UNTUK MENAMPILKAN ERROR - DITAMBAHKAN KEMBALI UNTUK DEBUGGING //
+// ================================================================= //
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+// ================================================================= //
+
+
 require('../fpdf/fpdf.php');
 
 $host = "mandiricoal.net";
@@ -7,6 +16,18 @@ $user = "podema";
 $pass = "Jam10pagi#";
 $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
+
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+if (!$conn->ping()) {
+    $conn->close();
+    $conn = new mysqli($host, $user, $pass, $db);
+    if ($conn->connect_error) {
+        die("Koneksi ulang gagal: " . $conn->connect_error);
+    }
+}
 
 $result = mysqli_query($conn, "SELECT assess_laptop.*, operating_sistem_laptop.os_name, processor_laptop.processor_name, batterylife_laptop.battery_name, device_age_laptop.age_name, issue_software_laptop.issue_name, ram_laptop.ram_name, vga_pc.vga_name,
                               storage_laptop.storage_name, keyboard_laptop.keyboard_name, screen_laptop.screen_name, touchpad_laptop.touchpad_name, audio_laptop.audio_name, body_laptop.body_name
@@ -27,35 +48,34 @@ $result = mysqli_query($conn, "SELECT assess_laptop.*, operating_sistem_laptop.o
                               ORDER BY assess_laptop.id DESC
                               LIMIT 1");
 
+if (!$result) {
+    die("Error pada query SQL: " . mysqli_error($conn));
+}
+
 $query = mysqli_fetch_array($result);
+
+if (!$query) {
+    // Jika query tidak mengembalikan hasil, skrip akan berhenti di sini dan menampilkan pesan ini.
+    die("<h1>DEBUG: Query berhasil, tetapi tidak ada data yang cocok ditemukan.</h1><p>Ini kemungkinan besar terjadi karena salah satu nilai skor pada data asesmen laptop terakhir tidak ada di tabel referensinya (INNER JOIN gagal).</p>");
+}
+
+// Jika skrip berhasil melewati pengecekan di atas, berarti query berhasil dan data ditemukan.
+// Jika masih ada error, maka errornya terjadi saat pembuatan PDF di bawah ini.
+echo "<h1>DEBUG: Query berhasil dan data ditemukan. Mencoba membuat PDF...</h1>";
+
+
 class PDF extends FPDF {
     function Header() {
-        $this->Image('../assets/images/logos/mandiri.png',10,8,33);
         $this->SetFont('helvetica','B',16);
         $this->Cell(0,10,'LAPTOP REPLACEMENT ASSESSMENT',0,1,'C');
-        $this->SetLineWidth(0.5);
-        $this->Line(10, $this->GetY() + 15, 200, $this->GetY() + 15); 
-        $this->SetLineWidth(0.2);
-        $this->Ln(20);
+        $this->Ln(15);
     }    
-
     function Footer() {
         $this->SetY(-15);
         $this->SetFont('helvetica','I',8);
         $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
-    } 
-
-    private $data; 
-
-    public function AddCustomRow($title, $description, $score) {
-        $this->SetFont('helvetica', '', 7);
-        $this->Cell(80, 10, $title, 0);
-        $this->Cell(80, 10, $description, 0);
-        $this->Cell(40, 10, $score, 0, 1, 'C');
     }
-    
 }
-
 
 $pdf = new PDF('P', 'mm', 'A4');
 $pdf->SetMargins(10, 10, 10);
@@ -178,5 +198,7 @@ $pdf->AliasNbPages();
 
 $filename = "Assessment-for-Laptop-Replacement-" . ($query['name']) . ".pdf";
 $pdf->Output($filename, 'D');
+
+echo "<p>Jika Anda melihat pesan ini, berarti tidak ada error fatal saat membuat objek PDF.</p>";
 
 ?>

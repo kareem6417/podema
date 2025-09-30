@@ -351,7 +351,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                                   <label for="date"><strong>Date</strong></label>
                                   <p id="date" name="date" class="form-control" ><?= isset($query['date']) ? $query['date'] : '' ?></p>
                                   <br>
-                                  <label for="type"><strong>Type PC</strong></label>
+                                  <label for="type"><strong>Type Laptop</strong></label>
                                   <p id="type" name="type" class="form-control" ><?= isset($query['type']) ? $query['type'] : '' ?></p>
                                   <br>
                                   <label for="serialnumber"><strong>Serial Number</strong></label>
