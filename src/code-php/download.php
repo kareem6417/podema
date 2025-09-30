@@ -50,6 +50,9 @@ if (!$query) {
 }
 
 class PDF extends FPDF {
+    var $widths;
+    var $aligns;
+
     function Header() {
         $this->Image('../assets/images/logos/mandiri.png',10,8,33);
         $this->SetFont('helvetica','B',16);
@@ -64,19 +67,102 @@ class PDF extends FPDF {
         $this->SetY(-15);
         $this->SetFont('helvetica','I',8);
         $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
-    } 
-
-    private $data; 
-
-    public function AddCustomRow($title, $description, $score) {
-        $this->SetFont('helvetica', '', 7);
-        $this->Cell(80, 10, $title, 0);
-        $this->Cell(80, 10, $description, 0);
-        $this->Cell(40, 10, $score, 0, 1, 'C');
     }
-    
-}
 
+    function SetWidths($w) {
+        // Atur lebar kolom
+        $this->widths = $w;
+    }
+
+    function SetAligns($a) {
+        // Atur perataan kolom
+        $this->aligns = $a;
+    }
+
+    function Row($data) {
+        // Hitung tinggi baris
+        $nb = 0;
+        for($i=0; $i<count($data); $i++)
+            $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
+        $h = 5 * $nb; // 5 adalah tinggi per baris
+        
+        // Cek jika halaman perlu pindah, sisakan ruang untuk baris
+        $this->CheckPageBreak($h);
+        
+        // Gambar sel-sel
+        for($i=0; $i<count($data); $i++) {
+            $w = $this->widths[$i];
+            $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+            
+            // Simpan posisi saat ini
+            $x = $this->GetX();
+            $y = $this->GetY();
+            
+            // Gambar border
+            $this->Rect($x, $y, $w, $h);
+            
+            // Cetak teks
+            $this->MultiCell($w, 5, $data[$i], 0, $a);
+            
+            // Posisikan kursor di sebelah kanan sel
+            $this->SetXY($x + $w, $y);
+        }
+        // Pindah ke baris baru
+        $this->Ln($h);
+    }
+
+    function CheckPageBreak($h) {
+        // Jika tinggi baris akan melewati batas halaman, pindah halaman
+        if($this->GetY() + $h > $this->PageBreakTrigger)
+            $this->AddPage($this->CurOrientation);
+    }
+
+    function NbLines($w, $txt) {
+        // Hitung jumlah baris yang akan digunakan oleh sebuah MultiCell
+        $cw = &$this->CurrentFont['cw'];
+        if($w==0)
+            $w = $this->w-$this->rMargin-$this->x;
+        $wmax = ($w-2*$this->cMargin)*1000/$this->FontSize;
+        $s = str_replace("\r",'',$txt);
+        $nb = strlen($s);
+        if($nb>0 and $s[$nb-1]=="\n")
+            $nb--;
+        $sep = -1;
+        $i = 0;
+        $j = 0;
+        $l = 0;
+        $nl = 1;
+        while($i<$nb) {
+            $c = $s[$i];
+            if($c=="\n") {
+                $i++;
+                $sep = -1;
+                $j = $i;
+                $l = 0;
+                $nl++;
+                continue;
+            }
+            if($c==' ')
+                $sep = $i;
+            $l += $cw[$c];
+            if($l>$wmax) {
+                if($sep==-1) {
+                    if($i==$j)
+                        $i++;
+                }
+                else
+                    $i = $sep+1;
+                $sep = -1;
+                $j = $i;
+                $l = 0;
+                $nl++;
+            }
+            else
+                $i++;
+        }
+        return $nl;
+    }
+}
 
 $pdf = new PDF('P', 'mm', 'A4');
 $pdf->SetMargins(10, 10, 10);
@@ -111,20 +197,21 @@ for ($i = 0; $i < count($data); $i++) {
 
 $pdf->Ln(4);
 
-$pdf->SetFont('helvetica', '', 10);
 $pdf->SetX(20);
-$columnWidths = [40, 75, 40]; 
-$header = ['Detail', 'Description', 'Score'];
-$pdf->SetFillColor(176, 224, 230); 
+$pdf->SetWidths([40, 75, 40]);
+$pdf->SetAligns(['C', 'C', 'C']);
+
+// Header tabel
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetFillColor(176, 224, 230);
 $pdf->SetTextColor(0);
 $pdf->SetDrawColor(0);
-$pdf->SetLineWidth(0.15); 
+$pdf->SetLineWidth(0.15);
+$pdf->Cell(40, 10, 'Detail', 1, 0, 'C', true);
+$pdf->Cell(75, 10, 'Description', 1, 0, 'C', true);
+$pdf->Cell(40, 10, 'Score', 1, 1, 'C', true);
 
-for ($i = 0; $i < count($header); $i++) {
-    $pdf->Cell($columnWidths[$i], 10, $header[$i], 1, 0, 'C', true);
-}
-$pdf->Ln();
-
+$pdf->SetFont('helvetica', '', 10);
 $dataTable = [
     ['Operating System', clean_text($query['os_name']), $query['os']],
     ['Processor', clean_text($query['processor_name']), $query['processor']],
@@ -139,20 +226,18 @@ $dataTable = [
     ['Touchpad', clean_text($query['touchpad_name']), $query['touchpad']],
     ['Audio', clean_text($query['audio_name']), $query['audio']],
     ['Body', clean_text($query['body_name']), $query['body']],
-    ['Total Score', '', $totalScore]
 ];
 
 foreach ($dataTable as $row) {
-    $pdf->SetX(20); 
-    if ($row[0] == 'Total Score') {
-        $pdf->Cell($columnWidths[0] + $columnWidths[1], 10, $row[0], 1, 0, 'C');
-        $pdf->Cell($columnWidths[2], 10, $row[2], 1, 1, 'C');
-    } else {
-        $pdf->Cell($columnWidths[0], 10, $row[0], 1, 0, 'C');
-        $pdf->Cell($columnWidths[1], 10, $row[1], 1, 0, 'C');
-        $pdf->Cell($columnWidths[2], 10, $row[2], 1, 1, 'C');
-    }
+    $pdf->SetX(20);
+    $pdf->Row($row);
 }
+
+$pdf->SetX(20);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(115, 10, 'Total Score', 1, 0, 'C'); // Gabungan kolom 1 dan 2
+$pdf->Cell(40, 10, $totalScore, 1, 1, 'C');
+
 
 $pdf->Ln(5);
 
