@@ -82,7 +82,7 @@ class PDF extends FPDF {
         for($i=0; $i<count($data); $i++)
             $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
 
-        $h = 8 * $nb; 
+        $h = 9 * $nb; 
         
         $this->CheckPageBreak($h);
         
