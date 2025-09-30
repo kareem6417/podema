@@ -1,8 +1,5 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 require('../fpdf/fpdf.php');
 
@@ -15,6 +12,19 @@ $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
+
+// ================================================================= //
+// SOLUSI: Cek koneksi dan sambungkan ulang jika terputus (gone away)//
+// ================================================================= //
+if (!$conn->ping()) {
+    $conn->close(); // Tutup koneksi lama
+    $conn = new mysqli($host, $user, $pass, $db); // Buat koneksi baru
+    if ($conn->connect_error) {
+        die("Koneksi ulang gagal: " . $conn->connect_error);
+    }
+}
+// ================================================================= //
+
 
 $result = mysqli_query($conn, "SELECT assess_laptop.*, operating_sistem_laptop.os_name, processor_laptop.processor_name, batterylife_laptop.battery_name, device_age_laptop.age_name, issue_software_laptop.issue_name, ram_laptop.ram_name, vga_pc.vga_name,
                               storage_laptop.storage_name, keyboard_laptop.keyboard_name, screen_laptop.screen_name, touchpad_laptop.touchpad_name, audio_laptop.audio_name, body_laptop.body_name
@@ -43,9 +53,9 @@ $query = mysqli_fetch_array($result);
 
 class PDF extends FPDF {
     function Header() {
-        // PERHATIKAN: Pastikan path gambar ini juga benar dari lokasi file Anda
-        // Dari /src/code-php/, path ini akan mencari /src/assets/...
-        $this->Image('../assets/images/logos/mandiri.png',10,8,33);
+        if (file_exists('../assets/images/logos/mandiri.png')) {
+             $this->Image('../assets/images/logos/mandiri.png',10,8,33);
+        }
         $this->SetFont('helvetica','B',16);
         $this->Cell(0,10,'LAPTOP REPLACEMENT ASSESSMENT',0,1,'C');
         $this->SetLineWidth(0.5);
@@ -60,6 +70,12 @@ class PDF extends FPDF {
         $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
     }
 }
+
+// Tambahan: Pastikan $query tidak kosong sebelum digunakan untuk menghindari error
+if (!$query) {
+    die("Data assessment tidak ditemukan di database.");
+}
+
 
 $pdf = new PDF('P', 'mm', 'A4');
 $pdf->SetMargins(10, 10, 10);
@@ -109,9 +125,6 @@ for ($i = 0; $i < count($header); $i++) {
 }
 $pdf->Ln();
 
-// ================================================================= //
-// KODE DENGAN KESALAHAN KETIK YANG TELAH DIPERBAIKI ADA DI BAWAH INI //
-// ================================================================= //
 $dataTable = [
     ['Operating System', $query['os_name'], $query['os']],
     ['Processor', $query['processor_name'], $query['processor']],
@@ -137,7 +150,7 @@ foreach ($dataTable as $row) {
         $pdf->Cell($columnWidths[2], 10, $row[2], 1, 1, 'C');
     } else {
         $pdf->Cell($columnWidths[0], 10, $row[0], 1, 0, 'C');
-        $pdf->Cell($columnWidths[1], 10, $row[1], 1, 0, 'C');
+        $pdf->Cell($columnWidths[1], 10, $row[1], 0, 'C');
         $pdf->Cell($columnWidths[2], 10, $row[2], 1, 1, 'C');
     }
 }
