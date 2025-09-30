@@ -11,7 +11,7 @@ $batterylife = $_POST["batterylife"];
 $age = $_POST["age"];
 $issue = $_POST["issue"];
 $ram = $_POST["ram"];
-$vga = $_POST[ "vga" ]; 
+$vga = $_POST[ "vga" ];
 $storage = $_POST["storage"];
 $keyboard = $_POST["keyboard"];
 $screen = $_POST["screen"];
@@ -21,43 +21,27 @@ $body = $_POST["body"];
 $score = $os + $processor + $batterylife + $age + $issue + $ram + $vga + $storage + $keyboard + $screen + $touchpad + $audio + $body;
 
 $host = "mandiricoal.net";
-$user = "podema"; 
-$pass = "Jam10pagi#"; 
+$user = "podema";
+$pass = "Jam10pagi#";
 $db = "podema";
 
+// Membuat koneksi ke database
 $conn = new mysqli($host, $user, $pass, $db);
 
-if (!$conn) {
-    die("Koneksi gagal");
-} else {
-    echo "Koneksi Berhasil";
+// Cek koneksi
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 
+// Perbaikan pada urutan kolom di query SQL
 $sql = "INSERT INTO assess_laptop (date, name, company, divisi, type, serialnumber, os, processor, batterylife, age, issue, ram, vga, storage, keyboard, screen, touchpad, audio, body, score)
-        VALUES ('$date', '$name', '$company', '$divisi', '$type', '$serialnumber', '$os', '$processor', '$batterylife', '$age', '$vga' ,'$issue', '$ram', '$storage', '$keyboard', '$screen', '$touchpad', '$audio', '$body', '$score')";
+        VALUES ('$date', '$name', '$company', '$divisi', '$type', '$serialnumber', '$os', '$processor', '$batterylife', '$age', '$issue', '$ram', '$vga', '$storage', '$keyboard', '$screen', '$touchpad', '$audio', '$body', '$score')";
 
+// Eksekusi query dan redirect ke view.php jika berhasil
 if ($conn->query($sql) === TRUE) {
-    $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/src/File Upload Laptop/";
-    $file = $_FILES['upload_file']['name'];
-    $path = pathinfo($file);
-    $filename = $path['filename'];
-    $ext = $path['extension'];
-    $temp_name = $_FILES['upload_file']['tmp_name'];
-    $path_filename_ext = $target_dir . $filename . '.' . $ext;
-
-    if (file_exists($path_filename_ext)) {
-        echo "Maaf, file sudah ada.";
-    } else {
-        if (move_uploaded_file($temp_name, $path_filename_ext)) {
-            echo "File Anda berhasil diunggah.";
-            echo '<meta http-equiv="refresh" content="0;url=view.php">';
-            exit();
-        } else {
-            echo $target_dir;
-            echo "Terjadi kesalahan saat mengunggah file.";
-        }
-        
-    }
+    // Mengarahkan ke halaman view.php setelah data berhasil disimpan
+    header("Location: view.php");
+    exit();
 } else {
     echo "Error: " . $sql . "<br>" . $conn->error;
 }
