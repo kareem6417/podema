@@ -82,7 +82,7 @@ class PDF extends FPDF {
         for($i=0; $i<count($data); $i++)
             $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
 
-        $h = 10 * $nb; 
+        $h = 8 * $nb; 
         
         $this->CheckPageBreak($h);
         
@@ -94,7 +94,7 @@ class PDF extends FPDF {
             $y = $this->GetY();
             
             $this->Rect($x, $y, $w, $h);
-            $this->MultiCell($w, 10, $data[$i], 0, $a);
+            $this->MultiCell($w, 9, $data[$i], 0, $a);
             
             $this->SetXY($x + $w, $y);
         }
