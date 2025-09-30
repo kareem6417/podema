@@ -1,113 +1,143 @@
 <?php
 session_start();
 
-// ================================================================= //
-// 1. PENGAMBILAN DATA TERPUSAT
-// ================================================================= //
-
-// Periksa apakah user_id ada di URL
-if (!isset($_GET['user_id'])) {
-    die("Tidak ada ID pengguna yang diberikan.");
-}
-
-$user_id = $_GET['user_id'];
-
-// Buka koneksi database sekali saja
 $servername = "mandiricoal.net";
 $username = "podema";
 $password = "Jam10pagi#";
 $dbname = "podema";
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
-    die("Koneksi ke database gagal: " . $conn->connect_error);
+    die("Koneksi ke database podema gagal: " . $conn->connect_error);
 }
 
-// ================================================================= //
-// 2. QUERY UTAMA UNTUK MENDAPATKAN DETAIL PENGGUNA
-// ================================================================= //
+//assessment_laptop
+if (isset($_GET['user_id']) && isset($_GET['name'])) {
+    $user_id = $_GET['user_id'];
+    $name = $_GET['name'];
 
-$user_sql = "SELECT nik, name, email, company, department FROM users WHERE user_id = ?";
-$user_stmt = $conn->prepare($user_sql);
-$user_stmt->bind_param("i", $user_id);
-$user_stmt->execute();
-$user_result = $user_stmt->get_result();
+    $assessment_sql = "SELECT a.date, a.type, a.serialnumber, 
+                            os.os_name AS os, 
+                            processor.processor_name AS processor, 
+                            batterylife.battery_name AS batterylife, 
+                            age.age_name AS age, 
+                            issue.issue_name AS issue, 
+                            ram.ram_name AS ram, 
+                            storage.storage_name AS storage, 
+                            keyboard.keyboard_name AS keyboard, 
+                            screen.screen_name AS screen, 
+                            touchpad.touchpad_name AS touchpad, 
+                            audio.audio_name AS audio, 
+                            body.body_name AS body, 
+                            a.score
+                    FROM assess_laptop a
+                    LEFT JOIN operating_sistem_laptop os ON a.os = os.os_score
+                    LEFT JOIN processor_laptop processor ON a.processor = processor.processor_score
+                    LEFT JOIN batterylife_laptop batterylife ON a.batterylife = batterylife.battery_score
+                    LEFT JOIN device_age_laptop age ON a.age = age.age_score
+                    LEFT JOIN issue_software_laptop issue ON a.issue = issue.issue_score
+                    LEFT JOIN ram_laptop ram ON a.ram = ram.ram_score
+                    LEFT JOIN storage_laptop storage ON a.storage = storage.storage_score
+                    LEFT JOIN keyboard_laptop keyboard ON a.keyboard = keyboard.keyboard_score
+                    LEFT JOIN screen_laptop screen ON a.screen = screen.screen_score
+                    LEFT JOIN touchpad_laptop touchpad ON a.touchpad = touchpad.touchpad_score
+                    LEFT JOIN audio_laptop audio ON a.audio = audio.audio_score
+                    LEFT JOIN body_laptop body ON a.body = body.body_score
+                    WHERE a.name = ?";
 
-if ($user_result->num_rows === 0) {
-    die("Pengguna dengan ID " . $user_id . " tidak ditemukan.");
+    $assessment_stmt = $conn->prepare($assessment_sql);
+    if ($assessment_stmt === false) {
+        die("Kesalahan saat menyiapkan query assessment: " . $conn->error);
+    }
+
+    $assessment_stmt->bind_param("s", $name);
+    if (!$assessment_stmt->execute()) {
+        die("Kesalahan saat menjalankan query assessment: " . $assessment_stmt->error);
+    }
+
+    $assessment_result = $assessment_stmt->get_result();
+    $assessment_stmt->close();
+} else {
+    echo "Tidak ada ID pengguna atau nama yang diberikan.";
 }
 
-// Simpan data pengguna ke variabel
-$user_data = $user_result->fetch_assoc();
-$nik = $user_data["nik"];
-$name = $user_data["name"];
-$email = $user_data["email"];
-$company = $user_data["company"];
-$department = $user_data["department"];
-$_SESSION['name'] = $name; // Simpan ke session untuk header
-$user_stmt->close();
+//assessment_pc
+if (isset($_GET['user_id']) && isset($_GET['name'])) {
+    $user_id = $_GET['user_id'];
+    $name = $_GET['name'];
 
+    $assessmentpc_sql = "SELECT a.date, a.merk, a.serialnumber, 
+                            pctype.pctype_name AS typepc,
+                            os.os_name AS os, 
+                            processor.processor_name AS processor, 
+                            vga.vga_name AS vga, 
+                            age.age_name AS age, 
+                            issue.issue_name AS issue, 
+                            ram.ram_name AS ram, 
+                            storage.storage_name AS storage, 
+                            typemonitor.monitor_name AS typemonitor, 
+                            sizemonitor.size_name AS sizemonitor, 
+                            a.score
+                    FROM assess_pc a
+                    LEFT JOIN pctype_pc pctype ON a.typepc = pctype.pctype_score
+                    LEFT JOIN operating_sistem_pc os ON a.os = os.os_score
+                    LEFT JOIN processor_pc processor ON a.processor = processor.processor_score
+                    LEFT JOIN vga_pc vga ON a.vga = vga.vga_score
+                    LEFT JOIN device_age_pc age ON a.age = age.age_score
+                    LEFT JOIN issue_software_pc issue ON a.issue = issue.issue_score
+                    LEFT JOIN ram_pc ram ON a.ram = ram.ram_score
+                    LEFT JOIN storage_pc storage ON a.storage = storage.storage_score
+                    LEFT JOIN typemonitor_pc typemonitor ON a.typemonitor = typemonitor.monitor_score
+                    LEFT JOIN sizemonitor_pc sizemonitor ON a.sizemonitor = sizemonitor.size_score
+                    WHERE a.name = ?";
 
-// ================================================================= //
-// 3. QUERY UNTUK RIWAYAT ASSESSMENT LAPTOP (MENGGUNAKAN $name)
-// PERBAIKAN: Menambahkan LEFT JOIN untuk VGA
-// ================================================================= //
-$assessment_sql = "SELECT a.date, a.type, a.serialnumber, 
-                        os.os_name AS os, processor.processor_name AS processor, batterylife.battery_name AS batterylife, 
-                        age.age_name AS age, issue.issue_name AS issue, ram.ram_name AS ram, vga.vga_name AS vga,
-                        storage.storage_name AS storage, keyboard.keyboard_name AS keyboard, screen.screen_name AS screen, 
-                        touchpad.touchpad_name AS touchpad, audio.audio_name AS audio, body.body_name AS body, a.score
-                FROM assess_laptop a
-                LEFT JOIN operating_sistem_laptop os ON a.os = os.os_score
-                LEFT JOIN processor_laptop processor ON a.processor = processor.processor_score
-                LEFT JOIN batterylife_laptop batterylife ON a.batterylife = batterylife.battery_score
-                LEFT JOIN device_age_laptop age ON a.age = age.age_score
-                LEFT JOIN issue_software_laptop issue ON a.issue = issue.issue_score
-                LEFT JOIN ram_laptop ram ON a.ram = ram.ram_score
-                LEFT JOIN vga_pc vga ON a.vga = vga.vga_score
-                LEFT JOIN storage_laptop storage ON a.storage = storage.storage_score
-                LEFT JOIN keyboard_laptop keyboard ON a.keyboard = keyboard.keyboard_score
-                LEFT JOIN screen_laptop screen ON a.screen = screen.screen_score
-                LEFT JOIN touchpad_laptop touchpad ON a.touchpad = touchpad.touchpad_score
-                LEFT JOIN audio_laptop audio ON a.audio = audio.audio_score
-                LEFT JOIN body_laptop body ON a.body = body.body_score
-                WHERE a.name = ?";
-$assessment_stmt = $conn->prepare($assessment_sql);
-$assessment_stmt->bind_param("s", $name);
-$assessment_stmt->execute();
-$assessment_result = $assessment_stmt->get_result();
-$assessment_stmt->close();
+    $assessmentpc_stmt = $conn->prepare($assessmentpc_sql);
+    if ($assessment_stmt === false) {
+        die("Kesalahan saat menyiapkan query assessment: " . $conn->error);
+    }
 
+    $assessmentpc_stmt->bind_param("s", $name);
+    if (!$assessmentpc_stmt->execute()) {
+        die("Kesalahan saat menjalankan query assessment PC: " . $assessmentpc_stmt->error);
+    }
 
-// ================================================================= //
-// 4. QUERY UNTUK RIWAYAT ASSESSMENT PC (MENGGUNAKAN $name)
-// ================================================================= //
-$assessmentpc_sql = "SELECT a.date, a.merk, a.serialnumber, pctype.pctype_name AS typepc, os.os_name AS os, 
-                        processor.processor_name AS processor, vga.vga_name AS vga, age.age_name AS age, 
-                        issue.issue_name AS issue, ram.ram_name AS ram, storage.storage_name AS storage, 
-                        typemonitor.monitor_name AS typemonitor, sizemonitor.size_name AS sizemonitor, a.score
-                FROM assess_pc a
-                LEFT JOIN pctype_pc pctype ON a.typepc = pctype.pctype_score
-                LEFT JOIN operating_sistem_pc os ON a.os = os.os_score
-                LEFT JOIN processor_pc processor ON a.processor = processor.processor_score
-                LEFT JOIN vga_pc vga ON a.vga = vga.vga_score
-                LEFT JOIN device_age_pc age ON a.age = age.age_score
-                LEFT JOIN issue_software_pc issue ON a.issue = issue.issue_score
-                LEFT JOIN ram_pc ram ON a.ram = ram.ram_score
-                LEFT JOIN storage_pc storage ON a.storage = storage.storage_score
-                LEFT JOIN typemonitor_pc typemonitor ON a.typemonitor = typemonitor.monitor_score
-                LEFT JOIN sizemonitor_pc sizemonitor ON a.sizemonitor = sizemonitor.size_score
-                WHERE a.name = ?";
-$assessmentpc_stmt = $conn->prepare($assessmentpc_sql);
-$assessmentpc_stmt->bind_param("s", $name);
-$assessmentpc_stmt->execute();
-$assessmentpc_result = $assessmentpc_stmt->get_result();
-$assessmentpc_stmt->close();
+    $assessmentpc_result = $assessmentpc_stmt->get_result();
+    $assessmentpc_stmt->close();
+} else {
+    echo "Tidak ada ID pengguna atau nama yang diberikan.";
+}
 
+  
 
-// ================================================================= //
-// 5. QUERY UNTUK RIWAYAT INSPEKSI (MENGGUNAKAN $name)
-// ================================================================= //
-$form_inspeksi_sql = "SELECT fi.*, age.age_name, age.age_score, casing_lap.casing_lap_name, casing_lap.casing_lap_score, 
+//inspeksi
+if (isset($_GET['user_id'])) {
+    $user_id = $_GET['user_id'];
+
+    $user_sql = "SELECT * FROM users WHERE user_id = ?";
+
+    $user_stmt = $conn->prepare($user_sql);
+    if ($user_stmt === false) {
+        die("Kesalahan saat menyiapkan query pengguna: " . $conn_userdata->error);
+    }
+
+    $user_stmt->bind_param("i", $user_id);
+    if (!$user_stmt->execute()) {
+        die("Kesalahan saat menjalankan query pengguna: " . $user_stmt->error);
+    }
+
+    $user_result = $user_stmt->get_result();
+
+    if ($user_result && $user_result->num_rows > 0) {
+        $row = $user_result->fetch_assoc();
+        $nik = $row["nik"];
+        $name = $row["name"];
+        $email = $row["email"];
+        $company = $row["company"];
+        $department = $row["department"];
+
+        $_SESSION['name'] = $name;
+
+        $form_inspeksi_sql = "SELECT fi.*, age.age_name, age.age_score, casing_lap.casing_lap_name, casing_lap.casing_lap_score, 
                           layar_lap.layar_lap_name, layar_lap.layar_lap_score, engsel_lap.engsel_lap_name, engsel_lap.engsel_lap_score, 
                           keyboard_lap.keyboard_lap_name, keyboard_lap.keyboard_lap_score, touchpad_lap.touchpad_lap_name, touchpad_lap.touchpad_lap_score,
                           booting_lap.booting_lap_name, booting_lap.booting_lap_score, multi_lap.multi_lap_name, multi_lap.multi_lap_score, 
@@ -129,12 +159,28 @@ $form_inspeksi_sql = "SELECT fi.*, age.age_name, age.age_score, casing_lap.casin
                       LEFT JOIN ins_audio_lap audio_lap ON fi.audio_lap = audio_lap.audio_lap_id
                       LEFT JOIN ins_software_lap software_lap ON fi.software_lap = software_lap.software_lap_id
                       WHERE fi.nama_user = ?";
-$form_inspeksi_stmt = $conn->prepare($form_inspeksi_sql);
-$form_inspeksi_stmt->bind_param("s", $name);
-$form_inspeksi_stmt->execute();
-$form_inspeksi_result = $form_inspeksi_stmt->get_result();
-$form_inspeksi_stmt->close();
 
+        $form_inspeksi_stmt = $conn->prepare($form_inspeksi_sql);
+        if ($form_inspeksi_stmt === false) {
+            die("Kesalahan saat menyiapkan query form inspeksi: " . $conn->error);
+        }
+
+        $form_inspeksi_stmt->bind_param("s", $name);
+        if (!$form_inspeksi_stmt->execute()) {
+            die("Kesalahan saat menjalankan query form inspeksi: " . $form_inspeksi_stmt->error);
+        }
+
+        $form_inspeksi_result = $form_inspeksi_stmt->get_result();
+
+        $form_inspeksi_stmt->close();
+    } else {
+        echo "Pengguna tidak ditemukan.";
+    }
+
+    $user_stmt->close();
+} else {
+    echo "Tidak ada ID pengguna yang diberikan.";
+}
 
 $conn->close();
 ?>
@@ -443,20 +489,20 @@ $conn->close();
                               echo "<table>";
                               echo "<tr><th colspan='2'>" . $assessment_row["type"] . " / " . $assessment_row["serialnumber"] . "</th></tr>";
                               echo "<tr><td>Tanggal</td><td>" . $assessment_row["date"] . "</td</tr>";
-                              echo "<tr><td>Sistem Operasi</td><td>" . $assessment_row["os"] . " (Skor: " . $assessment_row["os_score"] . ")</td></tr>";
-                              echo "<tr><td>Processor</td><td>" . $assessment_row["processor"] . " (Skor: " . $assessment_row["processor_score"] . ")</td></tr>";
-                              echo "<tr><td>Ketahanan Baterai (Tanpa Daya)</td><td>" . $assessment_row["batterylife"] . " (Skor: " . $assessment_row["battery_score"] . ")</td></tr>";
-                              echo "<tr><td>Usia Perangkat</td><td>" . $assessment_row["age"] . " (Skor: " . $assessment_row["age_score"] . ")</td></tr>";
-                              echo "<tr><td>Isue Terkait Software</td><td>" . $assessment_row["issue"] . " (Skor: " . $assessment_row["issue_score"] . ")</td></tr>";
-                              echo "<tr><td>RAM</td><td>" . $assessment_row["ram"] . " (Skor: " . $assessment_row["ram_score"] . ")</td></tr>";
-                              echo "<tr><td>VGA</td><td>" . $assessment_row["vga"] . " (Skor: " . $assessment_row["vga_score"] . ")</td></tr>";
-                              echo "<tr><td>Penyimpanan</td><td>" . $assessment_row["storage"] . " (Skor: " . $assessment_row["storage_score"] . ")</td></tr>";
-                              echo "<tr><td>Keyboard</td><td>" . $assessment_row["keyboard"] . " (Skor: " . $assessment_row["keyboard_score"] . ")</td></tr>";
-                              echo "<tr><td>Layar</td><td>" . $assessment_row["screen"] . " (Skor: " . $assessment_row["screen_score"] . ")</td></tr>";
-                              echo "<tr><td>Touchpad</td><td>" . $assessment_row["touchpad"] . " (Skor: " . $assessment_row["touchpad_score"] . ")</td></tr>";
-                              echo "<tr><td>Audio</td><td>" . $assessment_row["audio"] . " (Skor: " . $assessment_row["audio_score"] . ")</td></tr>";
-                              echo "<tr><td>Rangka</td><td>" . $assessment_row["body"] . " (Skor: " . $assessment_row["body_score"] . ")</td></tr>";
-                              echo "<tr><td>Score</td><td>" . $assessment_row["score"] . " </td></tr>";
+                              echo "<tr><td>Sistem Operasi</td><td>" . $assessment_row["os"] . "</td></tr>";
+                              echo "<tr><td>Processor</td><td>" . $assessment_row["processor"] . "</td></tr>";
+                              echo "<tr><td>Ketahanan Baterai (Tanpa Daya)</td><td>" . $assessment_row["batterylife"] . "</td></tr>";
+                              echo "<tr><td>Usia Perangkat</td><td>" . $assessment_row["age"] . "</td></tr>";
+                              echo "<tr><td>Isue Terkait Software</td><td>" . $assessment_row["issue"] . "</td></tr>";
+                              echo "<tr><td>RAM</td><td>" . $assessment_row["ram"] . "</td></tr>";
+                              echo "<tr><td>VGA</td><td>" . $assessment_row["vga"] . "</td></tr>";
+                              echo "<tr><td>Penyimpanan</td><td>" . $assessment_row["storage"] . "</td></tr>";
+                              echo "<tr><td>Keyboard</td><td>" . $assessment_row["keyboard"] . "</td></tr>";
+                              echo "<tr><td>Layar</td><td>" . $assessment_row["screen"] . "</td></tr>";
+                              echo "<tr><td>Touchpad</td><td>" . $assessment_row["touchpad"] . "</td></tr>";
+                              echo "<tr><td>Audio</td><td>" . $assessment_row["audio"] . "</td></tr>";
+                              echo "<tr><td>Rangka</td><td>" . $assessment_row["body"] . "</td></tr>";
+                              echo "<tr><td>Score</td><td>" . $assessment_row["score"] . "</td></tr>";
                               echo "</table>";
                               echo "</div>";
                               echo "<br>";
@@ -481,15 +527,15 @@ $conn->close();
                               echo "<tr><th colspan='2'>" . $assessmentpc_row["merk"] . " / " . $assessmentpc_row["serialnumber"] . "</th></tr>";
                               echo "<tr><td>Tanggal</td><td>" . $assessmentpc_row["date"] . "</td</tr>";
                               echo "<tr><td>Tipe PC</td><td>" . $assessmentpc_row["typepc"] . "</td></tr>";
-                              echo "<tr><td>Sistem Operasi</td><td>" . $assessmentpc_row["os"] . " (Skor: " . $assessmentpc_row["os_score"] . ")</td></tr>";
-                              echo "<tr><td>Processor</td><td>" . $assessmentpc_row["processor"] . " (Skor: " . $assessmentpc_row["processor_score"] . ")</td></tr>";
-                              echo "<tr><td>VGA</td><td>" . $assessmentpc_row["vga"] . " (Skor: " . $assessmentpc_row["vga_score"] . ")</td></tr>";
-                              echo "<tr><td>Usia Perangkat</td><td>" . $assessmentpc_row["age"] . " (Skor: " . $assessmentpc_row["age_score"] . ")</td></tr>";
-                              echo "<tr><td>Isu Terkait Software</td><td>" . $assessmentpc_row["issue"] . " (Skor: " . $assessmentpc_row["issue_score"] . ")</td></tr>";
-                              echo "<tr><td>RAM</td><td>" . $assessmentpc_row["ram"] . " (Skor: " . $assessmentpc_row["ram_score"] . ")</td></tr>";
-                              echo "<tr><td>Penyimpanan</td><td>" . $assessmentpc_row["storage"] . " (Skor: " . $assessmentpc_row["storage_score"] . ")</td></tr>";
-                              echo "<tr><td>Tipe Monitor</td><td>" . $assessmentpc_row["typemonitor"] . " (Skor: " . $assessmentpc_row["monitor_score"] . ")</td></tr>";
-                              echo "<tr><td>Ukuran Monitor</td><td>" . $assessmentpc_row["sizemonitor"] . " (Skor: " . $assessmentpc_row["size_score"] . ")</td></tr>";
+                              echo "<tr><td>Sistem Operasi</td><td>" . $assessmentpc_row["os"] . "</td></tr>";
+                              echo "<tr><td>Processor</td><td>" . $assessmentpc_row["processor"] . "</td></tr>";
+                              echo "<tr><td>VGA</td><td>" . $assessmentpc_row["vga"] . "</td></tr>";
+                              echo "<tr><td>Usia Perangkat</td><td>" . $assessmentpc_row["age"] . "</td></tr>";
+                              echo "<tr><td>Isu Terkait Software</td><td>" . $assessmentpc_row["issue"] . "</td></tr>";
+                              echo "<tr><td>RAM</td><td>" . $assessmentpc_row["ram"] . "</td></tr>";
+                              echo "<tr><td>Penyimpanan</td><td>" . $assessmentpc_row["storage"] . "</td></tr>";
+                              echo "<tr><td>Tipe Monitor</td><td>" . $assessmentpc_row["typemonitor"] . "</td></tr>";
+                              echo "<tr><td>Ukuran Monitor</td><td>" . $assessmentpc_row["sizemonitor"] . "</td></tr>";
                               echo "<tr><td>Score</td><td>" . $assessmentpc_row["score"] . "</td></tr>";
                               echo "</table>";
                               echo "</div>";
