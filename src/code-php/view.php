@@ -98,8 +98,8 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
         padding: 0.75rem 1.5rem;
     }
     .body-wrapper {
-        padding-left: 100px;  /* Mengurangi jarak dari sidebar */
-        padding-right: 20px; /* Mengurangi jarak dari tepi kanan */
+        padding-left: 5px;  /* Mengurangi jarak dari sidebar */
+        padding-right: 10px; /* Mengurangi jarak dari tepi kanan */
         /* padding-top dan padding-bottom tidak diubah, agar jarak ke header tetap normal */
     }
 
