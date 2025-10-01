@@ -97,6 +97,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
         font-size: 1rem;
         padding: 0.75rem 1.5rem;
     }
+    
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -365,10 +366,16 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
     
     <!-- <aside class="left-sidebar">
       </aside> -->
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+    
+    <aside class="left-sidebar">
+      </aside>
+    
     <div class="body-wrapper">
     
       <header class="app-header">
         </header>
+      
       <div class="container-fluid">
           <div class="card">
               <div class="card-body">
@@ -388,9 +395,6 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                           $query = $result->fetch_assoc();
                           $score = $query['score'];
 
-                          // ================================================================= //
-                          // PERBAIKAN: Ikon SVG Bootstrap disisipkan langsung ke teks rekomendasi //
-                          // ================================================================= //
                           if ($score > 99) {
                               $risk_level = "High Risk";
                               $risk_class = "high";
@@ -423,11 +427,8 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                       <div class="score-label">Total Score</div>
                   </div>
 
-                  <div class="alert alert-<?php echo $alert_class; ?> d-flex align-items-center" role="alert">
-                      <i class="<?php echo $icon_class; ?> me-2" style="font-size: 1.5rem;"></i>
-                      <div>
-                          <?php echo $recommendation; ?>
-                      </div>
+                  <div class="alert alert-<?php echo $alert_class; ?> d-flex" role="alert">
+                      <?php echo $recommendation; ?>
                   </div>
 
                   <hr class="my-4">
@@ -457,7 +458,6 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                               </div>
                           </div>
                       </div>
-
                       <div class="col-md-6">
                           <div class="detail-item">
                               <i class="ti ti-calendar-event"></i>
@@ -503,8 +503,6 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
               </div>
           </div>
       </div>
-    </div>
-  </div>
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/sidebarmenu.js"></script>
