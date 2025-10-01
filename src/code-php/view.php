@@ -368,8 +368,8 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
       </aside> -->
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
     
-    <aside class="left-sidebar">
-      </aside>
+    <!-- <aside class="left-sidebar">
+      </aside> -->
     
     <div class="body-wrapper">
     
