@@ -48,6 +48,55 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
     .sidebar-submenu .sidebar-link i {
         margin-right: 10px;
     }
+
+    .score-card {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 12px;
+        color: #fff;
+        margin-bottom: 2rem;
+    }
+    .score-card .score-value {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    .score-card .score-label {
+        font-size: 1.25rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+    .score-high { background: linear-gradient(135deg, #e53935, #b71c1c); }
+    .score-medium { background: linear-gradient(135deg, #fdd835, #f9a825); }
+    .score-low { background: linear-gradient(135deg, #43a047, #1b5e20); }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+    }
+    .detail-item i {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        color: #5D87FF;
+    }
+    .detail-label {
+        display: block;
+        font-weight: 600;
+        color: #2A3547;
+    }
+    .detail-value {
+        color: #5A6A85;
+    }
+    .btn-download {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+    }
+    .btn-back {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -311,10 +360,18 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
         </nav>
       </header>
       <!--  Header End -->
-      <div class="container">
+      <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    
+    <aside class="left-sidebar">
+      </aside>
+    <div class="body-wrapper">
+    
+      <header class="app-header">
+        </header>
+      <div class="container-fluid">
           <div class="card">
               <div class="card-body">
-                  <h1 class="card-title fw-semibold mb-4">Laptop Replacement Assessment</h1>
                   <?php
                       $host = "mandiricoal.net";
                       $user = "podema"; 
@@ -326,52 +383,118 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                           die("Koneksi database gagal: " . $conn->connect_error);
                       }
 
-                      $query = mysqli_fetch_array($conn->query("SELECT * FROM assess_laptop ORDER BY id DESC LIMIT 1"));
+                      $result = $conn->query("SELECT * FROM assess_laptop ORDER BY id DESC LIMIT 1");
+                      if ($result && $result->num_rows > 0) {
+                          $query = $result->fetch_assoc();
+                          $score = $query['score'];
+
+                          // Tentukan level risiko dan style berdasarkan skor
+                          if ($score > 99) {
+                              $risk_level = "High Risk";
+                              $risk_class = "high";
+                              $alert_class = "danger";
+                              $icon_class = "ti-alert-triangle";
+                              $recommendation = "<strong>Rekomendasi: Ganti Perangkat.</strong> Perangkat Anda menunjukkan banyak masalah dan sudah seharusnya dilakukan penggantian untuk menunjang produktivitas.";
+                          } elseif ($score >= 50 && $score <= 99) {
+                              $risk_level = "Medium Risk";
+                              $risk_class = "medium";
+                              $alert_class = "warning";
+                              $icon_class = "ti-alert-circle";
+                              $recommendation = "<strong>Rekomendasi: Perlu Perhatian.</strong> Perangkat Anda masih layak pakai, namun tim IT akan melakukan beberapa peningkatan (upgrade) jika dibutuhkan.";
+                          } else {
+                              $risk_level = "Low Risk";
+                              $risk_class = "low";
+                              $alert_class = "success";
+                              $icon_class = "ti-circle-check";
+                              $recommendation = "<strong>Kondisi Baik.</strong> Perangkat Anda dalam kondisi prima dan tidak memerlukan tindakan lebih lanjut saat ini.";
+                          }
                   ?>
-                      <h1>Score Hasil Assessment: <?= $query['score'] ?></h1>
-                      <br>
-                      <div class="row">
-                          <!-- Kolom 1 -->
-                          <div class="col-md-6">
-                            <div class="form-group">
-                                  <label for="name"><strong>Name</strong></label>
-                                  <p id="name" name="name" class="form-control" ><?= isset($query['name']) ? $query['name'] : '' ?></p>
-                                  <br>
-                                  <label for="company"><strong>Company</strong></label>
-                                  <p id="company" name="company" class="form-control" ><?= isset($query['company']) ? $query['company'] : '' ?></p>
-                                  <br>
-                                  <label for="divisi"><strong>Division</strong></label>
-                                  <p id="divisi" name="divisi" class="form-control" ><?= isset($query['divisi']) ? $query['divisi'] : '' ?></p>
+                  
+                  <h3 class="card-title fw-semibold mb-4 text-center">Laptop Replacement Assessment Result</h3>
+                  
+                  <div class="score-card score-<?php echo $risk_class; ?>">
+                      <div class="score-label"><?php echo $risk_level; ?></div>
+                      <div class="score-value"><?php echo $score; ?></div>
+                      <div class="score-label">Total Score</div>
+                  </div>
+
+                  <div class="alert alert-<?php echo $alert_class; ?> d-flex align-items-center" role="alert">
+                      <i class="<?php echo $icon_class; ?> me-2" style="font-size: 1.5rem;"></i>
+                      <div>
+                          <?php echo $recommendation; ?>
+                      </div>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <h5 class="fw-semibold mb-4">Assessment Details</h5>
+                  <div class="row">
+                      <div class="col-md-6">
+                          <div class="detail-item">
+                              <i class="ti ti-user"></i>
+                              <div>
+                                  <span class="detail-label">Name</span>
+                                  <span class="detail-value"><?php echo htmlspecialchars($query['name']); ?></span>
                               </div>
                           </div>
-
-                          <!-- Kolom 2 -->
-                          <div class="col-md-6">
-                              <div class="form-group">
-                                  <label for="date"><strong>Date</strong></label>
-                                  <p id="date" name="date" class="form-control" ><?= isset($query['date']) ? $query['date'] : '' ?></p>
-                                  <br>
-                                  <label for="type"><strong>Type Laptop</strong></label>
-                                  <p id="type" name="type" class="form-control" ><?= isset($query['type']) ? $query['type'] : '' ?></p>
-                                  <br>
-                                  <label for="serialnumber"><strong>Serial Number</strong></label>
-                                  <p id="serialnumber" name="serialnumber" class="form-control" ><?= isset($query['serialnumber']) ? $query['serialnumber'] : '' ?></p>
+                          <div class="detail-item">
+                              <i class="ti ti-building"></i>
+                              <div>
+                                  <span class="detail-label">Company</span>
+                                  <span class="detail-value"><?php echo htmlspecialchars($query['company']); ?></span>
+                              </div>
+                          </div>
+                          <div class="detail-item">
+                              <i class="ti ti-briefcase"></i>
+                              <div>
+                                  <span class="detail-label">Division</span>
+                                  <span class="detail-value"><?php echo htmlspecialchars($query['divisi']); ?></span>
                               </div>
                           </div>
                       </div>
 
-                      <?php if (isset($query['score'])): ?>
-                          <?php if ($query['score'] > 99): ?>
-                              <p style="font-weight: bold; text-decoration: underline; font-style: italic; animation: blinking 2s infinite;">Perangkat Anda sudah seharusnya dilakukan penggantian.</p>
-                          <?php else: ?>
-                              <p style="font-weight: bold; text-decoration: underline; font-style: italic; animation: blinking 2s infinite;">Perangkat Anda masih layak pakai, namun tim IT akan melakukan upgrade pada perangkatmu jika dibutuhkan.</p>
-                          <?php endif; ?>
-                      <?php endif; ?>
-
-                      <div class="button-container">
-                          <input type="button" class="btn btn-secondary" value="Back" onclick="window.location.href='assess_laptop.php';">
-                          <a href="download.php" download class="btn btn-primary">Download</a>
+                      <div class="col-md-6">
+                          <div class="detail-item">
+                              <i class="ti ti-calendar-event"></i>
+                              <div>
+                                  <span class="detail-label">Assessment Date</span>
+                                  <span class="detail-value"><?php echo htmlspecialchars($query['date']); ?></span>
+                              </div>
+                          </div>
+                          <div class="detail-item">
+                              <i class="ti ti-device-laptop"></i>
+                              <div>
+                                  <span class="detail-label">Merk / Type</span>
+                                  <span class="detail-value"><?php echo htmlspecialchars($query['type']); ?></span>
+                              </div>
+                          </div>
+                          <div class="detail-item">
+                              <i class="ti ti-id"></i>
+                              <div>
+                                  <span class="detail-label">Serial Number</span>
+                                  <span class="detail-value"><?php echo htmlspecialchars($query['serialnumber']); ?></span>
+                              </div>
+                          </div>
                       </div>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="d-flex justify-content-center gap-2">
+                      <a href="assess_laptop.php" class="btn btn-outline-secondary btn-back">
+                        <i class="ti ti-arrow-left me-1"></i> Back to Form
+                      </a>
+                      <a href="download.php" class="btn btn-primary btn-download">
+                        <i class="ti ti-download me-1"></i> Download Full Report (PDF)
+                      </a>
+                  </div>
+                  
+                  <?php
+                      } else {
+                          echo '<div class="alert alert-danger">Data assessment tidak ditemukan.</div>';
+                      }
+                      $conn->close();
+                  ?>
               </div>
           </div>
       </div>
