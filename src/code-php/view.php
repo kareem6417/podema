@@ -371,7 +371,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
     <!-- <aside class="left-sidebar">
       </aside> -->
     
-    <div class="body-wrapper">
+    <!-- <div class="body-wrapper"> -->
     
       <header class="app-header">
         </header>
@@ -502,7 +502,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                   ?>
               </div>
           </div>
-      </div>
+      <!-- </div> -->
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/sidebarmenu.js"></script>
