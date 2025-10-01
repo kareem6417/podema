@@ -376,7 +376,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
       <header class="app-header">
         </header>
       
-      <!-- <div class="container-fluid"> -->
+      <div class="container-fluid">
           <div class="card">
               <div class="card-body">
                   <?php
