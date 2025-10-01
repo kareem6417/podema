@@ -42,6 +42,16 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
     .sidebar-item.active > .sidebar-submenu {
         max-height: 500px; /* Ketinggian maksimal yang cukup untuk semua item */
     }
+
+    /* CSS untuk animasi rotasi panah dropdown */
+    .sidebar-item > a .arrow {
+        transition: transform 0.3s ease;
+        display: inline-block;
+        margin-left: auto;
+    }
+    .sidebar-item.active > a .arrow {
+        transform: rotate(180deg);
+    }
     
     /* Gaya untuk kartu skor dan detail */
     .score-card { text-align: center; padding: 2rem; border-radius: 12px; color: #fff; margin-bottom: 2rem; }
@@ -127,29 +137,16 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
               <a class="sidebar-link" href="#" aria-expanded="false">
                   <span><i class="ti ti-assembly"></i></span>
                   <span class="hide-menu">Device Inspection</span>
+                  <span class="arrow"><i class="fas fa-chevron-down"></i></span>
               </a>
               <ul class="sidebar-submenu">
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_printer.php"><span><i class="ti ti-printer"></i></span>Printer</a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_cctv.php"><span><i class="ti ti-device-cctv"></i></span>CCTV</a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_infra.php"><span><i class="ti ti-router"></i></span>Infrastructure</a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_tlp.php"><span><i class="ti ti-device-landline-phone"></i></span>Telephone</a>
-                  </li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_printer.php"><span><i class="ti ti-printer"></i></span>Printer</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_cctv.php"><span><i class="ti ti-device-cctv"></i></span>CCTV</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_infra.php"><span><i class="ti ti-router"></i></span>Infrastructure</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_tlp.php"><span><i class="ti ti-device-landline-phone"></i></span>Telephone</a></li>
               </ul>
             </li>
             <li class="sidebar-item">
@@ -284,18 +281,25 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
 
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/sidebarmenu.js"></script>
   <script src="../assets/js/app.min.js"></script>
   <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+  
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Cari semua link di sidebar yang punya submenu (link dengan href="#")
         var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
 
         submenuToggles.forEach(function(toggle) {
             toggle.addEventListener('click', function(e) {
-                e.preventDefault();
+                e.preventDefault(); // Mencegah link pindah halaman
+                
+                // Cari elemen <li> induk dari link yang di-klik
                 var parentItem = this.closest('.sidebar-item');
-                parentItem.classList.toggle('active');
+
+                // Toggle class 'active' pada elemen <li> induk
+                if (parentItem) {
+                    parentItem.classList.toggle('active');
+                }
             });
         });
     });
