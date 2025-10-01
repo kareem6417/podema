@@ -97,6 +97,9 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
         font-size: 1rem;
         padding: 0.75rem 1.5rem;
     }
+    .body-wrapper {
+      padding: 20px; /* Anda bisa sesuaikan angka ini, misal 15px atau 25px */
+    }
     
   </style>
   <script>
@@ -376,7 +379,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
       <header class="app-header">
         </header>
       
-      <div class="container">
+      <div class="container-fluid">
           <div class="card">
               <div class="card-body">
                   <?php
