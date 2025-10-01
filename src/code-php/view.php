@@ -26,7 +26,24 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
       padding-right: 24px;
     }
 
-    /* Style untuk kartu skor dan detail */
+    /* Perbaikan gaya submenu sidebar */
+    .sidebar-submenu {
+        position: static !important; /* Memaksa submenu kembali ke alur dokumen normal */
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease-in-out; /* Animasi buka-tutup yang mulus */
+        list-style: none; /* Menghilangkan bullet points */
+        padding-left: 25px; /* Memberi indentasi pada submenu */
+        background-color: #f8f9fa;
+        border-radius: 0 0 5px 5px;
+        margin: 0 10px 5px 10px;
+    }
+
+    .sidebar-item.active > .sidebar-submenu {
+        max-height: 500px; /* Ketinggian maksimal yang cukup untuk semua item */
+    }
+    
+    /* Gaya untuk kartu skor dan detail */
     .score-card { text-align: center; padding: 2rem; border-radius: 12px; color: #fff; margin-bottom: 2rem; }
     .score-card .score-value { font-size: 4rem; font-weight: 700; line-height: 1; }
     .score-card .score-label { font-size: 1.25rem; font-weight: 500; letter-spacing: 1px; }
@@ -64,9 +81,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./admin.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-layout-dashboard"></i>
-                </span>
+                <span><i class="ti ti-layout-dashboard"></i></span>
                 <span class="hide-menu">Administrator</span>
               </a>
             </li>
@@ -76,25 +91,19 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./dash_lap.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-area-line"></i>
-                </span>
+                <span><i class="ti ti-chart-area-line"></i></span>
                 <span class="hide-menu">Assessment Laptop</span>
               </a>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./dash_pc.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-line"></i>
-                </span>
+                <span><i class="ti ti-chart-line"></i></span>
                 <span class="hide-menu">Assessment PC Desktop</span>
               </a>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./dash_ins.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-donut"></i>
-                </span>
+                <span><i class="ti ti-chart-donut"></i></span>
                 <span class="hide-menu">Inspection</span>
               </a>
             </li>
@@ -104,94 +113,48 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./assess_laptop.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-device-laptop"></i>
-                </span>
+                <span><i class="ti ti-device-laptop"></i></span>
                 <span class="hide-menu">Assessment Laptop</span>
               </a>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./assess_pc.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-device-desktop-analytics"></i>
-                </span>
+                <span><i class="ti ti-device-desktop-analytics"></i></span>
                 <span class="hide-menu">Assessment PC Desktop</span>
               </a>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" aria-expanded="false">
-                  <span>
-                      <i class="ti ti-assembly"></i>
-                  </span>
+                  <span><i class="ti ti-assembly"></i></span>
                   <span class="hide-menu">Device Inspection</span>
-                  <span class="arrow">
-                    <i class="fas fa-chevron-down"></i>
-                  </span>
               </a>
               <ul class="sidebar-submenu">
                   <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_laptop.php">
-                          <span>
-                              <i class="ti ti-devices"></i>
-                          </span>
-                          Laptop
-                      </a>
+                      <a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a>
                   </li>
                   <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_desktop.php">
-                          <span>
-                              <i class="ti ti-device-desktop-search"></i>
-                          </span>
-                          PC Desktop
-                      </a>
+                      <a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a>
                   </li>
                   <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_monitor.php">
-                          <span>
-                              <i class="ti ti-screen-share"></i>
-                          </span>
-                          Monitor
-                      </a>
+                      <a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a>
                   </li>
                   <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_printer.php">
-                          <span>
-                              <i class="ti ti-printer"></i>
-                          </span>
-                          Printer
-                      </a>
+                      <a class="sidebar-link" href="./ins_printer.php"><span><i class="ti ti-printer"></i></span>Printer</a>
                   </li>
                   <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_cctv.php">
-                          <span>
-                              <i class="ti ti-device-cctv"></i>
-                          </span>
-                          CCTV
-                      </a>
+                      <a class="sidebar-link" href="./ins_cctv.php"><span><i class="ti ti-device-cctv"></i></span>CCTV</a>
                   </li>
                   <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_infra.php">
-                          <span>
-                              <i class="ti ti-router"></i>
-                          </span>
-                          Infrastructure
-                      </a>
+                      <a class="sidebar-link" href="./ins_infra.php"><span><i class="ti ti-router"></i></span>Infrastructure</a>
                   </li>
                   <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_tlp.php">
-                          <span>
-                              <i class="ti ti-device-landline-phone"></i>
-                          </span>
-                          Telephone
-                      </a>
+                      <a class="sidebar-link" href="./ins_tlp.php"><span><i class="ti ti-device-landline-phone"></i></span>Telephone</a>
                   </li>
               </ul>
-          </li>
+            </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./about.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-exclamation-circle"></i>
-                </span>
+                <span><i class="ti ti-exclamation-circle"></i></span>
                 <span class="hide-menu">About</span>
               </a>
             </li>
@@ -201,16 +164,14 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./astmgm.php" aria-expanded="false">
-                <span>
-                <i class="ti ti-cards"></i>
-              </span>
+                <span><i class="ti ti-cards"></i></span>
                 <span class="hide-menu">IT Asset Management</span>
               </a>
             </li>
           </ul>
         </nav>
-        </div>
-      </aside>
+      </div>
+    </aside>
     
     <div class="body-wrapper">
     
@@ -237,18 +198,9 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-user fs-6"></i>
-                      <p class="mb-0 fs-3">My Profile</p>
-                    </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-mail fs-6"></i>
-                      <p class="mb-0 fs-3">My Account</p>
-                    </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-list-check fs-6"></i>
-                      <p class="mb-0 fs-3">My Task</p>
-                    </a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-user fs-6"></i><p class="mb-0 fs-3">My Profile</p></a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-mail fs-6"></i><p class="mb-0 fs-3">My Account</p></a>
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-list-check fs-6"></i><p class="mb-0 fs-3">My Task</p></a>
                     <a href="./authentication-login.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                   </div>
                 </div>
@@ -262,35 +214,22 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
           <div class="card">
               <div class="card-body">
                   <?php
-                      $host = "mandiricoal.net";
-                      $user = "podema"; 
-                      $pass = "Jam10pagi#"; 
-                      $db = "podema";
-
+                      $host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
                       $conn = new mysqli($host, $user, $pass, $db);
-                      if ($conn->connect_error) {
-                          die("Koneksi database gagal: " . $conn->connect_error);
-                      }
-
+                      if ($conn->connect_error) { die("Koneksi database gagal: " . $conn->connect_error); }
                       $result = $conn->query("SELECT * FROM assess_laptop ORDER BY id DESC LIMIT 1");
                       if ($result && $result->num_rows > 0) {
                           $query = $result->fetch_assoc();
                           $score = $query['score'];
 
                           if ($score > 99) {
-                              $risk_level = "High Risk";
-                              $risk_class = "high";
-                              $alert_class = "danger";
+                              $risk_level = "High Risk"; $risk_class = "high"; $alert_class = "danger";
                               $recommendation = '<svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg><strong>Rekomendasi: Ganti Perangkat.</strong> Perangkat Anda menunjukkan banyak masalah dan sudah seharusnya dilakukan penggantian untuk menunjang produktivitas.';
                           } elseif ($score >= 50 && $score <= 99) {
-                              $risk_level = "Medium Risk";
-                              $risk_class = "medium";
-                              $alert_class = "warning";
+                              $risk_level = "Medium Risk"; $risk_class = "medium"; $alert_class = "warning";
                               $recommendation = '<svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16h.01" /></svg><strong>Rekomendasi: Perlu Perhatian.</strong> Perangkat Anda masih layak pakai, namun tim IT akan melakukan beberapa peningkatan (upgrade) jika dibutuhkan.';
                           } else {
-                              $risk_level = "Low Risk";
-                              $risk_class = "low";
-                              $alert_class = "success";
+                              $risk_level = "Low Risk"; $risk_class = "low"; $alert_class = "success";
                               $recommendation = '<svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg><strong>Kondisi Baik.</strong> Perangkat Anda dalam kondisi prima dan tidak memerlukan tindakan lebih lanjut saat ini.';
                           }
                   ?>
@@ -312,62 +251,22 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                   <h5 class="fw-semibold mb-4">Assessment Details</h5>
                   <div class="row">
                       <div class="col-md-6">
-                          <div class="detail-item">
-                              <i class="ti ti-user"></i>
-                              <div>
-                                  <span class="detail-label">Name</span>
-                                  <span class="detail-value"><?php echo htmlspecialchars($query['name']); ?></span>
-                              </div>
-                          </div>
-                          <div class="detail-item">
-                              <i class="ti ti-building"></i>
-                              <div>
-                                  <span class="detail-label">Company</span>
-                                  <span class="detail-value"><?php echo htmlspecialchars($query['company']); ?></span>
-                              </div>
-                          </div>
-                          <div class="detail-item">
-                              <i class="ti ti-briefcase"></i>
-                              <div>
-                                  <span class="detail-label">Division</span>
-                                  <span class="detail-value"><?php echo htmlspecialchars($query['divisi']); ?></span>
-                              </div>
-                          </div>
+                          <div class="detail-item"><i class="ti ti-user"></i><div><span class="detail-label">Name</span><span class="detail-value"><?php echo htmlspecialchars($query['name']); ?></span></div></div>
+                          <div class="detail-item"><i class="ti ti-building"></i><div><span class="detail-label">Company</span><span class="detail-value"><?php echo htmlspecialchars($query['company']); ?></span></div></div>
+                          <div class="detail-item"><i class="ti ti-briefcase"></i><div><span class="detail-label">Division</span><span class="detail-value"><?php echo htmlspecialchars($query['divisi']); ?></span></div></div>
                       </div>
                       <div class="col-md-6">
-                          <div class="detail-item">
-                              <i class="ti ti-calendar-event"></i>
-                              <div>
-                                  <span class="detail-label">Assessment Date</span>
-                                  <span class="detail-value"><?php echo htmlspecialchars($query['date']); ?></span>
-                              </div>
-                          </div>
-                          <div class="detail-item">
-                              <i class="ti ti-device-laptop"></i>
-                              <div>
-                                  <span class="detail-label">Merk / Type</span>
-                                  <span class="detail-value"><?php echo htmlspecialchars($query['type']); ?></span>
-                              </div>
-                          </div>
-                          <div class="detail-item">
-                              <i class="ti ti-id"></i>
-                              <div>
-                                  <span class="detail-label">Serial Number</span>
-                                  <span class="detail-value"><?php echo htmlspecialchars($query['serialnumber']); ?></span>
-                              </div>
-                          </div>
+                          <div class="detail-item"><i class="ti ti-calendar-event"></i><div><span class="detail-label">Assessment Date</span><span class="detail-value"><?php echo htmlspecialchars($query['date']); ?></span></div></div>
+                          <div class="detail-item"><i class="ti ti-device-laptop"></i><div><span class="detail-label">Merk / Type</span><span class="detail-value"><?php echo htmlspecialchars($query['type']); ?></span></div></div>
+                          <div class="detail-item"><i class="ti ti-id"></i><div><span class="detail-label">Serial Number</span><span class="detail-value"><?php echo htmlspecialchars($query['serialnumber']); ?></span></div></div>
                       </div>
                   </div>
 
                   <hr class="my-4">
 
                   <div class="d-flex justify-content-center gap-2">
-                      <a href="assess_laptop.php" class="btn btn-outline-secondary btn-back">
-                        <i class="ti ti-arrow-left me-1"></i> Back to Form
-                      </a>
-                      <a href="download.php" class="btn btn-primary btn-download">
-                        <i class="ti ti-download me-1"></i> Download Full Report (PDF)
-                      </a>
+                      <a href="assess_laptop.php" class="btn btn-outline-secondary btn-back"><i class="ti ti-arrow-left me-1"></i> Back to Form</a>
+                      <a href="download.php" class="btn btn-primary btn-download"><i class="ti ti-download me-1"></i> Download Full Report (PDF)</a>
                   </div>
                   
                   <?php
@@ -390,22 +289,13 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
   <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var submenuItems = document.querySelectorAll('.sidebar-submenu');
+        var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
 
-        submenuItems.forEach(function(item) {
-            item.style.maxHeight = '0';
-
-            item.closest('.sidebar-item').addEventListener('click', function(e) {
+        submenuToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
                 e.preventDefault();
-                this.classList.toggle('active');
-                // Logic to handle submenu expansion
-            });
-
-            var submenuLinks = item.querySelectorAll('.sidebar-link');
-            submenuLinks.forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
+                var parentItem = this.closest('.sidebar-item');
+                parentItem.classList.toggle('active');
             });
         });
     });
