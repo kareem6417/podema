@@ -388,25 +388,30 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                           $query = $result->fetch_assoc();
                           $score = $query['score'];
 
-                          // Tentukan level risiko dan style berdasarkan skor
+                          // ================================================================= //
+                          // PERBAIKAN: Ikon SVG Bootstrap disisipkan langsung ke teks rekomendasi //
+                          // ================================================================= //
                           if ($score > 99) {
                               $risk_level = "High Risk";
                               $risk_class = "high";
                               $alert_class = "danger";
-                              $icon_class = "ti-alert-triangle";
-                              $recommendation = "<strong>Rekomendasi: Ganti Perangkat.</strong> Perangkat Anda menunjukkan banyak masalah dan sudah seharusnya dilakukan penggantian untuk menunjang produktivitas.";
+                              $recommendation = '
+                                <svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>
+                                <strong>Rekomendasi: Ganti Perangkat.</strong> Perangkat Anda menunjukkan banyak masalah dan sudah seharusnya dilakukan penggantian untuk menunjang produktivitas.';
                           } elseif ($score >= 50 && $score <= 99) {
                               $risk_level = "Medium Risk";
                               $risk_class = "medium";
                               $alert_class = "warning";
-                              $icon_class = "ti-alert-circle";
-                              $recommendation = "<strong>Rekomendasi: Perlu Perhatian.</strong> Perangkat Anda masih layak pakai, namun tim IT akan melakukan beberapa peningkatan (upgrade) jika dibutuhkan.";
+                              $recommendation = '
+                                <svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16h.01" /></svg>
+                                <strong>Rekomendasi: Perlu Perhatian.</strong> Perangkat Anda masih layak pakai, namun tim IT akan melakukan beberapa peningkatan (upgrade) jika dibutuhkan.';
                           } else {
                               $risk_level = "Low Risk";
                               $risk_class = "low";
                               $alert_class = "success";
-                              $icon_class = "ti-circle-check";
-                              $recommendation = "<strong>Kondisi Baik.</strong> Perangkat Anda dalam kondisi prima dan tidak memerlukan tindakan lebih lanjut saat ini.";
+                              $recommendation = '
+                                <svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>
+                                <strong>Kondisi Baik.</strong> Perangkat Anda dalam kondisi prima dan tidak memerlukan tindakan lebih lanjut saat ini.';
                           }
                   ?>
                   
