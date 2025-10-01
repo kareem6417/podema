@@ -98,7 +98,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
         padding: 0.75rem 1.5rem;
     }
     .body-wrapper {
-      padding: 20px; /* Anda bisa sesuaikan angka ini, misal 15px atau 25px */
+      padding: 40px; /* Anda bisa sesuaikan angka ini, misal 15px atau 25px */
     }
     
   </style>
