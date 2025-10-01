@@ -13,142 +13,39 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Portal Device Management Application</title>
+  <title>Assessment Result - Portal Device Management</title>
   <link rel="shortcut icon" type="image/png" href="../assets/images/logos/icon.png" />
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-  <link rel="stylesheet" href="../assets/css/style_view.css">
+  
   <style>
-    /* Gaya submenu */
-    .sidebar-submenu {
-        max-height: 0;
-        overflow: hidden;
+    /* Mengurangi jarak horizontal area konten utama */
+    .body-wrapper {
+      padding-left: 24px;
+      padding-right: 24px;
     }
 
-    .sidebar-item.active .sidebar-submenu {
-        max-height: 1000px;
-    }
-
-    .sidebar-submenu .sidebar-item {
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: opacity 0.4s ease, transform 0.7s ease;
-        display: flex;
-        align-items: center;
-        padding-left: 20px;
-    }
-
-    .sidebar-item.active .sidebar-submenu .sidebar-item {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .sidebar-submenu .sidebar-link i {
-        margin-right: 10px;
-    }
-
-    .score-card {
-        text-align: center;
-        padding: 2rem;
-        border-radius: 12px;
-        color: #fff;
-        margin-bottom: 2rem;
-    }
-    .score-card .score-value {
-        font-size: 4rem;
-        font-weight: 700;
-        line-height: 1;
-    }
-    .score-card .score-label {
-        font-size: 1.25rem;
-        font-weight: 500;
-        letter-spacing: 1px;
-    }
+    /* Style untuk kartu skor dan detail */
+    .score-card { text-align: center; padding: 2rem; border-radius: 12px; color: #fff; margin-bottom: 2rem; }
+    .score-card .score-value { font-size: 4rem; font-weight: 700; line-height: 1; }
+    .score-card .score-label { font-size: 1.25rem; font-weight: 500; letter-spacing: 1px; }
     .score-high { background: linear-gradient(135deg, #e53935, #b71c1c); }
     .score-medium { background: linear-gradient(135deg, #fdd835, #f9a825); }
     .score-low { background: linear-gradient(135deg, #43a047, #1b5e20); }
-
-    .detail-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        font-size: 1rem;
-    }
-    .detail-item i {
-        font-size: 1.5rem;
-        margin-right: 1rem;
-        color: #5D87FF;
-    }
-    .detail-label {
-        display: block;
-        font-weight: 600;
-        color: #2A3547;
-    }
-    .detail-value {
-        color: #5A6A85;
-    }
-    .btn-download {
-        font-size: 1rem;
-        padding: 0.75rem 1.5rem;
-    }
-    .btn-back {
-        font-size: 1rem;
-        padding: 0.75rem 1.5rem;
-    }
-    .body-wrapper {
-        padding-left: 5px;  /* Mengurangi jarak dari sidebar */
-        padding-right: 10px; /* Mengurangi jarak dari tepi kanan */
-        /* padding-top dan padding-bottom tidak diubah, agar jarak ke header tetap normal */
-    }
-
-    
+    .detail-item { display: flex; align-items: center; margin-bottom: 1.5rem; font-size: 1rem; }
+    .detail-item i { font-size: 1.5rem; margin-right: 1rem; color: #5D87FF; }
+    .detail-label { display: block; font-weight: 600; color: #2A3547; }
+    .detail-value { color: #5A6A85; }
+    .btn-download { font-size: 1rem; padding: 0.75rem 1.5rem; }
+    .btn-back { font-size: 1rem; padding: 0.75rem 1.5rem; }
   </style>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    var submenuItems = document.querySelectorAll('.sidebar-submenu');
-
-    submenuItems.forEach(function(item) {
-        item.style.maxHeight = '0';
-
-        item.closest('.sidebar-item').addEventListener('click', function(e) {
-            e.preventDefault();
-
-            this.classList.toggle('active');
-
-            submenuItems.forEach(function(subitem) {
-                if (subitem !== item) {
-                    subitem.style.maxHeight = '0';
-                }
-            });
-
-            if (this.classList.contains('active')) {
-                item.style.maxHeight = '1000px';
-            } else {
-                item.style.maxHeight = '0';
-            }
-        });
-
-        var submenuLinks = item.querySelectorAll('.sidebar-link');
-        submenuLinks.forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-    });
-});
-
-</script>
 </head>
 
 <body>
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+    
     <aside class="left-sidebar">
-      <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-center">
           <a href="" class="text-nowrap logo-img">
@@ -159,7 +56,6 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
             <i class="ti ti-x fs-8"></i>
           </div>
         </div>
-        <!-- Sidebar navigation-->
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
           <ul id="sidebarnav">
             <li class="nav-small-cap">
@@ -312,16 +208,12 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
               </a>
             </li>
           </ul>
-
         </nav>
-        <!-- End Sidebar navigation -->
-      </div>
-      <!-- End Sidebar scroll-->
-    </aside>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
+        </div>
+      </aside>
+    
     <div class="body-wrapper">
-      <!--  Header Start -->
+    
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
           <ul class="navbar-nav">
@@ -340,8 +232,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
               <li class="nav-item dropdown">
-                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
-                  aria-expanded="false">
+                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false">
                   <img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle">
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
@@ -366,21 +257,6 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
           </div>
         </nav>
       </header>
-      <!--  Header End -->
-      <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    
-    <!-- <aside class="left-sidebar">
-      </aside> -->
-    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
-    
-    <!-- <aside class="left-sidebar">
-      </aside> -->
-    
-    <div class="body-wrapper">
-    
-      <header class="app-header">
-        </header>
       
       <div class="container-fluid">
           <div class="card">
@@ -405,23 +281,17 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                               $risk_level = "High Risk";
                               $risk_class = "high";
                               $alert_class = "danger";
-                              $recommendation = '
-                                <svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>
-                                <strong>Rekomendasi: Ganti Perangkat.</strong> Perangkat Anda menunjukkan banyak masalah dan sudah seharusnya dilakukan penggantian untuk menunjang produktivitas.';
+                              $recommendation = '<svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg><strong>Rekomendasi: Ganti Perangkat.</strong> Perangkat Anda menunjukkan banyak masalah dan sudah seharusnya dilakukan penggantian untuk menunjang produktivitas.';
                           } elseif ($score >= 50 && $score <= 99) {
                               $risk_level = "Medium Risk";
                               $risk_class = "medium";
                               $alert_class = "warning";
-                              $recommendation = '
-                                <svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16h.01" /></svg>
-                                <strong>Rekomendasi: Perlu Perhatian.</strong> Perangkat Anda masih layak pakai, namun tim IT akan melakukan beberapa peningkatan (upgrade) jika dibutuhkan.';
+                              $recommendation = '<svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16h.01" /></svg><strong>Rekomendasi: Perlu Perhatian.</strong> Perangkat Anda masih layak pakai, namun tim IT akan melakukan beberapa peningkatan (upgrade) jika dibutuhkan.';
                           } else {
                               $risk_level = "Low Risk";
                               $risk_class = "low";
                               $alert_class = "success";
-                              $recommendation = '
-                                <svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>
-                                <strong>Kondisi Baik.</strong> Perangkat Anda dalam kondisi prima dan tidak memerlukan tindakan lebih lanjut saat ini.';
+                              $recommendation = '<svg xmlns="http://www.w3.org/2000/svg" class="d-inline-block align-text-top me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg><strong>Kondisi Baik.</strong> Perangkat Anda dalam kondisi prima dan tidak memerlukan tindakan lebih lanjut saat ini.';
                           }
                   ?>
                   
@@ -509,11 +379,36 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
               </div>
           </div>
       </div>
+
+    </div> 
+  </div> 
+
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/sidebarmenu.js"></script>
   <script src="../assets/js/app.min.js"></script>
   <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-</body>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var submenuItems = document.querySelectorAll('.sidebar-submenu');
 
+        submenuItems.forEach(function(item) {
+            item.style.maxHeight = '0';
+
+            item.closest('.sidebar-item').addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.toggle('active');
+                // Logic to handle submenu expansion
+            });
+
+            var submenuLinks = item.querySelectorAll('.sidebar-link');
+            submenuLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            });
+        });
+    });
+  </script>
+</body>
 </html>
