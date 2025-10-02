@@ -1,86 +1,78 @@
 <?php
+session_start();
+require_once('../fpdf/fpdf.php'); // Pastikan path ke FPDF benar
 
-require_once('../fpdf/fpdf.php');
+if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
+    header("location: ./index.php");
+    exit();
+}
 
+// ================================================================= //
+// BAGIAN 1: AMBIL 'no' DARI URL, BUKAN LAGI MENCARI MAX(no)         //
+// ================================================================= //
+$no_inspeksi = isset($_GET['no']) ? (int)$_GET['no'] : 0;
+if ($no_inspeksi <= 0) {
+    die("Error: Nomor inspeksi tidak valid atau tidak diberikan.");
+}
+
+// Koneksi ke Database
 $host = "mandiricoal.net";
 $user = "podema";
 $pass = "Jam10pagi#";
 $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
-
-$query = $conn->prepare("SELECT fi.*, 
-                            a.age_name, a.age_score,
-                            cl.casing_lap_name, cl.casing_lap_score,
-                            ip.layar_lap_name, ip.layar_lap_score,
-                            el.engsel_lap_name, el.engsel_lap_score,
-                            kl.keyboard_lap_name, kl.keyboard_lap_score,
-                            tl1.touchpad_lap_name, tl1.touchpad_lap_score,
-                            bl.booting_lap_name, bl.booting_lap_score,
-                            ml.multi_lap_name, ml.multi_lap_score,
-                            tl2.tampung_lap_name, tl2.tampung_lap_score,
-                            il.isi_lap_name, il.isi_lap_score,
-                            pl.port_lap_name, pl.port_lap_score,
-                            al.audio_lap_name, al.audio_lap_score,
-                            sl.software_lap_name, sl.software_lap_score
-                    FROM form_inspeksi fi 
-                    JOIN device_age_laptop a ON fi.age = a.age_score
-                    JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_score
-                    JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_score
-                    JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_score
-                    JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_score
-                    JOIN ins_touchpad_lap tl1 ON fi.touchpad_lap = tl1.touchpad_lap_score
-                    JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_score
-                    JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_score
-                    JOIN ins_tampung_lap tl2 ON fi.tampung_lap = tl2.tampung_lap_score
-                    JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_score
-                    JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_score
-                    JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_score
-                    JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_score
-                    WHERE fi.no = (SELECT MAX(no) FROM form_inspeksi)");
-
-if (!$query) {
-    die("Error in query preparation: " . $conn->error);
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 
-$query->execute();
+// ================================================================= //
+// BAGIAN 2: PERBAIKI QUERY SQL UNTUK MENGGUNAKAN 'no' YANG SPESIFIK //
+// ================================================================= //
+$sql = "SELECT fi.*, 
+            a.age_name, a.age_score,
+            cl.casing_lap_name, cl.casing_lap_score,
+            ip.layar_lap_name, ip.layar_lap_score,
+            el.engsel_lap_name, el.engsel_lap_score,
+            kl.keyboard_lap_name, kl.keyboard_lap_score,
+            tl1.touchpad_lap_name, tl1.touchpad_lap_score,
+            bl.booting_lap_name, bl.booting_lap_score,
+            ml.multi_lap_name, ml.multi_lap_score,
+            tl2.tampung_lap_name, tl2.tampung_lap_score,
+            il.isi_lap_name, il.isi_lap_score,
+            pl.port_lap_name, pl.port_lap_score,
+            al.audio_lap_name, al.audio_lap_score,
+            sl.software_lap_name, sl.software_lap_score
+        FROM form_inspeksi fi 
+        LEFT JOIN device_age_laptop a ON fi.age = a.age_id
+        LEFT JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_id
+        LEFT JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_id
+        LEFT JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_id
+        LEFT JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_id
+        LEFT JOIN ins_touchpad_lap tl1 ON fi.touchpad_lap = tl1.touchpad_lap_id
+        LEFT JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_id
+        LEFT JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_id
+        LEFT JOIN ins_tampung_lap tl2 ON fi.tampung_lap = tl2.tampung_lap_id
+        LEFT JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_id
+        LEFT JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_id
+        LEFT JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_id
+        LEFT JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_id
+        WHERE fi.no = ?"; // <-- Diubah dari subquery MAX(no)
 
-if ($query->error) {
-    die("Query execution failed: " . $query->error);
-}
+$stmt = $conn->prepare($sql);
+if ($stmt === false) { die("Query preparation failed: " . $conn->error); }
 
-if ($query->error) {
-    die("Query failed: " . $query->error);
-}
+$stmt->bind_param("i", $no_inspeksi);
+$stmt->execute();
+$result = $stmt->get_result();
 
-$result = $query->get_result();
-
-if ($result) {
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-    } else {
-        die("No data found in the form_inspeksi table.");
-    }
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
 } else {
-    die("Result set error: " . $conn->error);
+    die("Tidak ada data ditemukan untuk nomor inspeksi: " . htmlspecialchars($no_inspeksi));
 }
 
-$runningNumber = $row['no'] + 1;
-
-$createDate = date('m/Y');
-
-$nomorInspeksi = sprintf("%03d", $runningNumber) . "/MIP/INS/" . $createDate;
-
-$screenshot_files = [];
-$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
-
-if ($handle = opendir($target_screenshot_dir)) {
-    while (false !== ($entry = readdir($handle))) {
-        if ($entry != "." && $entry != "..") {
-            $screenshot_files[] = $entry;
-        }
-    }
-    closedir($handle);
-}
+$stmt->close();
+$conn->close();
 
 class MYPDF extends FPDF {
     private $screenshot_files;
