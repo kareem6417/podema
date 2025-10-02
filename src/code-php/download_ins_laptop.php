@@ -7,13 +7,12 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
     exit();
 }
 
-// 1. Ambil 'no' (nomor inspeksi) dari URL dan validasi
+// 1. Ambil 'no' dari URL
 $no_inspeksi = isset($_GET['no']) ? (int)$_GET['no'] : 0;
 if ($no_inspeksi <= 0) {
-    die("Error: Nomor inspeksi tidak valid atau tidak diberikan.");
+    die("Error: Nomor inspeksi tidak valid.");
 }
 
-// Fungsi untuk membersihkan teks agar aman untuk PDF
 function clean_text($string) {
     if ($string === null) return '';
     return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $string);
@@ -23,12 +22,10 @@ function clean_text($string) {
 $host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
-    die("Koneksi ke database gagal: " . $conn->connect_error);
+    die("Koneksi gagal: " . $conn->connect_error);
 }
 
-// ================================================================= //
-// BAGIAN 3: PERBAIKAN TOTAL PADA SEMUA KONDISI 'JOIN'               //
-// ================================================================= //
+// 3. Query dengan JOIN yang BENAR (berdasarkan ID, kecuali age)
 $sql = "SELECT fi.*, 
             age.age_name, age.age_score,
             cl.casing_lap_name, cl.casing_lap_score,
@@ -44,32 +41,28 @@ $sql = "SELECT fi.*,
             al.audio_lap_name, al.audio_lap_score,
             sl.software_lap_name, sl.software_lap_score
         FROM form_inspeksi fi 
-        LEFT JOIN device_age_laptop age ON fi.age = age.age_score                   -- Bergabung pada 'age_score' (sudah benar sesuai DB Anda)
-        LEFT JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_id             -- Diperbaiki ke '_id'
-        LEFT JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_id                 -- Diperbaiki ke '_id'
-        LEFT JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_id             -- Diperbaiki ke '_id'
-        LEFT JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_id         -- Diperbaiki ke '_id'
-        LEFT JOIN ins_touchpad_lap tl ON fi.touchpad_lap = tl.touchpad_lap_id       -- Diperbaiki ke '_id'
-        LEFT JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_id           -- Diperbaiki ke '_id'
-        LEFT JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_id               -- Diperbaiki ke '_id'
-        LEFT JOIN ins_tampung_lap tampung ON fi.tampung_lap = tampung.tampung_lap_id -- Diperbaiki ke '_id'
-        LEFT JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_id                     -- Diperbaiki ke '_id'
-        LEFT JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_id                   -- Diperbaiki ke '_id'
-        LEFT JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_id               -- Diperbaiki ke '_id'
-        LEFT JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_id         -- Diperbaiki ke '_id'
+        LEFT JOIN device_age_laptop age ON fi.age = age.age_score
+        LEFT JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_id
+        LEFT JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_id
+        LEFT JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_id
+        LEFT JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_id
+        LEFT JOIN ins_touchpad_lap tl ON fi.touchpad_lap = tl.touchpad_lap_id
+        LEFT JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_id
+        LEFT JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_id
+        LEFT JOIN ins_tampung_lap tampung ON fi.tampung_lap = tampung.tampung_lap_id
+        LEFT JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_id
+        LEFT JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_id
+        LEFT JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_id
+        LEFT JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_id
         WHERE fi.no = ?";
 
 $stmt = $conn->prepare($sql);
-if ($stmt === false) { die("Query preparation failed: " . $conn->error); }
-
 $stmt->bind_param("i", $no_inspeksi);
 $stmt->execute();
 $result = $stmt->get_result();
-
-if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-} else {
-    die("Tidak ada data ditemukan untuk nomor inspeksi: " . htmlspecialchars($no_inspeksi));
+$row = $result->fetch_assoc();
+if (!$row) {
+    die("Data tidak ditemukan untuk no inspeksi: " . htmlspecialchars($no_inspeksi));
 }
 $stmt->close();
 $conn->close();
