@@ -64,7 +64,6 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   
   <style>
-    /* CSS BARU UNTUK MEMPERBAIKI SIDEBAR DAN TAMPILAN LAINNYA */
     .sidebar-submenu {
         position: static !important;
         max-height: 0;
@@ -159,30 +158,12 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="card shadow-none">
                 <div class="card-body p-3">
                     <form class="row g-3 align-items-center" method="get">
-                        <div class="col-md-4">
-                            <label for="filter_jenis" class="form-label">Filter by Device Type</label>
-                            <select id="filter_jenis" name="filter_jenis" class="form-select">
-                                <option value="">All Types</option>
-                                <?php foreach ($all_jenis as $jenis): ?>
-                                    <option value="<?php echo htmlspecialchars($jenis); ?>" <?php if ($filter_jenis == $jenis) echo 'selected'; ?>><?php echo htmlspecialchars($jenis); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="limit" class="form-label">Rows per page</label>
-                            <select id="limit" name="limit" class="form-select">
-                                <option value="10" <?php if ($limit == 10) echo 'selected'; ?>>10</option>
-                                <option value="25" <?php if ($limit == 25) echo 'selected'; ?>>25</option>
-                                <option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">Filter</button>
-                        </div>
+                        <div class="col-md-4"><label for="filter_jenis" class="form-label">Filter by Device Type</label><select id="filter_jenis" name="filter_jenis" class="form-select"><option value="">All Types</option><?php foreach ($all_jenis as $jenis): ?><option value="<?php echo htmlspecialchars($jenis); ?>" <?php if ($filter_jenis == $jenis) echo 'selected'; ?>><?php echo htmlspecialchars($jenis); ?></option><?php endforeach; ?></select></div>
+                        <div class="col-md-3"><label for="limit" class="form-label">Rows per page</label><select id="limit" name="limit" class="form-select"><option value="10" <?php if ($limit == 10) echo 'selected'; ?>>10</option><option value="25" <?php if ($limit == 25) echo 'selected'; ?>>25</option><option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50</option></select></div>
+                        <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-primary w-100">Filter</button></div>
                     </form>
                 </div>
             </div>
-
             <div class="table-responsive">
               <table class="table table-hover table-striped">
                 <thead class="table-light">
@@ -219,7 +200,6 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </tbody>
               </table>
             </div>
-
             <nav aria-label="Page navigation" class="mt-4 d-flex justify-content-end">
                 <ul class="pagination">
                     <?php if ($currentPage > 1): ?><li class="page-item"><a class="page-link" href="?page=<?php echo $currentPage - 1; ?>&limit=<?php echo $limit; ?>&filter_jenis=<?php echo urlencode($filter_jenis); ?>">Previous</a></li><?php endif; ?>
@@ -242,17 +222,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-header"><h5 class="modal-title" id="detailModalLabel">Detail Device Inspection</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
         <div class="modal-body">
             <table class="table table-bordered">
-                <tr><td>Inspection No</td><td id="modal-no"></td></tr>
-                <tr><td>Date</td><td id="modal-date"></td></tr>
-                <tr><td>Name</td><td id="modal-nama_user"></td></tr>
-                <tr><td>Device Type</td><td id="modal-jenis"></td></tr>
-                <tr><td>Merk</td><td id="modal-merk"></td></tr>
-                <tr><td>Serial Number</td><td id="modal-serialnumber"></td></tr>
-                <tr><td>Position/Department</td><td id="modal-status"></td></tr>
-                <tr><td>Location</td><td id="modal-lokasi"></td></tr>
-                <tr><td>Complaints / Issues</td><td id="modal-keluhan" style="white-space: pre-wrap;"></td></tr>
-                <tr><td>Examination/Findings</td><td id="modal-pemeriksaan" style="white-space: pre-wrap;"></td></tr>
-                <tr><td>Recommendation</td><td id="modal-rekomendasi" style="white-space: pre-wrap;"></td></tr>
+                <tr><td>Inspection No</td><td id="modal-no"></td></tr><tr><td>Date</td><td id="modal-date"></td></tr><tr><td>Name</td><td id="modal-nama_user"></td></tr><tr><td>Device Type</td><td id="modal-jenis"></td></tr><tr><td>Merk</td><td id="modal-merk"></td></tr><tr><td>Serial Number</td><td id="modal-serialnumber"></td></tr><tr><td>Position/Department</td><td id="modal-status"></td></tr><tr><td>Location</td><td id="modal-lokasi"></td></tr><tr><td>Complaints / Issues</td><td id="modal-keluhan" style="white-space: pre-wrap;"></td></tr><tr><td>Examination/Findings</td><td id="modal-pemeriksaan" style="white-space: pre-wrap;"></td></tr><tr><td>Recommendation</td><td id="modal-rekomendasi" style="white-space: pre-wrap;"></td></tr>
             </table>
         </div>
         <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
@@ -266,19 +236,14 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Logika untuk sidebar dropdown
       var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
         submenuToggles.forEach(function(toggle) {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 var parentItem = this.closest('.sidebar-item');
-                if (parentItem) {
-                    parentItem.classList.toggle('active');
-                }
+                if (parentItem) { parentItem.classList.toggle('active'); }
             });
         });
-
-      // Logika untuk modal
       var detailModal = document.getElementById('detailModal');
       detailModal.addEventListener('show.bs.modal', function (event) {
           var triggerElement = event.relatedTarget;
