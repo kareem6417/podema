@@ -35,7 +35,6 @@ if (!empty($filter_jenis)) {
 $count_stmt = $conn->prepare("SELECT COUNT(*) FROM form_inspeksi " . $where_clauses);
 $count_stmt->execute($params);
 $totalRows = $count_stmt->fetchColumn();
-
 $totalPages = ceil($totalRows / $limit);
 $currentPage = max(1, $currentPage); 
 $currentPage = min($currentPage, $totalPages > 0 ? $totalPages : 1); 
@@ -63,7 +62,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  
   <style>
+    /* CSS BARU UNTUK MEMPERBAIKI SIDEBAR DAN TAMPILAN LAINNYA */
     .sidebar-submenu {
         position: static !important;
         max-height: 0;
@@ -84,7 +85,6 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .sidebar-item.active > a .arrow { transform: rotate(180deg); }
     .table th, .table td { vertical-align: middle; }
     .action-icons a, .action-icons span { font-size: 1.2rem; margin: 0 5px; cursor: pointer; }
-    .action-icons a:hover { text-decoration: none; }
     .modal-body table td:first-child { font-weight: bold; width: 35%; }
   </style>
 </head>
