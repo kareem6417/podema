@@ -1,56 +1,214 @@
 <?php
 session_start();
+require('../fpdf/fpdf.php'); // Pastikan path ke FPDF benar
 
 if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
-  header("location: ./index.php");
-  exit();
+    header("location: ./index.php");
+    exit();
 }
 
-// Konfigurasi Database
-$host = "mandiricoal.net";
-$db   = "podema";
-$user = "podema";
-$pass = "Jam10pagi#";
-
-try {
-  $conn = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-  die("Koneksi ke database gagal: " . $e->getMessage());
+// 1. Ambil 'no' (nomor inspeksi) dari URL dan validasi
+$no_inspeksi = isset($_GET['no']) ? (int)$_GET['no'] : 0;
+if ($no_inspeksi <= 0) {
+    die("Error: Nomor inspeksi tidak valid atau tidak diberikan.");
 }
 
-// Logika untuk filter dan pagination
-$all_jenis = $conn->query("SELECT DISTINCT jenis FROM form_inspeksi WHERE jenis IS NOT NULL AND jenis != '' ORDER BY jenis ASC")->fetchAll(PDO::FETCH_COLUMN);
-$filter_jenis = isset($_GET['filter_jenis']) ? $_GET['filter_jenis'] : '';
-$limit = isset($_GET['limit']) && is_numeric($_GET['limit']) ? (int)$_GET['limit'] : 10;
-$currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-
-$params = [];
-$where_clauses = "WHERE 1=1";
-if (!empty($filter_jenis)) {
-    $where_clauses .= " AND jenis = :jenis";
-    $params[':jenis'] = $filter_jenis;
+// Fungsi untuk membersihkan teks agar aman untuk PDF
+function clean_text($string) {
+    if ($string === null) return '';
+    return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $string);
 }
 
-$count_stmt = $conn->prepare("SELECT COUNT(*) FROM form_inspeksi " . $where_clauses);
-$count_stmt->execute($params);
-$totalRows = $count_stmt->fetchColumn();
-
-$totalPages = ceil($totalRows / $limit);
-$currentPage = max(1, $currentPage); 
-$currentPage = min($currentPage, $totalPages > 0 ? $totalPages : 1); 
-$offset = ($currentPage - 1) * $limit;
-
-$main_sql = "SELECT * FROM form_inspeksi " . $where_clauses . " ORDER BY date DESC, no DESC LIMIT :limit OFFSET :offset";
-$stmt = $conn->prepare($main_sql);
-
-foreach ($params as $key => &$val) {
-    $stmt->bindParam($key, $val);
+// 2. Koneksi ke Database
+$host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Koneksi ke database gagal: " . $conn->connect_error);
 }
-$stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-$stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+
+// 3. Query BARU: Ambil data SPESIFIK berdasarkan 'no' dan JOIN semua tabel referensi
+$sql = "SELECT fi.*, age.age_name, casing_lap.casing_lap_name, layar_lap.layar_lap_name, 
+               engsel_lap.engsel_lap_name, keyboard_lap.keyboard_lap_name, touchpad_lap.touchpad_lap_name,
+               booting_lap.booting_lap_name, multi_lap.multi_lap_name, tampung_lap.tampung_lap_name, 
+               isi_lap.isi_lap_name, port_lap.port_lap_name, audio_lap.audio_lap_name, 
+               software_lap.software_lap_name
+        FROM form_inspeksi fi
+        LEFT JOIN device_age_laptop age ON fi.age = age.age_id
+        LEFT JOIN ins_casing_lap casing_lap ON fi.casing_lap = casing_lap.casing_lap_id
+        LEFT JOIN ins_layar_lap layar_lap ON fi.layar_lap = layar_lap.layar_lap_id
+        LEFT JOIN ins_engsel_lap engsel_lap ON fi.engsel_lap = engsel_lap.engsel_lap_id
+        LEFT JOIN ins_keyboard_lap keyboard_lap ON fi.keyboard_lap = keyboard_lap.keyboard_lap_id
+        LEFT JOIN ins_touchpad_lap touchpad_lap ON fi.touchpad_lap = touchpad_lap.touchpad_lap_id
+        LEFT JOIN ins_booting_lap booting_lap ON fi.booting_lap = booting_lap.booting_lap_id
+        LEFT JOIN ins_multi_lap multi_lap ON fi.multi_lap = multi_lap.multi_lap_id
+        LEFT JOIN ins_tampung_lap tampung_lap ON fi.tampung_lap = tampung_lap.tampung_lap_id
+        LEFT JOIN ins_isi_lap isi_lap ON fi.isi_lap = isi_lap.isi_lap_id
+        LEFT JOIN ins_port_lap port_lap ON fi.port_lap = port_lap.port_lap_id
+        LEFT JOIN ins_audio_lap audio_lap ON fi.audio_lap = audio_lap.audio_lap_id
+        LEFT JOIN ins_software_lap software_lap ON fi.software_lap = software_lap.software_lap_id
+        WHERE fi.no = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $no_inspeksi);
 $stmt->execute();
-$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$result = $stmt->get_result();
+$query = $result->fetch_assoc();
+
+if (!$query) {
+    die("Data inspeksi No. " . htmlspecialchars($no_inspeksi) . " tidak ditemukan.");
+}
+$stmt->close();
+$conn->close();
+
+// 4. Mulai membuat PDF dengan FPDF
+class PDF extends FPDF {
+    var $inspection_data;
+
+    function setInspectionData($data) {
+        $this->inspection_data = $data;
+    }
+
+    function Header() {
+        $this->Image('../assets/images/logos/mandiri.png', 10, 8, 33);
+        $this->SetFont('Arial', 'B', 14);
+        $this->Cell(0, 7, 'INSPEKSI PERANGKAT', 0, 1, 'C');
+        $this->SetFont('Arial', '', 9);
+        $this->Cell(0, 5, 'Divisi Teknologi Informasi', 0, 1, 'C');
+        
+        $this->SetFont('Arial', 'B', 9);
+        $this->SetXY(140, 12);
+        $this->Cell(30, 5, 'Form:', 0, 0, 'L');
+        $this->SetFont('Arial', '', 9);
+        $this->Cell(30, 5, 'MIP/FRM/ITE/005', 0, 1, 'L');
+
+        $this->SetFont('Arial', 'B', 9);
+        $this->SetXY(140, 17);
+        $this->Cell(30, 5, 'Revisi:', 0, 0, 'L');
+        $this->SetFont('Arial', '', 9);
+        $this->Cell(30, 5, '00', 0, 1, 'L');
+
+        $this->SetFont('Arial', 'B', 9);
+        $this->SetXY(140, 22);
+        $this->Cell(30, 5, 'No Inspeksi:', 0, 0, 'L');
+        $this->SetFont('Arial', '', 9);
+        $this->Cell(30, 5, clean_text($this->inspection_data['no']), 0, 1, 'L');
+
+        $this->Ln(10);
+    }    
+
+    function Footer() {
+        $this->SetY(-15);
+        $this->SetFont('Arial','I',8);
+        $this->Cell(0,10, $this->PageNo().'/{nb}',0,0,'R');
+    } 
+}
+
+$pdf = new PDF('P', 'mm', 'A4');
+$pdf->setInspectionData($query);
+$pdf->AliasNbPages();
+$pdf->AddPage();
+
+// Informasi Pengguna & Perangkat
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(45, 6, 'Tanggal:', 0, 0);
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(50, 6, clean_text(date('d F Y', strtotime($query['date']))), 0, 0);
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(45, 6, 'Nama Pengguna:', 0, 0);
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(50, 6, clean_text($query['nama_user']), 0, 1);
+
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(45, 6, 'Tipe Perangkat:', 0, 0);
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(50, 6, clean_text($query['jenis']), 0, 0);
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(45, 6, 'Divisi:', 0, 0);
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(50, 6, clean_text($query['status']), 0, 1);
+
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(45, 6, 'Merk/Nomor Serial:', 0, 0);
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 6, clean_text($query['merk'] . ' / ' . $query['serialnumber']), 0, 'L');
+
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(45, 6, 'Lokasi/Area Penggunaan:', 0, 0);
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 6, clean_text($query['lokasi']), 0, 'L');
+$pdf->Ln(5);
+
+// Informasi Keluhan & Pemeriksaan
+$pdf->SetFont('Arial','B',10);
+$pdf->Cell(0, 6, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1);
+$pdf->SetFont('Arial','',10);
+$pdf->MultiCell(0, 6, clean_text($query['informasi_keluhan']), 1, 'L');
+$pdf->Ln(2);
+
+$pdf->SetFont('Arial','B',10);
+$pdf->Cell(0, 6, 'Hasil Pemeriksaan:', 0, 1);
+$pdf->SetFont('Arial','',10);
+$pdf->MultiCell(0, 6, clean_text($query['hasil_pemeriksaan']), 1, 'L');
+$pdf->Ln(5);
+
+// Tabel Item Inspeksi
+$pdf->SetFont('Arial','B',10);
+$pdf->SetFillColor(230, 230, 230);
+$pdf->Cell(40, 7, 'Item', 1, 0, 'C', true);
+$pdf->Cell(120, 7, 'Detail', 1, 0, 'C', true);
+$pdf->Cell(30, 7, 'Skor', 1, 1, 'C', true);
+$pdf->SetFont('Arial','',9);
+
+$inspection_items = [
+    ['Usia Perangkat', $query['age_name'], $query['age']],
+    ['Casing', $query['casing_lap_name'], $query['casing_lap']],
+    ['Layar', $query['layar_lap_name'], $query['layar_lap']],
+    ['Engsel', $query['engsel_lap_name'], $query['engsel_lap']],
+    ['Keyboard', $query['keyboard_lap_name'], $query['keyboard_lap']],
+    ['Touchpad', $query['touchpad_lap_name'], $query['touchpad_lap']],
+    ['Proses Booting', $query['booting_lap_name'], $query['booting_lap']],
+    ['Multitasking Apps', $query['multi_lap_name'], $query['multi_lap']],
+    ['Kapasitas Baterai', $query['tampung_lap_name'], $query['tampung_lap']],
+    ['Waktu Charging', $query['isi_lap_name'], $query['isi_lap']],
+    ['Port', $query['port_lap_name'], $query['port_lap']],
+    ['Audio', $query['audio_lap_name'], $query['audio_lap']],
+    ['Software', $query['software_lap_name'], $query['software_lap']],
+];
+
+foreach ($inspection_items as $item) {
+    if (!empty($item[1])) { // Hanya tampilkan jika deskripsinya tidak kosong
+        $pdf->Cell(40, 6, $item[0], 1, 0);
+        $pdf->Cell(120, 6, clean_text($item[1]), 1, 0);
+        $pdf->Cell(30, 6, $item[2], 1, 1, 'C');
+    }
+}
+
+$pdf->SetFont('Arial','B',10);
+$pdf->Cell(160, 7, 'Total Skor', 1, 0, 'C', true);
+$pdf->Cell(30, 7, $query['score'], 1, 1, 'C', true);
+
+// Rekomendasi (bisa di halaman baru jika perlu)
+$pdf->AddPage();
+$pdf->SetFont('Arial','B',10);
+$pdf->Cell(0, 6, 'Rekomendasi:', 0, 1);
+$pdf->SetFont('Arial','',10);
+$pdf->MultiCell(0, 6, clean_text($query['rekomendasi']), 1, 'L');
+$pdf->Ln(10);
+
+// Tanda Tangan
+$pdf->SetFont('Arial','',10);
+$pdf->Cell(0, 6, 'Jakarta, ' . clean_text(date('d F Y', strtotime($query['date']))), 0, 1, 'L');
+$pdf->Ln(20);
+$pdf->Cell(95, 6, 'Diperiksa Oleh,', 0, 0, 'L');
+$pdf->Cell(95, 6, 'Nama Pengguna,', 0, 1, 'L');
+$pdf->Ln(15);
+$pdf->SetFont('Arial','U',10);
+$pdf->Cell(95, 6, 'IT Support', 0, 0, 'L');
+$pdf->Cell(95, 6, clean_text($query['nama_user']), 0, 1, 'L');
+
+$filename = "Inspeksi-" . clean_text($query['jenis']) . "-" . $query['no'] . ".pdf";
+$pdf->Output($filename, 'D');
+
 ?>
 
 <!doctype html>
@@ -67,6 +225,27 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .table th, .table td { vertical-align: middle; }
     .action-icons a, .action-icons span { font-size: 1.2rem; margin: 0 5px; cursor: pointer; }
     .action-icons a:hover { text-decoration: none; }
+    .modal-body table td:first-child { font-weight: bold; width: 35%; }
+    .sidebar-submenu {
+        position: static !important;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease-in-out;
+        list-style: none;
+        padding-left: 25px;
+        background-color: #f8f9fa;
+        border-radius: 0 0 5px 5px;
+        margin: 0 10px 5px 10px;
+    }
+    .sidebar-item.active > .sidebar-submenu { max-height: 500px; }
+    .sidebar-item > a .arrow {
+        transition: transform 0.3s ease;
+        display: inline-block;
+        margin-left: auto;
+    }
+    .sidebar-item.active > a .arrow { transform: rotate(180deg); }
+    .table th, .table td { vertical-align: middle; }
+    .action-icons a, .action-icons span { font-size: 1.2rem; margin: 0 5px; cursor: pointer; }
     .modal-body table td:first-child { font-weight: bold; width: 35%; }
   </style>
 </head>
@@ -248,6 +427,16 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <script src="../assets/js/app.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
+        submenuToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                var parentItem = this.closest('.sidebar-item');
+                if (parentItem) {
+                    parentItem.classList.toggle('active');
+                }
+            });
+        });
         var detailModal = document.getElementById('detailModal');
         detailModal.addEventListener('show.bs.modal', function (event) {
             var triggerElement = event.relatedTarget;
