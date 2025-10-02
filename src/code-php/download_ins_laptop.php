@@ -7,56 +7,57 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
     exit();
 }
 
-// ================================================================= //
-// BAGIAN 1: AMBIL 'no' DARI URL, BUKAN LAGI MENCARI MAX(no)         //
-// ================================================================= //
+// 1. Ambil 'no' (nomor inspeksi) dari URL dan validasi
 $no_inspeksi = isset($_GET['no']) ? (int)$_GET['no'] : 0;
 if ($no_inspeksi <= 0) {
     die("Error: Nomor inspeksi tidak valid atau tidak diberikan.");
 }
 
-// Koneksi ke Database
-$host = "mandiricoal.net";
-$user = "podema";
-$pass = "Jam10pagi#";
-$db = "podema";
+// Fungsi untuk membersihkan teks agar aman untuk PDF
+function clean_text($string) {
+    if ($string === null) return '';
+    return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $string);
+}
+
+// 2. Koneksi ke Database
+$host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+    die("Koneksi ke database gagal: " . $conn->connect_error);
 }
 
 // ================================================================= //
-// BAGIAN 2: PERBAIKI QUERY SQL UNTUK MENGGUNAKAN 'no' YANG SPESIFIK //
+// BAGIAN 3: PERBAIKAN TOTAL PADA SEMUA KONDISI 'JOIN'               //
 // ================================================================= //
 $sql = "SELECT fi.*, 
-            a.age_name, a.age_score,
+            age.age_name, age.age_score,
             cl.casing_lap_name, cl.casing_lap_score,
             ip.layar_lap_name, ip.layar_lap_score,
             el.engsel_lap_name, el.engsel_lap_score,
             kl.keyboard_lap_name, kl.keyboard_lap_score,
-            tl1.touchpad_lap_name, tl1.touchpad_lap_score,
+            tl.touchpad_lap_name, tl.touchpad_lap_score,
             bl.booting_lap_name, bl.booting_lap_score,
             ml.multi_lap_name, ml.multi_lap_score,
-            tl2.tampung_lap_name, tl2.tampung_lap_score,
+            tampung.tampung_lap_name, tampung.tampung_lap_score,
             il.isi_lap_name, il.isi_lap_score,
             pl.port_lap_name, pl.port_lap_score,
             al.audio_lap_name, al.audio_lap_score,
             sl.software_lap_name, sl.software_lap_score
         FROM form_inspeksi fi 
-        LEFT JOIN device_age_laptop a ON fi.age = a.age_id
-        LEFT JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_id
-        LEFT JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_id
-        LEFT JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_id
-        LEFT JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_id
-        LEFT JOIN ins_touchpad_lap tl1 ON fi.touchpad_lap = tl1.touchpad_lap_id
-        LEFT JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_id
-        LEFT JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_id
-        LEFT JOIN ins_tampung_lap tl2 ON fi.tampung_lap = tl2.tampung_lap_id
-        LEFT JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_id
-        LEFT JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_id
-        LEFT JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_id
-        LEFT JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_id
-        WHERE fi.no = ?"; // <-- Diubah dari subquery MAX(no)
+        LEFT JOIN device_age_laptop age ON fi.age = age.age_score                   -- Bergabung pada 'age_score' (sudah benar sesuai DB Anda)
+        LEFT JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_id             -- Diperbaiki ke '_id'
+        LEFT JOIN ins_layar_lap ip ON fi.layar_lap = ip.layar_lap_id                 -- Diperbaiki ke '_id'
+        LEFT JOIN ins_engsel_lap el ON fi.engsel_lap = el.engsel_lap_id             -- Diperbaiki ke '_id'
+        LEFT JOIN ins_keyboard_lap kl ON fi.keyboard_lap = kl.keyboard_lap_id         -- Diperbaiki ke '_id'
+        LEFT JOIN ins_touchpad_lap tl ON fi.touchpad_lap = tl.touchpad_lap_id       -- Diperbaiki ke '_id'
+        LEFT JOIN ins_booting_lap bl ON fi.booting_lap = bl.booting_lap_id           -- Diperbaiki ke '_id'
+        LEFT JOIN ins_multi_lap ml ON fi.multi_lap = ml.multi_lap_id               -- Diperbaiki ke '_id'
+        LEFT JOIN ins_tampung_lap tampung ON fi.tampung_lap = tampung.tampung_lap_id -- Diperbaiki ke '_id'
+        LEFT JOIN ins_isi_lap il ON fi.isi_lap = il.isi_lap_id                     -- Diperbaiki ke '_id'
+        LEFT JOIN ins_port_lap pl ON fi.port_lap = pl.port_lap_id                   -- Diperbaiki ke '_id'
+        LEFT JOIN ins_audio_lap al ON fi.audio_lap = al.audio_lap_id               -- Diperbaiki ke '_id'
+        LEFT JOIN ins_software_lap sl ON fi.software_lap = sl.software_lap_id         -- Diperbaiki ke '_id'
+        WHERE fi.no = ?";
 
 $stmt = $conn->prepare($sql);
 if ($stmt === false) { die("Query preparation failed: " . $conn->error); }
@@ -70,7 +71,6 @@ if ($result && $result->num_rows > 0) {
 } else {
     die("Tidak ada data ditemukan untuk nomor inspeksi: " . htmlspecialchars($no_inspeksi));
 }
-
 $stmt->close();
 $conn->close();
 
