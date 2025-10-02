@@ -230,7 +230,7 @@ $pdf->Cell(40, 10, $totalScore, 1, 1, 'C');
 
 $pdf->Ln(5);
 
-$recommendation = ($totalScore > 100)
+$recommendation = ($totalScore > 99)
     ? 'Berdasarkan pada hasil diatas, direkomendasikan untuk mengganti perangkat Anda dengan yang baru.'
     : 'Berdasarkan pada hasil diatas, dinyatakan bahwa perangkat Anda masih dapat digunakan. Oleh karena itu, tim IT akan melakukan peningkatan sesuai dengan kebutuhan perangkat Anda.';
 
