@@ -167,7 +167,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="table-responsive">
               <table class="table table-hover table-striped">
                 <thead class="table-light">
-                    <tr><th>No</th><th>Date</th><th>Name</th><th>Device Type</th><th>Issue</th><th>Actions</th></tr>
+                    <tr><th>No</th><th>Date</th><th>Name</th><th>Device Type</th><th>Issue</th><th>Findings</th><th>Recommendation</th><th>Score</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                     <?php if (empty($results)): ?>
@@ -180,6 +180,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?php echo htmlspecialchars($row['nama_user']); ?></td>
                             <td><?php echo htmlspecialchars($row['jenis']); ?></td>
                             <td><?php echo nl2br(htmlspecialchars(substr($row['informasi_keluhan'], 0, 100))) . (strlen($row['informasi_keluhan']) > 100 ? '...' : ''); ?></td>
+                            <td><?php echo nl2br(htmlspecialchars(substr($row['hasil_pemeriksaan'], 0, 100))) . (strlen($row['hasil_pemeriksaan']) > 100 ? '...' : ''); ?></td>
+                            <td><?php echo nl2br(htmlspecialchars(substr($row['rekomendasi'], 0, 100))) . (strlen($row['rekomendasi']) > 100 ? '...' : ''); ?></td>
+                            <td><?php echo htmlspecialchars($row['score']); ?></td>
                             <td class="action-icons">
                                 <span data-bs-toggle="modal" data-bs-target="#detailModal" data-no="<?php echo htmlspecialchars($row['no']); ?>" data-date="<?php echo htmlspecialchars($row['date']); ?>" data-nama_user="<?php echo htmlspecialchars($row['nama_user']); ?>" data-jenis="<?php echo htmlspecialchars($row['jenis']); ?>" data-merk="<?php echo htmlspecialchars($row['merk']); ?>" data-serialnumber="<?php echo htmlspecialchars($row['serialnumber']); ?>" data-status="<?php echo htmlspecialchars($row['status']); ?>" data-lokasi="<?php echo htmlspecialchars($row['lokasi']); ?>" data-keluhan="<?php echo htmlspecialchars($row['informasi_keluhan']); ?>" data-pemeriksaan="<?php echo htmlspecialchars($row['hasil_pemeriksaan']); ?>" data-rekomendasi="<?php echo htmlspecialchars($row['rekomendasi']); ?>"><i class="ti ti-eye text-primary" title="View Details"></i></span>
                                 <?php
