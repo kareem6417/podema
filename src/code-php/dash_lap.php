@@ -6,78 +6,81 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
   exit();
 }
 
+// Konfigurasi Database
 $host = "mandiricoal.net";
 $db   = "podema";
 $user = "podema";
 $pass = "Jam10pagi#";
 
 try {
-    $conn = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $conn = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    echo "Koneksi ke database gagal: " . $e->getMessage();
-    exit();
+  die("Koneksi ke database gagal: " . $e->getMessage());
 }
 
-try {
-    $stmt = $conn->query("SELECT COUNT(*) FROM assess_laptop"); 
-    $totalRows = $stmt->fetchColumn();
+// --- LOGIKA BARU UNTUK FILTER DAN PAGINATION ---
 
-    $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
-        if ($limit == 999999) {
-            $totalRows = $conn->query("SELECT COUNT(*) FROM assess_laptop")->fetchColumn();
-        } else {
-            $allowedLimits = [10, 25, 50, 100];
-            $limit = in_array($limit, $allowedLimits) ? $limit : 10;
-            $totalRows = $limit;
-        }
+// 1. Ambil semua nama unik untuk dropdown filter
+$all_names = $conn->query("SELECT DISTINCT name FROM assess_laptop WHERE name IS NOT NULL AND name != '' ORDER BY name ASC")->fetchAll(PDO::FETCH_COLUMN);
 
-    $totalPages = 1;
+// 2. Proses parameter dari URL
+$filter_name = isset($_GET['filter_name']) ? $_GET['filter_name'] : '';
+$limit = isset($_GET['limit']) && in_array($_GET['limit'], [10, 25, 50, 100]) ? (int)$_GET['limit'] : 10;
+$currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 
-    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
-    $currentPage = max(1, $currentPage); 
-    $currentPage = min($currentPage, $totalPages); 
+// 3. Bangun query dinamis berdasarkan filter
+$params = [];
+$where_clauses = "WHERE 1=1";
+if (!empty($filter_name)) {
+    $where_clauses .= " AND al.name = :name";
+    $params[':name'] = $filter_name;
+}
 
-    $offset = ($currentPage - 1) * $limit;
+// 4. Hitung total data untuk pagination
+$count_stmt = $conn->prepare("SELECT COUNT(*) FROM assess_laptop al " . $where_clauses);
+$count_stmt->execute($params);
+$totalRows = $count_stmt->fetchColumn();
 
-    $stmt = $conn->prepare("SELECT assess_laptop.*, operating_sistem_laptop.os_name AS os_name, operating_sistem_laptop.os_score AS os_score,
-                            processor_laptop.processor_name AS processor_name, processor_laptop.processor_score AS processor_score,
-                            batterylife_laptop.battery_name AS battery_name, batterylife_laptop.battery_score AS battery_score,
-                            device_age_laptop.age_name AS age_name, device_age_laptop.age_score AS age_score,
-                            issue_software_laptop.issue_name AS issue_name, issue_software_laptop.issue_score AS issue_score,
-                            ram_laptop.ram_name AS ram_name, ram_laptop.ram_score AS ram_score,
-                            vga_pc.vga_name AS vga_name, vga_pc.vga_score AS vga_score,
-                            storage_laptop.storage_name AS storage_name, storage_laptop.storage_score AS storage_score,
-                            keyboard_laptop.keyboard_name AS keyboard_name, keyboard_laptop.keyboard_score AS keyboard_score,
-                            screen_laptop.screen_name AS screen_name, screen_laptop.screen_score AS screen_score,
-                            touchpad_laptop.touchpad_name AS touchpad_name, touchpad_laptop.touchpad_score AS touchpad_score,
-                            audio_laptop.audio_name AS audio_name, audio_laptop.audio_score AS audio_score,
-                            body_laptop.body_name AS body_name, body_laptop.body_score AS body_score
-                            FROM assess_laptop
-                            LEFT JOIN operating_sistem_laptop ON assess_laptop.os = operating_sistem_laptop.os_score
-                            LEFT JOIN processor_laptop ON assess_laptop.processor = processor_laptop.processor_score
-                            LEFT JOIN batterylife_laptop ON assess_laptop.batterylife = batterylife_laptop.battery_score
-                            LEFT JOIN device_age_laptop ON assess_laptop.age = device_age_laptop.age_score
-                            LEFT JOIN issue_software_laptop ON assess_laptop.issue = issue_software_laptop.issue_score
-                            LEFT JOIN ram_laptop ON assess_laptop.ram = ram_laptop.ram_score
-                            LEFT JOIN vga_pc ON assess_laptop.vga = vga_pc.vga_score
-                            LEFT JOIN storage_laptop ON assess_laptop.storage = storage_laptop.storage_score
-                            LEFT JOIN keyboard_laptop ON assess_laptop.keyboard = keyboard_laptop.keyboard_score
-                            LEFT JOIN screen_laptop ON assess_laptop.screen = screen_laptop.screen_score
-                            LEFT JOIN touchpad_laptop ON assess_laptop.touchpad = touchpad_laptop.touchpad_score
-                            LEFT JOIN audio_laptop ON assess_laptop.audio = audio_laptop.audio_score
-                            LEFT JOIN body_laptop ON assess_laptop.body = body_laptop.body_score
-                            ORDER BY assess_laptop.id DESC
-                            LIMIT :limit OFFSET :offset");
-                        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-                        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-                        $stmt->execute();
+$totalPages = ceil($totalRows / $limit);
+$currentPage = max(1, $currentPage); 
+$currentPage = min($currentPage, $totalPages > 0 ? $totalPages : 1); 
+$offset = ($currentPage - 1) * $limit;
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// 5. Query utama untuk mengambil data dengan JOIN lengkap
+$main_sql = "SELECT al.*, 
+                os.os_name, ram.ram_name, proc.processor_name, bat.battery_name, age.age_name, 
+                iss.issue_name, vga.vga_name, store.storage_name, kbd.keyboard_name, 
+                scr.screen_name, pad.touchpad_name, aud.audio_name, body.body_name
+            FROM assess_laptop al
+            LEFT JOIN operating_sistem_laptop os ON al.os = os.os_score
+            LEFT JOIN ram_laptop ram ON al.ram = ram.ram_score
+            LEFT JOIN processor_laptop proc ON al.processor = proc.processor_score
+            LEFT JOIN batterylife_laptop bat ON al.batterylife = bat.battery_score
+            LEFT JOIN device_age_laptop age ON al.age = age.age_score
+            LEFT JOIN issue_software_laptop iss ON al.issue = iss.issue_score
+            LEFT JOIN vga_pc vga ON al.vga = vga.vga_score
+            LEFT JOIN storage_laptop store ON al.storage = store.storage_score
+            LEFT JOIN keyboard_laptop kbd ON al.keyboard = kbd.keyboard_score
+            LEFT JOIN screen_laptop scr ON al.screen = scr.screen_score
+            LEFT JOIN touchpad_laptop pad ON al.touchpad = pad.touchpad_score
+            LEFT JOIN audio_laptop aud ON al.audio = aud.audio_score
+            LEFT JOIN body_laptop body ON al.body = body.body_score " . 
+            $where_clauses . " ORDER BY al.date DESC, al.id DESC LIMIT :limit OFFSET :offset";
 
-} catch(PDOException $e) {
-    echo "Error: " . $e->getMessage();
-    exit();
+$stmt = $conn->prepare($main_sql);
+foreach ($params as $key => &$val) { $stmt->bindParam($key, $val); }
+$stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fungsi bantuan untuk menampilkan data
+function display_data_with_score($name, $score) {
+    if ($name !== null) {
+        return htmlspecialchars($name) . " (Skor: " . htmlspecialchars($score) . ")";
+    }
+    return '<em class="text-muted">Data tidak tersedia</em>';
 }
 ?>
 
@@ -139,6 +142,10 @@ try {
     th {
       background-color: #f2f2f2;
     }
+
+    .table th, .table td { vertical-align: middle; }
+    .action-icons a, .action-icons span { font-size: 1.2rem; margin: 0 5px; cursor: pointer; }
+    .modal-body table td:first-child { font-weight: bold; width: 35%; }
 
     /* Popup Styles */
     .popup-overlay {
