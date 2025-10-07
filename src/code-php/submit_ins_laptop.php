@@ -1,94 +1,156 @@
 <?php
-session_start();
 
-if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
-    header("location: ./index.php");
-    exit();
-}
+$host = "mandiricoal.net";
+$user = "podema"; 
+$pass = "Jam10pagi#"; 
+$db = "podema";
 
-// Koneksi Database
-$host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
-if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+
+if (!$conn) {
+    die("Koneksi database gagal: " . $conn->connect_error);
 }
 
-// Ambil semua data ID dari POST dengan aman
-$jenis = $_POST["jenis"] ?? '';
-$date = $_POST["date"] ?? '';
-$merk = $_POST["merk"] ?? '';
-$lokasi = $_POST["lokasi"] ?? '';
-$status = $_POST["status"] ?? '';
-$serialnumber = $_POST["serialnumber"] ?? '';
-$informasi_keluhan = $_POST["informasi_keluhan"] ?? '';
-$hasil_pemeriksaan = $_POST["hasil_pemeriksaan"] ?? '';
-$rekomendasi = $_POST["rekomendasi"] ?? '';
-$nama_user = $_POST["nama_user"] ?? '';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $jenis = isset($_POST["jenis"]) ? $_POST["jenis"] : '';
+    $date = isset($_POST["date"]) ? $_POST["date"] : '';
+    $merk = isset($_POST["merk"]) ? $_POST["merk"] : '';
+    $lokasi = isset($_POST["lokasi"]) ? $_POST["lokasi"] : '';
+    $status = isset($_POST["status"]) ? $_POST["status"] : '';
+    $serialnumber = isset($_POST["serialnumber"]) ? $_POST["serialnumber"] : '';
+    $informasi_keluhan = isset($_POST["informasi_keluhan"]) ? $_POST["informasi_keluhan"] : '';
+    $hasil_pemeriksaan = isset($_POST["hasil_pemeriksaan"]) ? $_POST["hasil_pemeriksaan"] : '';
+    $rekomendasi = isset($_POST["rekomendasi"]) ? $_POST["rekomendasi"] : '';
+    $nama_user = isset($_POST["nama_user"]) ? $_POST["nama_user"] : '';
+    $score = 0;
 
-// Ambil ID dari setiap item inspeksi
-$age_id = !empty($_POST["age"]) ? (int)$_POST["age"] : null;
-$casing_lap_id = !empty($_POST["casing_lap"]) ? (int)$_POST["casing_lap"] : null;
-$layar_lap_id = !empty($_POST["layar_lap"]) ? (int)$_POST["layar_lap"] : null;
-$engsel_lap_id = !empty($_POST["engsel_lap"]) ? (int)$_POST["engsel_lap"] : null;
-$keyboard_lap_id = !empty($_POST["keyboard_lap"]) ? (int)$_POST["keyboard_lap"] : null;
-$touchpad_lap_id = !empty($_POST["touchpad_lap"]) ? (int)$_POST["touchpad_lap"] : null;
-$booting_lap_id = !empty($_POST["booting_lap"]) ? (int)$_POST["booting_lap"] : null;
-$multi_lap_id = !empty($_POST["multi_lap"]) ? (int)$_POST["multi_lap"] : null;
-$tampung_lap_id = !empty($_POST["tampung_lap"]) ? (int)$_POST["tampung_lap"] : null;
-$isi_lap_id = !empty($_POST["isi_lap"]) ? (int)$_POST["isi_lap"] : null;
-$port_lap_id = !empty($_POST["port_lap"]) ? (int)$_POST["port_lap"] : null;
-$audio_lap_id = !empty($_POST["audio_lap"]) ? (int)$_POST["audio_lap"] : null;
-$software_lap_id = !empty($_POST["software_lap"]) ? (int)$_POST["software_lap"] : null;
+    $sql = '';
 
-// LOGIKA BARU: HITUNG TOTAL SKOR BERDASARKAN ID YANG DITERIMA
-$total_score = 0;
-$lookup_map = [
-    'age' => ['table' => 'device_age_laptop', 'id_col' => 'age_id', 'score_col' => 'age_score', 'value' => $age_id],
-    'casing_lap' => ['table' => 'ins_casing_lap', 'id_col' => 'casing_lap_id', 'score_col' => 'casing_lap_score', 'value' => $casing_lap_id],
-    'layar_lap' => ['table' => 'ins_layar_lap', 'id_col' => 'layar_lap_id', 'score_col' => 'layar_lap_score', 'value' => $layar_lap_id],
-    'engsel_lap' => ['table' => 'ins_engsel_lap', 'id_col' => 'engsel_lap_id', 'score_col' => 'engsel_lap_score', 'value' => $engsel_lap_id],
-    'keyboard_lap' => ['table' => 'ins_keyboard_lap', 'id_col' => 'keyboard_lap_id', 'score_col' => 'keyboard_lap_score', 'value' => $keyboard_lap_id],
-    'touchpad_lap' => ['table' => 'ins_touchpad_lap', 'id_col' => 'touchpad_lap_id', 'score_col' => 'touchpad_lap_score', 'value' => $touchpad_lap_id],
-    'booting_lap' => ['table' => 'ins_booting_lap', 'id_col' => 'booting_lap_id', 'score_col' => 'booting_lap_score', 'value' => $booting_lap_id],
-    'multi_lap' => ['table' => 'ins_multi_lap', 'id_col' => 'multi_lap_id', 'score_col' => 'multi_lap_score', 'value' => $multi_lap_id],
-    'tampung_lap' => ['table' => 'ins_tampung_lap', 'id_col' => 'tampung_lap_id', 'score_col' => 'tampung_lap_score', 'value' => $tampung_lap_id],
-    'isi_lap' => ['table' => 'ins_isi_lap', 'id_col' => 'isi_lap_id', 'score_col' => 'isi_lap_score', 'value' => $isi_lap_id],
-    'port_lap' => ['table' => 'ins_port_lap', 'id_col' => 'port_lap_id', 'score_col' => 'port_lap_score', 'value' => $port_lap_id],
-    'audio_lap' => ['table' => 'ins_audio_lap', 'id_col' => 'audio_lap_id', 'score_col' => 'audio_lap_score', 'value' => $audio_lap_id],
-    'software_lap' => ['table' => 'ins_software_lap', 'id_col' => 'software_lap_id', 'score_col' => 'software_lap_score', 'value' => $software_lap_id]
-];
+    if ($jenis == "Laptop") {
+        // elemen Laptop
+        $age = isset($_POST["age"]) ? $_POST["age"] : '';
+        $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
+        $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
+        $engsel_lap = isset($_POST["engsel_lap"]) ? $_POST["engsel_lap"] : '';
+        $keyboard_lap = isset($_POST["keyboard_lap"]) ? $_POST["keyboard_lap"] : '';
+        $touchpad_lap = isset($_POST["touchpad_lap"]) ? $_POST["touchpad_lap"] : '';
+        $booting_lap = isset($_POST["booting_lap"]) ? $_POST["booting_lap"] : '';
+        $multi_lap = isset($_POST["multi_lap"]) ? $_POST["multi_lap"] : '';
+        $tampung_lap = isset($_POST["tampung_lap"]) ? $_POST["tampung_lap"] : '';
+        $isi_lap = isset($_POST["isi_lap"]) ? $_POST["isi_lap"] : '';
+        $port_lap = isset($_POST["port_lap"]) ? $_POST["port_lap"] : '';
+        $audio_lap = isset($_POST["audio_lap"]) ? $_POST["audio_lap"] : '';
+        $software_lap = isset($_POST["software_lap"]) ? $_POST["software_lap"] : '';
 
-foreach ($lookup_map as $details) {
-    if ($details['value'] !== null) {
-        $stmt_score = $conn->prepare("SELECT {$details['score_col']} FROM {$details['table']} WHERE {$details['id_col']} = ?");
-        $stmt_score->bind_param("i", $details['value']);
-        $stmt_score->execute();
-        $score_result = $stmt_score->get_result()->fetch_assoc();
-        if ($score_result) {
-            $total_score += $score_result[$details['score_col']];
+        // Hitung skor
+        $score = $age + $casing_lap + $layar_lap + $engsel_lap + $keyboard_lap + $touchpad_lap + $booting_lap + $multi_lap + $tampung_lap + $isi_lap + $port_lap + $audio_lap + $software_lap;
+        
+        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score)
+            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$engsel_lap', '$keyboard_lap', '$touchpad_lap', '$booting_lap', '$multi_lap', '$tampung_lap', '$isi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
+    }
+
+    if ($jenis == "PC Desktop") {
+        // elemen PC Desktop
+        $age = isset($_POST["age"]) ? $_POST["age"] : '';
+        $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
+        $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
+        $keyboard_lap = isset($_POST["keyboard_lap"]) ? $_POST["keyboard_lap"] : '';
+        $booting_lap = isset($_POST["booting_lap"]) ? $_POST["booting_lap"] : '';
+        $multi_lap = isset($_POST["multi_lap"]) ? $_POST["multi_lap"] : '';
+        $port_lap = isset($_POST["port_lap"]) ? $_POST["port_lap"] : '';
+        $audio_lap = isset($_POST["audio_lap"]) ? $_POST["audio_lap"] : '';
+        $software_lap = isset($_POST["software_lap"]) ? $_POST["software_lap"] : '';
+
+        // Hitung skor
+        $score = $age + $casing_lap + $layar_lap + $keyboard_lap + $booting_lap + $multi_lap + $port_lap + $audio_lap + $software_lap;
+        
+        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, keyboard_lap, booting_lap, multi_lap, port_lap, audio_lap, software_lap, score)
+            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$keyboard_lap', '$booting_lap', '$multi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
+    }
+
+    if ($jenis == "Monitor") {
+        // elemen Monitor
+        $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
+        $layar_lap = isset($_POST["layar_lap"]) ? $_POST["layar_lap"] : '';
+
+        // Hitung skor
+        $score = $casing_lap + $layar_lap;
+ 
+        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, casing_lap, layar_lap, score)
+            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$casing_lap', '$layar_lap', '$score')";
+    }
+
+    if ($jenis == "Printer") {
+        // elemen printer
+        $casing_lap = isset($_POST["casing_lap"]) ? $_POST["casing_lap"] : '';
+        $ink_pad = isset($_POST["ink_pad"]) ? $_POST["ink_pad"] : '';
+                
+        // Hitung skor
+        $score = $casing_lap + $ink_pad;
+        
+        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, casing_lap, ink_pad, score)
+            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$casing_lap', '$ink_pad', '$score')";
+    }   
+
+    // if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    //     $target_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/File Upload Inspeksi";
+    
+    //     // Upload file lainnya
+    //     $file = $_FILES['upload_file']['name'];
+    //     $path = pathinfo($file);
+    //     $filename = $path['filename'];
+    //     $ext = $path['extension'];
+    //     $temp_name = $_FILES['upload_file']['tmp_name'];
+    //     $path_filename_ext = $target_dir . $filename . '.' . $ext;
+    
+    //     if (file_exists($path_filename_ext)) {
+    //         $error_message = "Maaf, file sudah ada.";
+    //         echo $error_message;
+    //         error_log($error_message, 0);
+    //     } else {
+    //         if (move_uploaded_file($temp_name, $path_filename_ext)) {
+    //             echo "File Anda berhasil diunggah.";
+    //         } else {
+    //             $error_message = "Terjadi kesalahan saat mengunggah file.";
+    //             echo $error_message;
+    //             error_log($error_message, 0);
+    //         }
+    //     }
+    // }
+
+    // $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/screenshot/";
+
+    // // Loop melalui setiap file screenshot yang diunggah
+    // foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
+    //     $file_name = $_FILES['screenshot_file']['name'][$key];
+    //     $file_size = $_FILES['screenshot_file']['size'][$key];
+    //     $file_tmp = $_FILES['screenshot_file']['tmp_name'][$key];
+    //     $file_type = $_FILES['screenshot_file']['type'][$key];
+
+    //     $target_screenshot_file = $target_screenshot_dir . $file_name;
+
+    //     // Pindahkan file dari lokasi sementara ke direktori tujuan
+    //     if (move_uploaded_file($file_tmp, $target_screenshot_file)) {
+    //         echo "File screenshot berhasil diunggah.";
+    //     } else {
+    //         $error_message = "Terjadi kesalahan saat mengunggah file screenshot.";
+    //         echo $error_message;
+    //         error_log($error_message, 0); // Menyimpan pesan error ke file log
+    //     }
+    // }
+
+    if ($sql != '') {
+        if ($conn->query($sql) === TRUE) {
+            echo "Data berhasil disimpan.";
+            echo "<script>window.location.href='viewinspeksi.php';</script>"; // Pengalihan halaman
+            exit(); // Pastikan untuk keluar dari skrip
+        } else {
+            $error_message = "Error: " . $sql . "<br>" . $conn->error;
+            echo $error_message;
+            error_log($error_message, 0); // Menyimpan pesan error ke file log
         }
-        $stmt_score->close();
     }
 }
 
-// Gunakan Prepared Statement untuk menyimpan data dengan aman
-$sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssssssssiiiiiiiiiiisii", 
-    $date, $jenis, $merk, $lokasi, $nama_user, $status, $serialnumber, $informasi_keluhan, $hasil_pemeriksaan, $rekomendasi, 
-    $age_id, $casing_lap_id, $layar_lap_id, $engsel_lap_id, $keyboard_lap_id, $touchpad_lap_id, $booting_lap_id, $multi_lap_id, 
-    $tampung_lap_id, $isi_lap_id, $port_lap_id, $audio_lap_id, $software_lap_id, $total_score
-);
-
-if ($stmt->execute()) {
-    header("Location: viewinspeksi.php");
-    exit();
-} else {
-    die("Error saat menyimpan data: " . $stmt->error);
-}
-
-$stmt->close();
 $conn->close();
 ?>

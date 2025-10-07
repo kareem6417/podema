@@ -407,8 +407,8 @@ foreach ($users as $user) {
                   <option value="">--- Pilih ---</option>
                     <?php
                       $ageOptions = fetchData("device_age_laptop");
-                      foreach ($ageOptions as $option) {
-                          echo '<option value="' . $option['age_id'] . '">' . $option['age_name'] . '</option>';
+                      foreach ($ageOptions as $ageOption) {
+                          echo '<option value="' . $ageOption['age_score'] . '">' . $ageOption['age_name'] . '</option>';
                       }
                     ?>
                 </select>
@@ -419,8 +419,8 @@ foreach ($users as $user) {
                   <option value="">--- Pilih ---</option>
                     <?php
                       $casingOptions = fetchData("ins_casing_lap");
-                      foreach ($casingOptions as $option) {
-                          echo '<option value="' . $option['casing_lap_id'] . '">' . $option['casing_lap_name'] . '</option>';
+                      foreach ($casingOptions as $casingOption) {
+                          echo '<option value="' . $casingOption['casing_lap_score'] . '">' . $casingOption['casing_lap_name'] . '</option>';
                       }
                     ?>
                 </select>
@@ -431,8 +431,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $layarOptions = fetchData("ins_layar_lap");
-                    foreach ($layarOptions as $option) {
-                        echo '<option value="' . $option['layar_lap_id'] . '">' . $option['layar_lap_name'] . '</option>';
+                    foreach ($layarOptions as $layarOption) {
+                        echo '<option value="' . $layarOption['layar_lap_score'] . '">' . $layarOption['layar_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -443,8 +443,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $engselOptions = fetchData("ins_engsel_lap");
-                    foreach ($engselOptions as $option) {
-                        echo '<option value="' . $option['engsel_lap_id'] . '">' . $option['engsel_lap_name'] . '</option>';
+                    foreach ($engselOptions as $engselOption) {
+                        echo '<option value="' . $engselOption['engsel_lap_score'] . '">' . $engselOption['engsel_lap_name'] . '</option>';
                     }
                     ?>
                 </select> 
@@ -455,8 +455,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $keyboardOptions = fetchData("ins_keyboard_lap");
-                    foreach ($keyboardOptions as $option) {
-                        echo '<option value="' . $option['keyboard_lap_id'] . '">' . $option['keyboard_lap_name'] . '</option>';
+                    foreach ($keyboardOptions as $keyboardOption) {
+                        echo '<option value="' . $keyboardOption['keyboard_lap_score'] . '">' . $keyboardOption['keyboard_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -467,8 +467,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $touchpadOptions = fetchData("ins_touchpad_lap");
-                    foreach ($touchpadOptions as $option) {
-                        echo '<option value="' . $option['touchpad_lap_id'] . '">' . $option['touchpad_lap_name'] . '</option>';
+                    foreach ($touchpadOptions as $touchpadOption) {
+                        echo '<option value="' . $touchpadOption['touchpad_lap_score'] . '">' . $touchpadOption['touchpad_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -479,8 +479,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $bootingOptions = fetchData("ins_booting_lap");
-                    foreach ($bootingOptions as $option) {
-                        echo '<option value="' . $option['booting_lap_id'] . '">' . $option['booting_lap_name'] . '</option>';
+                    foreach ($bootingOptions as $bootingOption) {
+                        echo '<option value="' . $bootingOption['booting_lap_score'] . '">' . $bootingOption['booting_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -491,8 +491,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $multiOptions = fetchData("ins_multi_lap");
-                    foreach ($multiOptions as $option) {
-                        echo '<option value="' . $option['multi_lap_id'] . '">' . $option['multi_lap_name'] . '</option>';
+                    foreach ($multiOptions as $multiOption) {
+                        echo '<option value="' . $multiOption['multi_lap_score'] . '">' . $multiOption['multi_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -503,8 +503,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $tampungOptions = fetchData("ins_tampung_lap");
-                    foreach ($tampungOptions as $option) {
-                        echo '<option value="' . $option['tampung_lap_id'] . '">' . $option['tampung_lap_name'] . '</option>';
+                    foreach ($tampungOptions as $tampungOption) {
+                        echo '<option value="' . $tampungOption['tampung_lap_score'] . '">' . $tampungOption['tampung_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -515,8 +515,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $isiOptions = fetchData("ins_isi_lap");
-                    foreach ($isiOptions as $option) {
-                        echo '<option value="' . $option['isi_lap_id'] . '">' . $option['isi_lap_name'] . '</option>';
+                    foreach ($isiOptions as $isiOption) {
+                        echo '<option value="' . $isiOption['isi_lap_score'] . '">' . $isiOption['isi_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -527,8 +527,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $portOptions = fetchData("ins_port_lap");
-                    foreach ($portOptions as $option) {
-                        echo '<option value="' . $option['port_lap_id'] . '">' . $option['port_lap_name'] . '</option>';
+                    foreach ($portOptions as $portOption) {
+                        echo '<option value="' . $portOption['port_lap_score'] . '">' . $portOption['port_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -539,8 +539,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $audioOptions = fetchData("ins_audio_lap");
-                    foreach ($audioOptions as $option) {
-                        echo '<option value="' . $option['audio_lap_id'] . '">' . $option['audio_lap_name'] . '</option>';
+                    foreach ($audioOptions as $audioOption) {
+                        echo '<option value="' . $audioOption['audio_lap_score'] . '">' . $audioOption['audio_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
@@ -551,8 +551,8 @@ foreach ($users as $user) {
                     <option value="">--- Pilih ---</option>
                     <?php
                     $softwareOptions = fetchData("ins_software_lap");
-                    foreach ($softwareOptions as $option) {
-                        echo '<option value="' . $option['software_lap_id'] . '">' . $option['software_lap_name'] . '</option>';
+                    foreach ($softwareOptions as $softwareOption) {
+                        echo '<option value="' . $softwareOption['software_lap_score'] . '">' . $softwareOption['software_lap_name'] . '</option>';
                     }
                     ?>
                 </select>
