@@ -259,14 +259,14 @@ $pdf->SetFont('helvetica', 'B', 11);
 $pdf->addTableRow('Total Skor', '', $totalScore);
 
 // Rekomendasi
+$pdf->AddPage(); 
 $pdf->SetFont('Arial', 'B', 11);
 $pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
-// Ganti blok foreach dengan satu MultiCell
-$pdf->MultiCell(0, 7, clean_text($row['rekomendasi']), 1, 'L');
+// Ubah parameter ke-4 dari 1 menjadi 'B'
+$pdf->MultiCell(0, 7, clean_text($row['rekomendasi']), 'B', 'L');
 $pdf->Ln(5);
 
-$pdf->Ln(5);
 $pdf->AddScreenshots($target_screenshot_dir, $row['no']);
 
 $current_inspection_id = $row['no'];
