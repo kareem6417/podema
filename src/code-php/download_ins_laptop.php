@@ -122,64 +122,65 @@ class MYPDF extends FPDF {
         $this->Cell(0,10,''.$this->PageNo().'/{nb}',0,0,'C');
     }
     
-    function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
-        $screenshotTitleShown = false; 
-        $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
-        $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
-        $query->bind_param("i", $current_inspection_id);
-        $query->execute();
-        $result = $query->get_result();
+    // function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
+    //     $screenshotTitleShown = false; 
+    //     $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
+    //     $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
+    //     $query->bind_param("i", $current_inspection_id);
+    //     $query->execute();
+    //     $result = $query->get_result();
     
-        if ($result) {
-            while ($row = $result->fetch_assoc()) {
-                $screenshot = $row['screenshot_name'];
-                $screenshot_path = $target_screenshot_dir . $screenshot;
+    //     if ($result) {
+    //         while ($row = $result->fetch_assoc()) {
+    //             $screenshot = $row['screenshot_name'];
+    //             $screenshot_path = $target_screenshot_dir . $screenshot;
     
-                if (!$screenshotTitleShown) { 
-                    $this->SetFont('helvetica', 'B', 11);
-                    $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
-                    $this->Ln(5);
-                    $screenshotTitleShown = true;
-                }
-                $this->resizeAndInsertImage($screenshot_path);
-            }
-        }
-        $query->close();
-        $conn->close();
-    }     
+    //             if (!$screenshotTitleShown) { 
+    //                 $this->SetFont('helvetica', 'B', 11);
+    //                 $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
+    //                 $this->Ln(5);
+    //                 $screenshotTitleShown = true;
+    //             }
+    //             $this->resizeAndInsertImage($screenshot_path);
+    //         }
+    //     }
+    //     $query->close();
+    //     $conn->close();
+    // }     
     
-    function resizeAndInsertImage($imagePath) {
-        list($width, $height) = getimagesize($imagePath);
-        $maxWidth = 184; // Mengurangi lebar gambar
-        $maxHeight = 152; // Mengurangi tinggi gambar
-        $ratio = $width / $height;
+    // function resizeAndInsertImage($imagePath) {
+    //     list($width, $height) = getimagesize($imagePath);
+    //     $maxWidth = 184; // Mengurangi lebar gambar
+    //     $maxHeight = 152; // Mengurangi tinggi gambar
+    //     $ratio = $width / $height;
     
-        if ($width > $height) {
-            $newWidth = $maxWidth;
-            $newHeight = $maxWidth / $ratio;
-        } else {
-            $newHeight = $maxHeight;
-            $newWidth = $maxHeight * $ratio;
-        }
+    //     if ($width > $height) {
+    //         $newWidth = $maxWidth;
+    //         $newHeight = $maxWidth / $ratio;
+    //     } else {
+    //         $newHeight = $maxHeight;
+    //         $newWidth = $maxHeight * $ratio;
+    //     }
     
-        $this->Image($imagePath, 10, null, $newWidth, $newHeight);
-    }
+    //     $this->Image($imagePath, 10, null, $newWidth, $newHeight);
+    // }
 
-    private $columnWidths = array(30, 140, 20);
+    // private $columnWidths = array(30, 140, 20);
 
-    function addTableRow($item, $detail, $skor) {
-        $fill = $this->RowNeedsFill();
-        $this->Cell($this->columnWidths[0], 10, $item, 1, 0, 'C', $fill);
-        $this->Cell($this->columnWidths[1], 10, $detail, 1, 0, 'C', $fill);
-        $this->Cell($this->columnWidths[2], 10, $skor, 1, 1, 'C', $fill);
-    }
+    // function addTableRow($item, $detail, $skor) {
+    //     $fill = $this->RowNeedsFill();
+    //     $this->Cell($this->columnWidths[0], 10, $item, 1, 0, 'C', $fill);
+    //     $this->Cell($this->columnWidths[1], 10, $detail, 1, 0, 'C', $fill);
+    //     $this->Cell($this->columnWidths[2], 10, $skor, 1, 1, 'C', $fill);
+    // }
 
     function RowNeedsFill() {
         return $this->GetY() % 20 === 0;
     }
 }
 
-$pdf = new MYPDF($screenshot_files, $nomorInspeksi);
+$pdf = new MYPDF('P', 'mm', 'A4');
+$pdf->setInspectionData($row);
 $pdf->AliasNbPages();
 $pdf->AddPage();
 
