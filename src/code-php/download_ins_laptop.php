@@ -230,9 +230,8 @@ $pdf->Ln(5);
 $pdf->SetFont('Arial', 'B', 11);
 $pdf->Cell(0, 7, 'Hasil Pemeriksaan:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
-// Ganti blok foreach dengan satu MultiCell
-$pdf->MultiCell(0, 7, clean_text($row['hasil_pemeriksaan']), 1, 'L');
-
+// Ubah parameter ke-4 dari 1 menjadi 'B'
+$pdf->MultiCell(0, 7, clean_text($row['hasil_pemeriksaan']), 'B', 'L');
 $pdf->Ln(5);
 
 $pdf->SetFont('helvetica', 'B', 10);
