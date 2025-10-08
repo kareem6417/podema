@@ -61,24 +61,23 @@ $sql = "SELECT fi.*,
         WHERE fi.no = ?";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $nomorInspeksi);
+$stmt->bind_param("i", $no_inspeksi);
 $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 if (!$row) {
-    die("Data inspeksi No. " . htmlspecialchars($nomorInspeksi) . " tidak ditemukan.");
+    die("Data inspeksi No. " . htmlspecialchars($no_inspeksi) . " tidak ditemukan.");
 }
-$stmt->close();
-$conn->close();
-class MYPDF extends FPDF {
-    private $screenshot_files;
-    private $nomorInspeksi;
 
-    public function __construct($screenshot_files, $nomorInspeksi) {
-        parent::__construct();
-        $this->screenshot_files = $screenshot_files;
-        $this->nomorInspeksi = $nomorInspeksi;
+// $stmt->close();
+// $conn->close();
+
+class MYPDF extends FPDF {
+    var $inspection_data;
+
+    public function setInspectionData($data) {
+        $this->inspection_data = $data;
     }
 
     function Header() {
@@ -107,9 +106,8 @@ class MYPDF extends FPDF {
         $this->Line(10, -2 + $logo_height + 0, $this->GetPageWidth() - 10, -2 + $logo_height + 0);
         $this->SetLineWidth(0.2);
 
-        $this->SetFont('helvetica', '', 11);
-        $this->SetXY(($this->GetPageWidth() - 80) / 2, 40);
-        $this->Cell(80, -2, 'No Inspeksi: ' . $nomorInspeksi, 0, false, 'C', 0, '', 0, false, 'M', 'M');        
+        $this->SetFont('helvetica', 'B', 11);
+        $this->Cell(0, 5, 'No Inspeksi: ' . clean_text($this->inspection_data['no']), 0, 1, 'C');
         $this->Ln(5);
     }
     
