@@ -196,7 +196,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                     $jenis_perangkat = isset($query['jenis']) ? $query['jenis'] : '';
                     $download_link = '#'; // Default link jika tidak ada yang cocok
                     
-                    if ($jenis_perangkat == 'Laptop') { $download_link = './download_ins_laptop.php?no=' . $no_inspeksi; } 
+                    if ($jenis_perangkat == 'Laptop') { $download_link = './download_ins_laptop.php?no=' . $query['no']; } 
                       elseif ($jenis_perangkat == 'PC Desktop') { $download_link = './download_ins_pc.php?no=' . $no_inspeksi; } 
                       elseif ($jenis_perangkat == 'Monitor') { $download_link = './download_ins_monitor.php?no=' . $no_inspeksi; } 
                       elseif ($jenis_perangkat == 'Printer') { $download_link = './download_ins_printer.php?no=' . $no_inspeksi; } 
