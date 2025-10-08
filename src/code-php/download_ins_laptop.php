@@ -234,6 +234,8 @@ $pdf->SetFont('Arial', '', 11);
 $pdf->MultiCell(0, 7, clean_text($row['hasil_pemeriksaan']), 'B', 'L');
 $pdf->Ln(5);
 
+$pdf->Ln(5);
+
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetFillColor(173, 216, 230);
 $pdf->addTableRow('Item', 'Detail', 'Skor');
@@ -257,9 +259,9 @@ $pdf->addTableRow('Software', $row['software_lap_name'], $row['software_lap_scor
 $totalScore = $row['age_score'] + $row['casing_lap_score'] + $row['layar_lap_score'] + $row['engsel_lap_score'] +$row['keyboard_lap_score'] + $row['touchpad_lap_score'] + $row['booting_lap_score'] + $row['multi_lap_score'] + $row['tampung_lap_score'] + $row['isi_lap_score'] + $row['port_lap_score'] + $row['audio_lap_score'] + $row['software_lap_score'];
 $pdf->SetFont('helvetica', 'B', 11);
 $pdf->addTableRow('Total Skor', '', $totalScore);
-$pdf->Ln(5);
 
 // Rekomendasi
+$pdf->Ln(5);
 $pdf->SetFont('Arial', 'B', 11);
 $pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
