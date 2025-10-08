@@ -8,8 +8,8 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
 }
 
 // 1. Ambil 'no' (nomor inspeksi) dari URL dan validasi
-$no_inspeksi = isset($_GET['no']) ? (int)$_GET['no'] : 0;
-if ($no_inspeksi <= 0) {
+$nomorInspeksi = isset($_GET['no']) ? (int)$_GET['no'] : 0;
+if ($nomorInspeksi <= 0) {
     die("Error: Nomor inspeksi tidak valid atau tidak diberikan.");
 }
 
@@ -61,16 +61,13 @@ $sql = "SELECT fi.*,
         WHERE fi.no = ?";
 
 $stmt = $conn->prepare($sql);
-if ($stmt === false) { die("Query preparation failed: " . $conn->error); }
-
-$stmt->bind_param("i", $no_inspeksi);
+$stmt->bind_param("i", $nomorInspeksi);
 $stmt->execute();
 $result = $stmt->get_result();
+$row = $result->fetch_assoc();
 
-if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-} else {
-    die("Tidak ada data ditemukan untuk nomor inspeksi: " . htmlspecialchars($no_inspeksi));
+if (!$row) {
+    die("Data inspeksi No. " . htmlspecialchars($nomorInspeksi) . " tidak ditemukan.");
 }
 $stmt->close();
 $conn->close();
