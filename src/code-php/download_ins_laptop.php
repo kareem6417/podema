@@ -259,7 +259,6 @@ $pdf->SetFont('helvetica', 'B', 11);
 $pdf->addTableRow('Total Skor', '', $totalScore);
 
 // Rekomendasi
-$pdf->AddPage(); 
 $pdf->SetFont('Arial', 'B', 11);
 $pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
 $pdf->SetFont('Arial', '', 11);
