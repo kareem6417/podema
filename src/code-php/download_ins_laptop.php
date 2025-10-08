@@ -16,20 +16,21 @@ if ($no_inspeksi <= 0) {
 // Fungsi untuk membersihkan teks agar aman untuk PDF
 function clean_text($string) {
     if ($string === null) return '';
+    // Mengonversi karakter non-standar ke padanan terdekatnya
     return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $string);
 }
 
 // 2. Koneksi ke Database
-$host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
+$host = "mandiricoal.net";
+$user = "podema";
+$pass = "Jam10pagi#";
+$db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Koneksi ke database gagal: " . $conn->connect_error);
 }
 
-// ================================================================= //
-// BAGIAN 3: QUERY SQL DIPERBAIKI TOTAL SESUAI ATURAN ANDA           //
-// SEMUA JOIN SEKARANG BERDASARKAN KOLOM '_score'                    //
-// ================================================================= //
+// 3. Query SQL yang benar: JOIN berdasarkan SKOR
 $sql = "SELECT fi.*, 
             age.age_name, age.age_score,
             cl.casing_lap_name, cl.casing_lap_score,
@@ -61,7 +62,9 @@ $sql = "SELECT fi.*,
         WHERE fi.no = ?";
 
 $stmt = $conn->prepare($sql);
-if ($stmt === false) { die("Query preparation failed: " . $conn->error); }
+if ($stmt === false) {
+    die("Query preparation failed: " . $conn->error);
+}
 
 $stmt->bind_param("i", $no_inspeksi);
 $stmt->execute();
@@ -73,109 +76,70 @@ if ($result && $result->num_rows > 0) {
     die("Tidak ada data ditemukan untuk nomor inspeksi: " . htmlspecialchars($no_inspeksi));
 }
 $stmt->close();
-$conn->close();
-class MYPDF extends FPDF {
-    private $screenshot_files;
-    private $nomorInspeksi;
+// Koneksi ditutup nanti setelah semua query selesai
 
-    public function __construct($screenshot_files, $nomorInspeksi) {
-        parent::__construct();
-        $this->screenshot_files = $screenshot_files;
-        $this->nomorInspeksi = $nomorInspeksi;
+// Class FPDF yang sudah disederhanakan
+class MYPDF extends FPDF {
+    var $inspection_data;
+
+    public function setInspectionData($data) {
+        $this->inspection_data = $data;
     }
 
     function Header() {
-        $this->Image('../assets/images/logos/mandiri.png',10,8,33);
-        $this->addHeaderContent($this->nomorInspeksi);
-    }
-
-    function addHeaderContent($nomorInspeksi) {
-        $logo_height = 33;
+        $this->Image('../assets/images/logos/mandiri.png', 10, 8, 33);
         $this->SetFont('helvetica', 'B', 15);
-        $this->SetXY(($this->GetPageWidth() - 80) / 2, 13);
-        $this->Cell(83, 5, 'INSPEKSI PERANGKAT', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-
+        $this->Cell(0, 7, 'INSPEKSI PERANGKAT', 0, 1, 'C');
         $this->SetFont('helvetica', '', 9);
-        $this->SetXY(($this->GetPageWidth() - 80) / 2, 22);
-        $this->Cell(80, 5, 'Divisi Teknologi Informasi', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-
-        $this->SetFont('helvetica', '', 7);
-        $this->SetXY(($this->GetPageWidth() - 20) / 2, 13);
-        $this->Cell(100, 5, 'Form: MIP/FRM/ITE/005', 0, false, 'R', 0, '', 0, false, 'M', 'M');
-
-        $this->SetXY(($this->GetPageWidth() - 20) / 2, 18);
-        $this->Cell(100, 5, 'Revisi: 00', 0, false, 'R', 0, '', 0, false, 'M', 'M');
+        $this->Cell(0, 5, 'Divisi Teknologi Informasi', 0, 1, 'C');
+        
+        $this->SetFont('helvetica', 'B', 9);
+        $this->SetXY(140, 12);
+        $this->Cell(30, 5, 'Form:', 0, 0, 'L');
+        $this->SetFont('helvetica', '', 9);
+        $this->Cell(30, 5, 'MIP/FRM/ITE/005', 0, 1, 'L');
+        
+        $this->SetXY(140, 17);
+        $this->SetFont('helvetica', 'B', 9);
+        $this->Cell(30, 5, 'Revisi:', 0, 0, 'L');
+        $this->SetFont('helvetica', '', 9);
+        $this->Cell(30, 5, '00', 0, 1, 'L');
 
         $this->SetLineWidth(0.5);
-        $this->Line(10, -2 + $logo_height + 0, $this->GetPageWidth() - 10, -2 + $logo_height + 0);
+        $this->Line(10, 35, $this->GetPageWidth() - 10, 35);
         $this->SetLineWidth(0.2);
+        $this->Ln(5);
 
-        $this->SetFont('helvetica', '', 11);
-        $this->SetXY(($this->GetPageWidth() - 80) / 2, 40);
-        $this->Cell(80, -2, 'No Inspeksi: ' . $nomorInspeksi, 0, false, 'C', 0, '', 0, false, 'M', 'M');        
+        // Menampilkan Nomor Inspeksi yang benar dari data
+        $this->SetFont('helvetica', 'B', 11);
+        $this->Cell(0, 5, 'No Inspeksi: ' . clean_text($this->inspection_data['no']), 0, 1, 'C');
         $this->Ln(5);
     }
-    
+
     function Footer() {
         $this->SetY(-15);
-        $this->SetFont('helvetica','I',8);
-        $this->Cell(0,10,''.$this->PageNo().'/{nb}',0,0,'C');
+        $this->SetFont('helvetica', 'I', 8);
+        $this->Cell(0, 10, $this->PageNo() . '/{nb}', 0, 0, 'R');
     }
-    
-    function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
-        $screenshotTitleShown = false; 
-        $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
-        $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
-        $query->bind_param("i", $current_inspection_id);
-        $query->execute();
-        $result = $query->get_result();
-    
-        if ($result) {
-            while ($row = $result->fetch_assoc()) {
-                $screenshot = $row['screenshot_name'];
-                $screenshot_path = $target_screenshot_dir . $screenshot;
-    
-                if (!$screenshotTitleShown) { 
-                    $this->SetFont('helvetica', 'B', 11);
-                    $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
-                    $this->Ln(5);
-                    $screenshotTitleShown = true;
-                }
-                $this->resizeAndInsertImage($screenshot_path);
-            }
+
+    // Fungsi untuk membuat baris tabel dengan wrap-text
+    function MultiCellRow($data, $widths, $aligns) {
+        $nb = 0;
+        for ($i = 0; $i < count($data); $i++) {
+            $nb = max($nb, $this->NbLines($widths[$i], $data[$i]));
         }
-        $query->close();
-        $conn->close();
-    }     
-    
-    function resizeAndInsertImage($imagePath) {
-        list($width, $height) = getimagesize($imagePath);
-        $maxWidth = 184; // Mengurangi lebar gambar
-        $maxHeight = 152; // Mengurangi tinggi gambar
-        $ratio = $width / $height;
-    
-        if ($width > $height) {
-            $newWidth = $maxWidth;
-            $newHeight = $maxWidth / $ratio;
-        } else {
-            $newHeight = $maxHeight;
-            $newWidth = $maxHeight * $ratio;
+        $h = 6 * $nb;
+        $this->CheckPageBreak($h);
+        for ($i = 0; $i < count($data); $i++) {
+            $w = $widths[$i];
+            $a = isset($aligns[$i]) ? $aligns[$i] : 'L';
+            $x = $this->GetX();
+            $y = $this->GetY();
+            $this->Rect($x, $y, $w, $h);
+            $this->MultiCell($w, 6, $data[$i], 0, $a);
+            $this->SetXY($x + $w, $y);
         }
-    
-        $this->Image($imagePath, 10, null, $newWidth, $newHeight);
-    }
-
-    private $columnWidths = array(30, 140, 20);
-
-    function addTableRow($item, $detail, $skor) {
-        $fill = $this->RowNeedsFill();
-        $this->Cell($this->columnWidths[0], 10, $item, 1, 0, 'C', $fill);
-        $this->Cell($this->columnWidths[1], 10, $detail, 1, 0, 'C', $fill);
-        $this->Cell($this->columnWidths[2], 10, $skor, 1, 1, 'C', $fill);
-    }
-
-    function RowNeedsFill() {
-        return $this->GetY() % 20 === 0;
+        $this->Ln($h);
     }
 }
 
@@ -183,11 +147,10 @@ $pdf = new MYPDF($screenshot_files, $nomorInspeksi);
 $pdf->AliasNbPages();
 $pdf->AddPage();
 
-$pageWidth = $pdf->GetPageWidth();
-$cellWidth = $pageWidth / 4;
-$maxTableWidth = $pageWidth * 0.90; 
-$cellWidth = $maxTableWidth / 4; 
-$pdf->SetLineWidth(0); 
+$pdf = new MYPDF('P', 'mm', 'A4');
+$pdf->setInspectionData($row); // Mengirim data ke class untuk digunakan di header
+$pdf->AliasNbPages();
+$pdf->AddPage();
 
 $pdf->SetFont('helvetica', 'B', 11);
 $pdf->Cell($cellWidth, 10, 'Tanggal:', 1, 0, 'L', false);
@@ -219,28 +182,16 @@ $pdf->Cell($cellWidth * 2, 10, $row['lokasi'], 1, 1, 'L', false);
 $pdf->Ln(3);
 
 // Informasi Keluhan
-$complaints = explode("\n", $row['informasi_keluhan']);
-$pdf->SetFont('Arial', 'B', 11);
+$pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(0, 7, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 11);
-
-foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 7, $complaint, 'B');
-    $pdf->Ln();
-}
-
-// Hasil Pemeriksaan
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 6, clean_text($row['informasi_keluhan']), 1, 'L');
 $pdf->Ln(5);
-$complaints = explode("\n", $row['hasil_pemeriksaan']);
-$pdf->SetFont('Arial', 'B', 11);
+
+$pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(0, 7, 'Hasil Pemeriksaan:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 11);
-
-foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 7, $complaint, 'B');
-    $pdf->Ln();
-}
-
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 6, clean_text($row['hasil_pemeriksaan']), 1, 'L');
 $pdf->Ln(5);
 
 $pdf->SetFont('helvetica', 'B', 10);
@@ -267,17 +218,12 @@ $totalScore = $row['age_score'] + $row['casing_lap_score'] + $row['layar_lap_sco
 $pdf->SetFont('helvetica', 'B', 11);
 $pdf->addTableRow('Total Skor', '', $totalScore);
 
-// Rekomendasi
-$pdf->Ln(5);
-$complaints = explode("\n", $row['rekomendasi']);
-$pdf->SetFont('Arial', 'B', 11);
+$pdf->AddPage();
+$pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 11);
-
-foreach ($complaints as $complaint) {
-    $pdf->Cell(0, 7, $complaint, 'B');
-    $pdf->Ln();
-}
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 6, clean_text($row['rekomendasi']), 1, 'L');
+$pdf->Ln(10);
 
 $pdf->Ln(5);
 $pdf->AddScreenshots($target_screenshot_dir, $row['no']);
