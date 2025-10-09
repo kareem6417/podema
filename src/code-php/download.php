@@ -30,19 +30,19 @@ $sql = "SELECT assess_laptop.*,
             ram.ram_name, vga.vga_name, store.storage_name, kbd.keyboard_name, 
             scr.screen_name, pad.touchpad_name, aud.audio_name, body.body_name
         FROM assess_laptop
-        LEFT JOIN operating_sistem_laptop os ON assess_laptop.os = os.os_score
-        LEFT JOIN processor_laptop proc ON assess_laptop.processor = proc.processor_score
-        LEFT JOIN batterylife_laptop bat ON assess_laptop.batterylife = bat.battery_score
-        LEFT JOIN device_age_laptop age ON assess_laptop.age = age.age_score
-        LEFT JOIN issue_software_laptop iss ON assess_laptop.issue = iss.issue_score
-        LEFT JOIN ram_laptop ram ON assess_laptop.ram = ram.ram_score
+        LEFT JOIN operating_sistem_pc os ON assess_laptop.os = os.os_score
+        LEFT JOIN processor_pc proc ON assess_laptop.processor = proc.processor_score
+        LEFT JOIN batterylife_pc bat ON assess_laptop.batterylife = bat.battery_score
+        LEFT JOIN device_age_pc age ON assess_laptop.age = age.age_score
+        LEFT JOIN issue_software_pc iss ON assess_laptop.issue = iss.issue_score
+        LEFT JOIN ram_pc ram ON assess_laptop.ram = ram.ram_score
         LEFT JOIN vga_pc vga ON assess_laptop.vga = vga.vga_score
-        LEFT JOIN storage_laptop store ON assess_laptop.storage = store.storage_score
-        LEFT JOIN keyboard_laptop kbd ON assess_laptop.keyboard = kbd.keyboard_score
-        LEFT JOIN screen_laptop scr ON assess_laptop.screen = scr.screen_score
-        LEFT JOIN touchpad_laptop pad ON assess_laptop.touchpad = pad.touchpad_score
-        LEFT JOIN audio_laptop aud ON assess_laptop.audio = aud.audio_score
-        LEFT JOIN body_laptop body ON assess_laptop.body = body.body_score
+        LEFT JOIN storage_pc store ON assess_laptop.storage = store.storage_score
+        LEFT JOIN keyboard_pc kbd ON assess_laptop.keyboard = kbd.keyboard_score
+        LEFT JOIN screen_pc scr ON assess_laptop.screen = scr.screen_score
+        LEFT JOIN touchpad_pc pad ON assess_laptop.touchpad = pad.touchpad_score
+        LEFT JOIN audio_pc aud ON assess_laptop.audio = aud.audio_score
+        LEFT JOIN body_pc body ON assess_laptop.body = body.body_score
         WHERE assess_laptop.id = ?"; // Menggunakan placeholder untuk keamanan
 
 // 3. Gunakan prepared statement untuk keamanan
@@ -246,7 +246,7 @@ $pdf->Cell(47.5, 10, 'Diperiksa Oleh', 'T', 0, 'L');
 $pdf->Cell(5, 10, '', 0, 0, 'C'); 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetX(95);
-$pdf->Cell(47.5, 10, 'Nama Pengguna', 'T', 1, 'C');
+$pdf->Cell(47.5, 7, $row['nama_user'], 'T', 1, 'L');
 $pdf->AliasNbPages();
 
 $filename = "Assessment-for-PC-Replacement-{$query['name']}.pdf";
