@@ -196,14 +196,14 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
                     $jenis_perangkat = isset($query['jenis']) ? $query['jenis'] : '';
                     $download_link = '#'; // Default link jika tidak ada yang cocok
                     
-                    if ($jenis_perangkat == 'Laptop') { $download_link = './download_ins_laptop.php'; } 
-                    elseif ($jenis_perangkat == 'PC Desktop') { $download_link = './download_ins_pc.php'; } 
-                    elseif ($jenis_perangkat == 'Monitor') { $download_link = './download_ins_monitor.php'; } 
-                    elseif ($jenis_perangkat == 'Printer') { $download_link = './download_ins_printer.php'; } 
-                    elseif ($jenis_perangkat == 'CCTV') { $download_link = './download_ins_cctv.php'; } 
-                    elseif (in_array($jenis_perangkat, ['Router', 'Switch', 'Access Point'])) { $download_link = './download_ins_infra.php'; } 
-                    elseif ($jenis_perangkat == 'Telephone') { $download_link = './download_ins_telp.php'; }                        
-                  ?>
+                    if ($jenis_perangkat == 'Laptop') { $download_link = './download_ins_laptop.php?no=' . $query['no']; } 
+                      elseif ($jenis_perangkat == 'PC Desktop') { $download_link = './download_ins_pc.php?no=' . $query['no']; } 
+                      elseif ($jenis_perangkat == 'Monitor') { $download_link = './download_ins_monitor.php?no=' . $query['no']; } 
+                      elseif ($jenis_perangkat == 'Printer') { $download_link = './download_ins_printer.php?no=' . $query['no']; } 
+                      elseif ($jenis_perangkat == 'CCTV') { $download_link = './download_ins_cctv.php?no=' . $query['no']; } 
+                      elseif (in_array($jenis_perangkat, ['Router', 'Switch', 'Access Point'])) { $download_link = './download_ins_infra.php?no=' . $query['no']; } 
+                      elseif ($jenis_perangkat == 'Telephone') { $download_link = './download_ins_telp.php?no=' . $query['no']; }                
+                    ?>
                   <div class="d-flex justify-content-center gap-2">
                       <a href="javascript:window.history.back()" class="btn btn-outline-secondary btn-back"><i class="ti ti-arrow-left me-1"></i> Back</a>
                       <a href="<?php echo $download_link; ?>" class="btn btn-primary btn-download"><i class="ti ti-download me-1"></i> Download Full Report (PDF)</a>

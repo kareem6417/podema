@@ -218,22 +218,19 @@ $pdf->SetFont('helvetica', '', 11);
 $pdf->Cell($cellWidth * 2, 10, $row['lokasi'], 1, 1, 'L', false);
 $pdf->Ln(3);
 
-// Informasi Keluhan
-$pdf->SetFont('Arial', 'B', 11);
+// Informasi Keluhan, Pemeriksaan, Rekomendasi
+$pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(0, 7, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 11);
-// Ganti blok foreach dengan satu MultiCell
-$pdf->MultiCell(0, 7, clean_text($row['informasi_keluhan']), 1, 'L');
-
-// Hasil Pemeriksaan
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 7, clean_text($row['informasi_keluhan']), 'B', 'L');
 $pdf->Ln(5);
-$pdf->SetFont('Arial', 'B', 11);
+
+$pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(0, 7, 'Hasil Pemeriksaan:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 11);
-// Ganti blok foreach dengan satu MultiCell
-$pdf->MultiCell(0, 7, clean_text($row['hasil_pemeriksaan']), 1, 'L');
-
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 7, clean_text($row['hasil_pemeriksaan']), 'B', 'L');
 $pdf->Ln(5);
+
 
 $pdf->SetFont('helvetica', 'B', 10);
 $pdf->SetFillColor(173, 216, 230);
@@ -260,12 +257,11 @@ $pdf->SetFont('helvetica', 'B', 11);
 $pdf->addTableRow('Total Skor', '', $totalScore);
 
 // Rekomendasi
-$pdf->SetFont('Arial', 'B', 11);
-$pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 11);
-// Ganti blok foreach dengan satu MultiCell
-$pdf->MultiCell(0, 7, clean_text($row['rekomendasi']), 1, 'L');
 $pdf->Ln(5);
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
+$pdf->SetFont('Arial', '', 10);
+$pdf->MultiCell(0, 7, clean_text($row['rekomendasi']), 'B', 'L');
 
 $pdf->Ln(5);
 $pdf->AddScreenshots($target_screenshot_dir, $row['no']);
