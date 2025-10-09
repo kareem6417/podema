@@ -166,7 +166,7 @@ function format_detail_string($name, $score) {
             <div class="card shadow-none">
                 <div class="card-body p-3">
                     <form class="row g-3 align-items-center" method="get">
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <label for="filter_name" class="form-label">Filter by Name</label>
                             <select id="filter_name" name="filter_name" class="form-select">
                                 <option value="">All Names</option>
@@ -176,7 +176,7 @@ function format_detail_string($name, $score) {
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="col-md-3">
                             <label for="limit" class="form-label">Rows per page</label>
                             <select id="limit" name="limit" class="form-select">
