@@ -7,47 +7,62 @@ function clean_text($string) {
     return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $string);
 }
 
+// Konfigurasi Database
 $host = "mandiricoal.net";
 $user = "podema"; 
 $pass = "Jam10pagi#";
 $db = "podema";
-$conn = new mysqli($host, $user, $pass, $db);
 
+$conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Koneksi gagal: " . $conn->connect_error);
 }
 
-$result = mysqli_query($conn, "SELECT assess_laptop.*, operating_sistem_laptop.os_name, processor_laptop.processor_name, batterylife_laptop.battery_name, device_age_laptop.age_name, issue_software_laptop.issue_name, ram_laptop.ram_name, vga_pc.vga_name,
-                              storage_laptop.storage_name, keyboard_laptop.keyboard_name, screen_laptop.screen_name, touchpad_laptop.touchpad_name, audio_laptop.audio_name, body_laptop.body_name
-                              FROM assess_laptop
-                              LEFT JOIN operating_sistem_laptop ON assess_laptop.os = operating_sistem_laptop.os_score
-                              LEFT JOIN processor_laptop ON assess_laptop.processor = processor_laptop.processor_score
-                              LEFT JOIN batterylife_laptop ON assess_laptop.batterylife = batterylife_laptop.battery_score
-                              LEFT JOIN device_age_laptop ON assess_laptop.age = device_age_laptop.age_score
-                              LEFT JOIN issue_software_laptop ON assess_laptop.issue = issue_software_laptop.issue_score
-                              LEFT JOIN ram_laptop ON assess_laptop.ram = ram_laptop.ram_score
-                              LEFT JOIN vga_pc ON assess_laptop.vga = vga_pc.vga_score
-                              LEFT JOIN storage_laptop ON assess_laptop.storage = storage_laptop.storage_score
-                              LEFT JOIN keyboard_laptop ON assess_laptop.keyboard = keyboard_laptop.keyboard_score
-                              LEFT JOIN screen_laptop ON assess_laptop.screen = screen_laptop.screen_score
-                              LEFT JOIN touchpad_laptop ON assess_laptop.touchpad = touchpad_laptop.touchpad_score
-                              LEFT JOIN audio_laptop ON assess_laptop.audio = audio_laptop.audio_score
-                              LEFT JOIN body_laptop ON assess_laptop.body = body_laptop.body_score
-                              ORDER BY assess_laptop.id DESC
-                              LIMIT 1");
-
-if (!$result) {
-    die("Error pada query: " . mysqli_error($conn));
+// 1. Ambil dan validasi ID dari URL
+$assessment_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if ($assessment_id <= 0) {
+    die("Error: ID assessment tidak valid atau tidak diberikan.");
 }
 
-$query = mysqli_fetch_array($result);
+// 2. Modifikasi SQL dengan WHERE clause untuk mencari ID yang spesifik
+$sql = "SELECT assess_laptop.*, 
+            os.os_name, proc.processor_name, bat.battery_name, age.age_name, iss.issue_name, 
+            ram.ram_name, vga.vga_name, store.storage_name, kbd.keyboard_name, 
+            scr.screen_name, pad.touchpad_name, aud.audio_name, body.body_name
+        FROM assess_laptop
+        LEFT JOIN operating_sistem_laptop os ON assess_laptop.os = os.os_score
+        LEFT JOIN processor_laptop proc ON assess_laptop.processor = proc.processor_score
+        LEFT JOIN batterylife_laptop bat ON assess_laptop.batterylife = bat.battery_score
+        LEFT JOIN device_age_laptop age ON assess_laptop.age = age.age_score
+        LEFT JOIN issue_software_laptop iss ON assess_laptop.issue = iss.issue_score
+        LEFT JOIN ram_laptop ram ON assess_laptop.ram = ram.ram_score
+        LEFT JOIN vga_pc vga ON assess_laptop.vga = vga.vga_score
+        LEFT JOIN storage_laptop store ON assess_laptop.storage = store.storage_score
+        LEFT JOIN keyboard_laptop kbd ON assess_laptop.keyboard = kbd.keyboard_score
+        LEFT JOIN screen_laptop scr ON assess_laptop.screen = scr.screen_score
+        LEFT JOIN touchpad_laptop pad ON assess_laptop.touchpad = pad.touchpad_score
+        LEFT JOIN audio_laptop aud ON assess_laptop.audio = aud.audio_score
+        LEFT JOIN body_laptop body ON assess_laptop.body = body.body_score
+        WHERE assess_laptop.id = ?"; // Menggunakan placeholder untuk keamanan
 
-// Setelah data didapat, koneksi bisa langsung ditutup
+// 3. Gunakan prepared statement untuk keamanan
+$stmt = $conn->prepare($sql);
+if ($stmt === false) {
+    die("Query preparation failed: " . $conn->error);
+}
+
+$stmt->bind_param("i", $assessment_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result && $result->num_rows > 0) {
+    $query = $result->fetch_assoc();
+} else {
+    die("Tidak ada data ditemukan untuk ID assessment: " . htmlspecialchars($assessment_id));
+}
+
+$stmt->close();
 $conn->close();
-
-if (!$query) {
-    die("Data assessment tidak ditemukan di database.");
-}
 
 class PDF extends FPDF {
     var $widths;
@@ -69,33 +84,22 @@ class PDF extends FPDF {
         $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
     }
 
-    function SetWidths($w) {
-        $this->widths = $w;
-    }
-
-    function SetAligns($a) {
-        $this->aligns = $a;
-    }
+    function SetWidths($w) { $this->widths = $w; }
+    function SetAligns($a) { $this->aligns = $a; }
 
     function Row($data) {
         $nb = 0;
         for($i=0; $i<count($data); $i++)
             $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
-
         $h = 9 * $nb; 
-        
         $this->CheckPageBreak($h);
-        
         for($i=0; $i<count($data); $i++) {
             $w = $this->widths[$i];
             $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
-            
             $x = $this->GetX();
             $y = $this->GetY();
-            
             $this->Rect($x, $y, $w, $h);
             $this->MultiCell($w, 9, $data[$i], 0, $a);
-            
             $this->SetXY($x + $w, $y);
         }
         $this->Ln($h);
@@ -107,47 +111,27 @@ class PDF extends FPDF {
     }
 
     function NbLines($w, $txt) {
-        // (Fungsi ini tidak berubah)
         $cw = &$this->CurrentFont['cw'];
-        if($w==0)
-            $w = $this->w-$this->rMargin-$this->x;
+        if($w==0) $w = $this->w-$this->rMargin-$this->x;
         $wmax = ($w-2*$this->cMargin)*1000/$this->FontSize;
         $s = str_replace("\r",'',$txt);
         $nb = strlen($s);
-        if($nb>0 and $s[$nb-1]=="\n")
-            $nb--;
-        $sep = -1;
-        $i = 0;
-        $j = 0;
-        $l = 0;
-        $nl = 1;
+        if($nb>0 and $s[$nb-1]=="\n") $nb--;
+        $sep = -1; $i = 0; $j = 0; $l = 0; $nl = 1;
         while($i<$nb) {
             $c = $s[$i];
             if($c=="\n") {
-                $i++;
-                $sep = -1;
-                $j = $i;
-                $l = 0;
-                $nl++;
+                $i++; $sep = -1; $j = $i; $l = 0; $nl++;
                 continue;
             }
-            if($c==' ')
-                $sep = $i;
+            if($c==' ') $sep = $i;
             $l += $cw[$c];
             if($l>$wmax) {
                 if($sep==-1) {
-                    if($i==$j)
-                        $i++;
-                }
-                else
-                    $i = $sep+1;
-                $sep = -1;
-                $j = $i;
-                $l = 0;
-                $nl++;
-            }
-            else
-                $i++;
+                    if($i==$j) $i++;
+                } else $i = $sep+1;
+                $sep = -1; $j = $i; $l = 0; $nl++;
+            } else $i++;
         }
         return $nl;
     }
@@ -156,7 +140,7 @@ class PDF extends FPDF {
 $pdf = new PDF('P', 'mm', 'A4');
 $pdf->SetMargins(10, 10, 10);
 
-$totalScore = $query['os'] + $query['processor'] + $query['batterylife'] + $query['age'] + $query['issue'] + $query['ram'] + $query['vga'] + $query['storage'] + $query['keyboard'] + $query['screen'] + $query['touchpad'] + $query['audio'] + $query['body'];
+$totalScore = $query['score']; // Ambil skor langsung dari database
 
 $pdf->AddPage();
 $pdf->SetFont('helvetica', '', 10);
@@ -224,9 +208,8 @@ foreach ($dataTable as $row) {
 
 $pdf->SetX(20);
 $pdf->SetFont('helvetica', 'B', 10);
-$pdf->Cell(115, 10, 'Total Score', 1, 0, 'C'); // Gabungan kolom 1 dan 2
+$pdf->Cell(115, 10, 'Total Score', 1, 0, 'C');
 $pdf->Cell(40, 10, $totalScore, 1, 1, 'C');
-
 
 $pdf->Ln(5);
 
@@ -245,7 +228,6 @@ $location = '    Jakarta,';
 $currentDate = date('d F Y'); 
 $locationWidth = $pdf->GetStringWidth($location);
 $dateWidth = $pdf->GetStringWidth($currentDate);
-$totalWidth = $locationWidth + $dateWidth + 5; 
 
 $pdf->SetX(10); 
 $pdf->Cell($locationWidth, 5, $location, 0, 0, 'L'); 
