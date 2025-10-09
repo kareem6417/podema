@@ -251,7 +251,7 @@ function format_detail_string($name, $score) {
                                       data-score="<?php echo htmlspecialchars($row['score']); ?>">
                                     <i class="ti ti-eye text-primary" title="View Details"></i>
                                 </span>
-                                <a href="./download_lap_assessment.php?id=<?php echo $row['id']; ?>" target="_blank">
+                                <a href="./download.php?id=<?php echo $row['id']; ?>" target="_blank">
                                     <i class="ti ti-download text-secondary" title="Download PDF"></i>
                                 </a>
                             </td>
