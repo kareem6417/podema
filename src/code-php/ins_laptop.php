@@ -62,7 +62,32 @@ $companyOptions = [
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   
-  <style>
+   <style>
+    /* === CSS UNTUK SUBMENU DROPDOWN (DARI ins_desktop.php) === */
+    .sidebar-submenu {
+        position: static !important;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease-in-out;
+        list-style: none;
+        padding-left: 25px;
+        background-color: #f8f9fa;
+        border-radius: 0 0 5px 5px;
+        margin: 0 10px 5px 10px;
+    }
+    .sidebar-item.active > .sidebar-submenu {
+        max-height: 500px; /* Cukup besar untuk menampung semua item */
+    }
+    .sidebar-item > a .arrow {
+        transition: transform 0.3s ease;
+        display: inline-block;
+        margin-left: auto;
+    }
+    .sidebar-item.active > a .arrow {
+        transform: rotate(180deg);
+    }
+    /* === AKHIR DARI CSS SUBMENU === */
+      
     .card-title {
         margin-bottom: 1.5rem;
     }
@@ -86,7 +111,6 @@ $companyOptions = [
         padding: 0.5rem 0.75rem;
     }
 
-    /* Modern File Uploader */
     .file-drop-zone {
         border: 2px dashed #0d6efd;
         border-radius: 6px;
@@ -108,7 +132,6 @@ $companyOptions = [
         color: #6c757d;
     }
 
-    /* Screenshot Preview */
     #screenshot_preview_container {
         display: flex;
         flex-wrap: wrap;
@@ -472,6 +495,27 @@ $companyOptions = [
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+        
+        // === JavaScript UNTUK SUBMENU DROPDOWN (DARI ins_desktop.php) ===
+        var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
+        submenuToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                var parentItem = this.closest('.sidebar-item');
+                if (parentItem) {
+                    // Tutup submenu lain yang mungkin terbuka
+                    document.querySelectorAll('.sidebar-item.active').forEach(function(activeItem) {
+                        if (activeItem !== parentItem) {
+                            activeItem.classList.remove('active');
+                        }
+                    });
+                    // Toggle submenu yang diklik
+                    parentItem.classList.toggle('active');
+                }
+            });
+        });
+        // === AKHIR DARI JAVASCRIPT SUBMENU ===
+
         const userInfos = <?php echo json_encode($userInfos); ?>;
         const companyOptions = <?php echo json_encode($companyOptions); ?>;
 
