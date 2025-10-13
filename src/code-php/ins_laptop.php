@@ -65,15 +65,12 @@ $companyOptions = [
    <style>
     /* === CSS UNTUK SUBMENU DROPDOWN (DARI ins_desktop.php) === */
     .sidebar-submenu {
-        position: static !important;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.35s ease-in-out;
         list-style: none;
-        padding-left: 25px;
-        background-color: #f8f9fa;
-        border-radius: 0 0 5px 5px;
-        margin: 0 10px 5px 10px;
+        padding-left: 20px;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.35s ease-in-out;
+        background-color: #fff; /* Diubah menjadi putih */
     }
     .sidebar-item.active > .sidebar-submenu {
         max-height: 500px; /* Cukup besar untuk menampung semua item */
