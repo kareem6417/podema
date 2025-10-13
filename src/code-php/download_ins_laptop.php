@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once('../fpdf/fpdf.php'); // Pastikan path ke FPDF benar
+require_once('../fpdf/fpdf.php');
 
 if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
     header("location: ./index.php");
@@ -26,24 +26,12 @@ if ($conn->connect_error) {
     die("Koneksi ke database gagal: " . $conn->connect_error);
 }
 
-// ================================================================= //
-// BAGIAN 3: QUERY SQL DIPERBAIKI TOTAL SESUAI ATURAN ANDA           //
-// SEMUA JOIN SEKARANG BERDASARKAN KOLOM '_score'                    //
-// ================================================================= //
+// 3. Query utama untuk mengambil data inspeksi
 $sql = "SELECT fi.*, 
-            age.age_name, age.age_score,
-            cl.casing_lap_name, cl.casing_lap_score,
-            ip.layar_lap_name, ip.layar_lap_score,
-            el.engsel_lap_name, el.engsel_lap_score,
-            kl.keyboard_lap_name, kl.keyboard_lap_score,
-            tl.touchpad_lap_name, tl.touchpad_lap_score,
-            bl.booting_lap_name, bl.booting_lap_score,
-            ml.multi_lap_name, ml.multi_lap_score,
-            tampung.tampung_lap_name, tampung.tampung_lap_score,
-            il.isi_lap_name, il.isi_lap_score,
-            pl.port_lap_name, pl.port_lap_score,
-            al.audio_lap_name, al.audio_lap_score,
-            sl.software_lap_name, sl.software_lap_score
+            age.age_name, cl.casing_lap_name, ip.layar_lap_name, el.engsel_lap_name,
+            kl.keyboard_lap_name, tl.touchpad_lap_name, bl.booting_lap_name, ml.multi_lap_name,
+            tampung.tampung_lap_name, il.isi_lap_name, pl.port_lap_name, al.audio_lap_name,
+            sl.software_lap_name
         FROM form_inspeksi fi 
         LEFT JOIN device_age_laptop age ON fi.age = age.age_score
         LEFT JOIN ins_casing_lap cl ON fi.casing_lap = cl.casing_lap_score
@@ -73,270 +61,180 @@ if ($result && $result->num_rows > 0) {
     die("Tidak ada data ditemukan untuk nomor inspeksi: " . htmlspecialchars($no_inspeksi));
 }
 $stmt->close();
+
+// 4. Query terpisah untuk mengambil semua screenshot terkait
+$screenshot_files = [];
+$stmt_ss = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
+$stmt_ss->bind_param("i", $no_inspeksi);
+$stmt_ss->execute();
+$result_ss = $stmt_ss->get_result();
+if ($result_ss) {
+    while($ss_row = $result_ss->fetch_assoc()) {
+        $screenshot_files[] = $ss_row['screenshot_name'];
+    }
+}
+$stmt_ss->close();
 $conn->close();
+
 class MYPDF extends FPDF {
-    private $screenshot_files;
-    private $nomorInspeksi;
-
-    public function __construct($screenshot_files, $nomorInspeksi) {
-        parent::__construct();
-        $this->screenshot_files = $screenshot_files;
-        $this->nomorInspeksi = $nomorInspeksi;
-    }
-
     function Header() {
-        $this->Image('../assets/images/logos/mandiri.png',10,8,33);
-        $this->addHeaderContent($this->nomorInspeksi);
-    }
-
-    function addHeaderContent($nomorInspeksi) {
-        $logo_height = 33;
+        $this->Image('../assets/images/logos/mandiri.png', 10, 8, 33);
         $this->SetFont('helvetica', 'B', 15);
-        $this->SetXY(($this->GetPageWidth() - 80) / 2, 13);
-        $this->Cell(83, 5, 'INSPEKSI PERANGKAT', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-
+        $this->Cell(0, 10, 'INSPEKSI PERANGKAT', 0, 1, 'C');
         $this->SetFont('helvetica', '', 9);
-        $this->SetXY(($this->GetPageWidth() - 80) / 2, 22);
-        $this->Cell(80, 5, 'Divisi Teknologi Informasi', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-
+        $this->Cell(0, 5, 'Divisi Teknologi Informasi', 0, 1, 'C');
+        
         $this->SetFont('helvetica', '', 7);
-        $this->SetXY(($this->GetPageWidth() - 20) / 2, 13);
-        $this->Cell(100, 5, 'Form: MIP/FRM/ITE/005', 0, false, 'R', 0, '', 0, false, 'M', 'M');
-
-        $this->SetXY(($this->GetPageWidth() - 20) / 2, 18);
-        $this->Cell(100, 5, 'Revisi: 00', 0, false, 'R', 0, '', 0, false, 'M', 'M');
+        $this->SetXY($this->GetPageWidth() - 40, 13);
+        $this->Cell(30, 5, 'Form: MIP/FRM/ITE/005', 0, 1, 'R');
+        $this->SetXY($this->GetPageWidth() - 40, 18);
+        $this->Cell(30, 5, 'Revisi: 00', 0, 1, 'R');
 
         $this->SetLineWidth(0.5);
-        $this->Line(10, -2 + $logo_height + 0, $this->GetPageWidth() - 10, -2 + $logo_height + 0);
+        $this->Line(10, 32, $this->GetPageWidth() - 10, 32);
         $this->SetLineWidth(0.2);
-
-        $this->SetFont('helvetica', '', 11);
-        $this->SetXY(($this->GetPageWidth() - 80) / 2, 40);
-        $this->Cell(80, -2, 'No Inspeksi: ' . $nomorInspeksi, 0, false, 'C', 0, '', 0, false, 'M', 'M');        
         $this->Ln(5);
     }
     
     function Footer() {
         $this->SetY(-15);
-        $this->SetFont('helvetica','I',8);
-        $this->Cell(0,10,''.$this->PageNo().'/{nb}',0,0,'C');
+        $this->SetFont('helvetica', 'I', 8);
+        $this->Cell(0, 10, 'Halaman ' . $this->PageNo() . '/{nb}', 0, 0, 'C');
     }
-    
-    function AddScreenshots($target_screenshot_dir, $current_inspection_id) {
-        $screenshotTitleShown = false; 
-        $conn = new mysqli($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['pass'], $GLOBALS['db']);
-        $query = $conn->prepare("SELECT screenshot_name FROM screenshots WHERE form_no = ?");
-        $query->bind_param("i", $current_inspection_id);
-        $query->execute();
-        $result = $query->get_result();
-    
-        if ($result) {
-            while ($row = $result->fetch_assoc()) {
-                $screenshot = $row['screenshot_name'];
-                $screenshot_path = $target_screenshot_dir . $screenshot;
-    
-                if (!$screenshotTitleShown) { 
-                    $this->SetFont('helvetica', 'B', 11);
-                    $this->Cell(0, 10, 'Screenshot:', 0, 1, 'L');
-                    $this->Ln(5);
-                    $screenshotTitleShown = true;
-                }
-                $this->resizeAndInsertImage($screenshot_path);
-            }
-        }
-        $query->close();
-        $conn->close();
-    }     
-    
-    function resizeAndInsertImage($imagePath) {
-        list($width, $height) = getimagesize($imagePath);
-        $maxWidth = 184; // Mengurangi lebar gambar
-        $maxHeight = 152; // Mengurangi tinggi gambar
-        $ratio = $width / $height;
-    
-        if ($width > $height) {
-            $newWidth = $maxWidth;
-            $newHeight = $maxWidth / $ratio;
-        } else {
-            $newHeight = $maxHeight;
-            $newWidth = $maxHeight * $ratio;
-        }
-    
-        $this->Image($imagePath, 10, null, $newWidth, $newHeight);
-    }
-
-    private $columnWidths = array(30, 140, 20);
 
     function addTableRow($item, $detail, $skor) {
-        $fill = $this->RowNeedsFill();
-        $this->Cell($this->columnWidths[0], 10, $item, 1, 0, 'C', $fill);
-        $this->Cell($this->columnWidths[1], 10, $detail, 1, 0, 'C', $fill);
-        $this->Cell($this->columnWidths[2], 10, $skor, 1, 1, 'C', $fill);
+        $this->Cell(40, 10, $item, 1, 0, 'L');
+        $this->Cell(110, 10, clean_text($detail), 1, 0, 'L');
+        $this->Cell(40, 10, $skor, 1, 1, 'C');
     }
 
-    function RowNeedsFill() {
-        return $this->GetY() % 20 === 0;
+    function AddScreenshots($screenshot_files) {
+        // Path ke folder screenshot, PASTIKAN INI BENAR
+        $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
+        
+        if (!empty($screenshot_files)) {
+            $this->Ln(5);
+            $this->SetFont('helvetica', 'B', 11);
+            $this->Cell(0, 10, 'Bukti Screenshot:', 0, 1, 'L');
+            
+            foreach ($screenshot_files as $filename) {
+                $screenshot_path = $target_screenshot_dir . $filename;
+                if (file_exists($screenshot_path)) {
+                    // Cek sisa ruang di halaman
+                    if ($this->GetY() + 80 > $this->PageBreakTrigger) {
+                        $this->AddPage();
+                    }
+                    $this->Image($screenshot_path, $this->GetX(), $this->GetY(), 180); // Lebar gambar 180mm
+                    $this->Ln(80); // Sesuaikan spasi setelah gambar
+                }
+            }
+        }
     }
 }
 
-$pdf = new MYPDF($screenshot_files, $nomorInspeksi);
+// ================================================================= //
+// PEMBUATAN DOKUMEN PDF                                             //
+// ================================================================= //
+$pdf = new MYPDF();
 $pdf->AliasNbPages();
 $pdf->AddPage();
 
-$pageWidth = $pdf->GetPageWidth();
-$cellWidth = $pageWidth / 4;
-$maxTableWidth = $pageWidth * 0.90; 
-$cellWidth = $maxTableWidth / 4; 
-$pdf->SetLineWidth(0); 
-
+// Header Info
 $pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($cellWidth, 10, 'Tanggal:', 1, 0, 'L', false);
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell($cellWidth, 10, $row['date'], 1, 0, 'L', false);
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($cellWidth, 10, 'Nama pengguna:', 1, 0, 'L', false);
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell($cellWidth, 10, $row['nama_user'], 1, 1, 'L', false); 
-
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($cellWidth, 10, 'Tipe Perangkat:', 1, 0, 'L', false); 
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell($cellWidth, 10, $row['jenis'], 1, 0, 'L', false);
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($cellWidth, 10, 'Divisi:', 1, 0, 'L', false); 
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell($cellWidth, 10, $row['status'], 1, 1, 'L', false); 
-
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($cellWidth * 2, 10, 'Merk/Nomor Serial:', 1, 0, 'L', false);
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell($cellWidth * 2, 10, $row['merk'] . ' / ' . $row['serialnumber'], 1, 1, 'L', false); 
-
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->Cell($cellWidth * 2, 10, 'Lokasi/Area Penggunaan:', 1, 0, 'L', false);
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell($cellWidth * 2, 10, $row['lokasi'], 1, 1, 'L', false);
+$pdf->Cell(0, 7, 'No Inspeksi: ' . $row['no'], 0, 1, 'C');
 $pdf->Ln(3);
 
-// Informasi Keluhan, Pemeriksaan, Rekomendasi
-$pdf->SetFont('Arial', 'B', 10);
-$pdf->Cell(0, 7, 'Informasi Keluhan/Permasalahan yang disampaikan:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 10);
-$pdf->MultiCell(0, 7, clean_text($row['informasi_keluhan']), 'B', 'L');
-$pdf->Ln(5);
+// Tabel Info Utama
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(47.5, 7, 'Tanggal', 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(47.5, 7, $row['date'], 1);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(47.5, 7, 'Nama Pengguna', 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(47.5, 7, clean_text($row['nama_user']), 1, 1);
+// Baris berikutnya
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(47.5, 7, 'Tipe Perangkat', 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(47.5, 7, clean_text($row['jenis']), 1);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(47.5, 7, 'Divisi', 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(47.5, 7, clean_text($row['status']), 1, 1);
+// Baris berikutnya
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(47.5, 7, 'Merk/Nomor Serial', 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(142.5, 7, clean_text($row['merk'] . ' / ' . $row['serialnumber']), 1, 1);
+// Baris berikutnya
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(47.5, 7, 'Lokasi Penggunaan', 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->Cell(142.5, 7, clean_text($row['lokasi']), 1, 1);
+$pdf->Ln(8);
 
-$pdf->SetFont('Arial', 'B', 10);
-$pdf->Cell(0, 7, 'Hasil Pemeriksaan:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 10);
-$pdf->MultiCell(0, 7, clean_text($row['hasil_pemeriksaan']), 'B', 'L');
-$pdf->Ln(5);
-
+// MultiCell untuk Keluhan, Pemeriksaan, Rekomendasi
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(0, 7, 'Informasi Keluhan/Permasalahan:', 0, 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->MultiCell(190, 5, clean_text($row['informasi_keluhan']), 0, 'L');
+$pdf->Ln(3);
 
 $pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetFillColor(173, 216, 230);
-$pdf->addTableRow('Item', 'Detail', 'Skor');
+$pdf->Cell(0, 7, 'Hasil Pemeriksaan:', 0, 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->MultiCell(190, 5, clean_text($row['hasil_pemeriksaan']), 0, 'L');
+$pdf->Ln(8);
+
+// Tabel Detail Inspeksi
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->SetFillColor(230, 230, 230);
+$pdf->Cell(40, 10, 'Item', 1, 0, 'C', true);
+$pdf->Cell(110, 10, 'Detail', 1, 0, 'C', true);
+$pdf->Cell(40, 10, 'Skor', 1, 1, 'C', true);
 
 $pdf->SetFont('helvetica', '', 9);
+$pdf->addTableRow('Usia Perangkat', $row['age_name'], $row['age']);
+$pdf->addTableRow('Casing', $row['casing_lap_name'], $row['casing_lap']);
+$pdf->addTableRow('Layar', $row['layar_lap_name'], $row['layar_lap']);
+$pdf->addTableRow('Engsel', $row['engsel_lap_name'], $row['engsel_lap']);
+$pdf->addTableRow('Keyboard', $row['keyboard_lap_name'], $row['keyboard_lap']);
+$pdf->addTableRow('Touchpad', $row['touchpad_lap_name'], $row['touchpad_lap']);
+$pdf->addTableRow('Proses Booting', $row['booting_lap_name'], $row['booting_lap']);
+$pdf->addTableRow('Multitasking Apps', $row['multi_lap_name'], $row['multi_lap']);
+$pdf->addTableRow('Kapasitas Baterai', $row['tampung_lap_name'], $row['tampung_lap']);
+$pdf->addTableRow('Waktu Charging', $row['isi_lap_name'], $row['isi_lap']);
+$pdf->addTableRow('Port', $row['port_lap_name'], $row['port_lap']);
+$pdf->addTableRow('Audio', $row['audio_lap_name'], $row['audio_lap']);
+$pdf->addTableRow('Software', $row['software_lap_name'], $row['software_lap']);
 
-$pdf->addTableRow('Usia Perangkat', $row['age_name'], $row['age_score']);
-$pdf->addTableRow('Casing', $row['casing_lap_name'], $row['casing_lap_score']);
-$pdf->addTableRow('Layar', $row['layar_lap_name'], $row['layar_lap_score']);
-$pdf->addTableRow('Engsel', $row['engsel_lap_name'], $row['engsel_lap_score']);
-$pdf->addTableRow('Keyboard', $row['keyboard_lap_name'], $row['keyboard_lap_score']);
-$pdf->addTableRow('Touchpad', $row['touchpad_lap_name'], $row['touchpad_lap_score']);
-$pdf->addTableRow('Proses Booting', $row['booting_lap_name'], $row['booting_lap_score']);
-$pdf->addTableRow('Multitasking Apps', $row['multi_lap_name'], $row['multi_lap_score']);
-$pdf->addTableRow('Kapasitas Baterai', $row['tampung_lap_name'], $row['tampung_lap_score']);
-$pdf->addTableRow('Waktu Charging', $row['isi_lap_name'], $row['isi_lap_score']);
-$pdf->addTableRow('Port', $row['port_lap_name'], $row['port_lap_score']);
-$pdf->addTableRow('Audio', $row['audio_lap_name'], $row['audio_lap_score']);
-$pdf->addTableRow('Software', $row['software_lap_name'], $row['software_lap_score']);
-
-$totalScore = $row['age_score'] + $row['casing_lap_score'] + $row['layar_lap_score'] + $row['engsel_lap_score'] +$row['keyboard_lap_score'] + $row['touchpad_lap_score'] + $row['booting_lap_score'] + $row['multi_lap_score'] + $row['tampung_lap_score'] + $row['isi_lap_score'] + $row['port_lap_score'] + $row['audio_lap_score'] + $row['software_lap_score'];
-$pdf->SetFont('helvetica', 'B', 11);
-$pdf->addTableRow('Total Skor', '', $totalScore);
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Cell(150, 10, 'Total Skor', 1, 0, 'C');
+$pdf->Cell(40, 10, $row['score'], 1, 1, 'C');
+$pdf->Ln(8);
 
 // Rekomendasi
-$pdf->Ln(5);
-$pdf->SetFont('Arial', 'B', 10);
-$pdf->Cell(0, 7, 'Rekomendasi:', 0, 1, 'L');
-$pdf->SetFont('Arial', '', 10);
-$pdf->MultiCell(0, 7, clean_text($row['rekomendasi']), 'B', 'L');
-
-$pdf->Ln(5);
-$pdf->AddScreenshots($target_screenshot_dir, $row['no']);
-
-$current_inspection_id = $row['no'];
-$target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
-
-// Mendapatkan daftar file screenshot terbaru di direktori
-$latest_screenshot = null;
-$latest_timestamp = 0;
-
-if ($handle = opendir($target_screenshot_dir)) {
-    while (false !== ($entry = readdir($handle))) {
-        if ($entry != "." && $entry != "..") {
-            $screenshot_path = $target_screenshot_dir . $entry;
-            $timestamp = filemtime($screenshot_path);
-
-            if ($timestamp > $latest_timestamp) {
-                $latest_timestamp = $timestamp;
-                $latest_screenshot = $entry;
-            }
-        }
-    }
-    closedir($handle);
-}
-
-if ($latest_screenshot !== null && !in_array($latest_screenshot, $screenshot_files)) {
-    $screenshot_path = $target_screenshot_dir . $latest_screenshot;
-    list($width, $height) = getimagesize($screenshot_path);
-    $maxWidth = 84; // Mengurangi lebar gambar
-    $maxHeight = 52; // Mengurangi tinggi gambar
-    $ratio = $width / $height;
-
-    if ($width > $height) {
-        $newWidth = $maxWidth;
-        $newHeight = $maxWidth / $ratio;
-    } else {
-        $newHeight = $maxHeight;
-        $newWidth = $maxHeight * $ratio;
-    }
-
-    $pdf->Image($screenshot_path, 10, null, $newWidth, $newHeight);
-    $screenshot_files[] = $latest_screenshot;
-}
-
-$pdf->Ln(10);
 $pdf->SetFont('helvetica', 'B', 10);
-$location = '    Jakarta,'; 
-$currentDate = date('d F Y'); 
-$locationWidth = $pdf->GetStringWidth($location);
-$dateWidth = $pdf->GetStringWidth($currentDate);
-$totalWidth = $locationWidth + $dateWidth + 5; 
+$pdf->Cell(0, 7, 'Rekomendasi:', 0, 1);
+$pdf->SetFont('helvetica', '', 10);
+$pdf->MultiCell(190, 5, clean_text($row['rekomendasi']), 0, 'L');
 
-$pdf->SetX(10); 
-$pdf->Cell($locationWidth, 5, $location, 0, 0, 'L'); 
-$pdf->Cell(1, 1, '', 0, 0, 'C'); 
-$pdf->Cell($dateWidth, 5, $currentDate, 0, 1, 'L'); 
+// Panggil fungsi untuk menambahkan screenshot
+$pdf->AddScreenshots($screenshot_files);
 
+// Tanda Tangan
 $pdf->Ln(15); 
-
-$pdf->Cell(95, 10, '', 0, 0, 'C');
-$pdf->Cell(5, 10, '', 0, 0, 'C'); 
-$pdf->Cell(95, 10, '', 0, 1, 'C');
-
 $pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetX(15);
-$pdf->Cell(47.5, 7, 'ITE Division', 'T', 0, 'L');
-$pdf->Cell(5, 10, '', 0, 0, 'C'); 
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->SetX(95);
-$pdf->Cell(47.5, 7, $row['nama_user'], 'T', 1, 'L');
-$pdf->AliasNbPages();
+$pdf->Cell(95, 7, 'ITE Division', 0, 0, 'C');
+$pdf->Cell(95, 7, 'Nama Pengguna', 0, 1, 'C');
+$pdf->Ln(20);
+$pdf->Cell(95, 7, '(______________________)', 0, 0, 'C');
+$pdf->Cell(95, 7, '( ' . clean_text($row['nama_user']) . ' )', 0, 1, 'C');
 
-$filename = "Inspection-Devices.pdf";
-$pdf->Output($filename, 'D');
-echo '<a href="Inspection-Devices.pdf">Download</a>';
+
+// Output PDF
+$filename = "Inspection-Laptop-" . clean_text($row['nama_user']) . "-" . $row['date'] . ".pdf";
+$pdf->Output('D', $filename);
 exit;
 ?>
