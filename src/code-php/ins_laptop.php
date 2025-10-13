@@ -229,12 +229,13 @@ $companyOptions = [
                 <span class="hide-menu">Assessment PC Desktop</span>
               </a>
             </li>
-            <li class="sidebar-item active">
-              <a class="sidebar-link" href="#" aria-expanded="true">
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="#" aria-expanded="false">
                   <span><i class="ti ti-assembly"></i></span>
                   <span class="hide-menu">Device Inspection</span>
+                  <span class="arrow"><i class="fas fa-chevron-down"></i></span>
               </a>
-              <ul class="collapse first-level show" aria-expanded="true">
+              <ul class="sidebar-submenu">
                   <li class="sidebar-item"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
                   <li class="sidebar-item"><a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a></li>
                   <li class="sidebar-item"><a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a></li>
@@ -243,7 +244,7 @@ $companyOptions = [
                   <li class="sidebar-item"><a class="sidebar-link" href="./ins_infra.php"><span><i class="ti ti-router"></i></span>Infrastructure</a></li>
                   <li class="sidebar-item"><a class="sidebar-link" href="./ins_tlp.php"><span><i class="ti ti-device-landline-phone"></i></span>Telephone</a></li>
               </ul>
-          </li>
+            </li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="./about.php" aria-expanded="false">
                 <span>
