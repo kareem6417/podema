@@ -47,15 +47,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$engsel_lap', '$keyboard_lap', '$touchpad_lap', '$booting_lap', '$multi_lap', '$tampung_lap', '$isi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
     }
     
-    // Anda bisa menambahkan logika untuk device lain di sini (PC Desktop, Monitor, dll)
-
     if ($sql != '') {
         if ($conn->query($sql) === TRUE) {
             // 1. Dapatkan ID dari data inspeksi yang baru saja disimpan
             $last_id = $conn->insert_id;
 
             // 2. Tentukan folder tujuan screenshot
-            // PASTIKAN FOLDER INI ADA DAN BISA DITULIS OLEH SERVER
             $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
             // 3. Proses setiap file screenshot yang diunggah
