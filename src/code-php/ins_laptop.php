@@ -86,7 +86,17 @@ $companyOptions = [
     .sidebar-item.active > a .arrow {
         transform: rotate(180deg);
     }
-    /* === AKHIR DARI CSS SUBMENU === */
+
+    .sidebar-nav ul .sidebar-item.active > .sidebar-link {
+        background: var(--bs-primary); /* Menggunakan warna biru utama tema */
+        color: var(--bs-white);
+        border-radius: 7px;
+    }
+
+    .sidebar-nav ul .sidebar-item.active > .sidebar-link i,
+    .sidebar-nav ul .sidebar-item.active > .sidebar-link .arrow {
+        color: var(--bs-white);
+    }
       
     .card-title {
         margin-bottom: 1.5rem;
@@ -233,7 +243,9 @@ $companyOptions = [
               <a class="sidebar-link" href="#" aria-expanded="false">
                   <span><i class="ti ti-assembly"></i></span>
                   <span class="hide-menu">Device Inspection</span>
+                  
                   <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+
               </a>
               <ul class="sidebar-submenu">
                   <li class="sidebar-item"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
