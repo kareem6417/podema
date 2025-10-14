@@ -60,6 +60,7 @@ $companyOptions = [
   <title>Inspection - Laptop</title>
   <link rel="shortcut icon" type="image/png" href="../assets/images/logos/icon.png" />
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   
    <style>
