@@ -160,7 +160,7 @@ $companyOptions = [
         <div class="card">
           <div class="card-body">
             <h1 class="card-title fw-semibold mb-4">Device Inspection (PC Desktop)</h1>
-            <form id="assessmentForm" method="post" action="submit_ins_desktop.php" enctype="multipart/form-data">
+            <form id="assessmentForm" method="post" action="submit_inspeksi.php" enctype="multipart/form-data">
 
               <div class="card form-section-card">
                 <div class="card-body">
