@@ -192,7 +192,7 @@ $companyOptions = [
                   <div class="row">
                     <div class="col-md-6 mb-3"><label for="status" class="form-label">Position/Division<span class="required-star">*</span></label><input type="text" id="status" name="status" class="form-control" readonly placeholder="Auto-filled"></div>
                     <div class="col-md-6 mb-3"><label for="lokasi" class="form-label">Location<span class="required-star">*</span></label><input type="text" id="lokasi" name="lokasi" class="form-control" readonly placeholder="Auto-filled"></div>
-                    <div class="col-md-6 mb-3"><label for="jenis" class="form-label">Device Type<span class="required-star">*</span></label><input type="text" id="jenis" name="jenis" class="form-control" value="Monitor" readonly></div>
+                    <div class="col-md-6 mb-3"><label for="jenis" class="form-label">Device Type<span class="required-star">*</span></label><input type="text" id="jenis" name="jenis" class="form-control" value="CCTV" readonly></div>
                     <div class="col-md-6 mb-3"><label for="merk" class="form-label">Merk/Type<span class="required-star">*</span></label><input type="text" id="merk" name="merk" class="form-control" required></div>
                     <div class="col-md-6 mb-3"><label for="serialnumber" class="form-label">Serial Number</label><input type="text" id="serialnumber" name="serialnumber" class="form-control"></div>
                   </div>
