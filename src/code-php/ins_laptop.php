@@ -63,37 +63,13 @@ $companyOptions = [
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   
    <style>
-    /* === CSS UNTUK SUBMENU DROPDOWN (DARI ins_desktop.php) === */
-    .sidebar-submenu {
-        list-style: none;
-        padding-left: 20px;
-        overflow: hidden;
-        max-height: 0;
-        transition: max-height 0.35s ease-in-out;
-        background-color: #fff; /* Diubah menjadi putih */
-    }
-    .sidebar-item.active > .sidebar-submenu {
-        max-height: 500px; /* Cukup besar untuk menampung semua item */
-    }
-    .sidebar-item > a .arrow {
-        transition: transform 0.3s ease;
-        display: inline-block;
-        margin-left: auto;
-    }
-    .sidebar-item.active > a .arrow {
-        transform: rotate(180deg);
-    }
-
-    .sidebar-nav ul .sidebar-item.active > .sidebar-link {
-        background: var(--bs-primary); /* Menggunakan warna biru utama tema */
-        color: var(--bs-white);
-        border-radius: 7px;
-    }
-
-    .sidebar-nav ul .sidebar-item.active > .sidebar-link i,
-    .sidebar-nav ul .sidebar-item.active > .sidebar-link .arrow {
-        color: var(--bs-white);
-    }
+    .sidebar-submenu { position: static !important; max-height: 0; overflow: hidden; transition: max-height 0.35s ease-in-out; list-style: none; padding-left: 25px; background-color: #f8f9fa; border-radius: 0 0 5px 5px; margin: 0 10px 5px 10px; }
+    .sidebar-item.active > .sidebar-submenu { max-height: 500px; }
+    .sidebar-item > a .arrow { transition: transform 0.3s ease; display: inline-block; margin-left: auto; }
+    .sidebar-item.active > a .arrow { transform: rotate(180deg); }
+    .table th, .table td { vertical-align: middle; }
+    .action-icons span, .action-icons a { font-size: 1.2rem; margin: 0 5px; cursor: pointer; }
+    .modal-body table td:first-child { font-weight: bold; width: 35%; }
       
     .card-title {
         margin-bottom: 1.5rem;
@@ -164,117 +140,40 @@ $companyOptions = [
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
     
     <aside class="left-sidebar">
-      <div>
-        <div class="brand-logo d-flex align-items-center justify-content-center">
-          <a href="" class="text-nowrap logo-img">
-            <br>
-            <img src="../assets/images/logos/logos.png" width="160" alt="" />
-          </a>
-          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-            <i class="ti ti-x fs-8"></i>
-          </div>
+        <div>
+            <div class="brand-logo d-flex align-items-center justify-content-center">
+                <a href="" class="text-nowrap logo-img"><br><img src="../assets/images/logos/logos.png" width="160" alt="" /></a>
+                <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse"><i class="ti ti-x fs-8"></i></div>
+            </div>
+            <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+                <ul id="sidebarnav">
+                    <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Home</span></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./admin.php" aria-expanded="false"><span><i class="ti ti-layout-dashboard"></i></span><span class="hide-menu">Administrator</span></a></li>
+                    <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Dashboard</span></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./dash_lap.php" aria-expanded="false"><span><i class="ti ti-chart-area-line"></i></span><span class="hide-menu">Assessment Laptop</span></a></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./dash_pc.php" aria-expanded="false"><span><i class="ti ti-chart-line"></i></span><span class="hide-menu">Assessment PC Desktop</span></a></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./dash_ins.php" aria-expanded="false"><span><i class="ti ti-chart-donut"></i></span><span class="hide-menu">Inspection</span></a></li>
+                    <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Evaluation Portal</span></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./assess_laptop.php" aria-expanded="false"><span><i class="ti ti-device-laptop"></i></span><span class="hide-menu">Assessment Laptop</span></a></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./assess_pc.php" aria-expanded="false"><span><i class="ti ti-device-desktop-analytics"></i></span><span class="hide-menu">Assessment PC Desktop</span></a></li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" href="#" aria-expanded="false"><span><i class="ti ti-assembly"></i></span><span class="hide-menu">Device Inspection</span><span class="arrow"><i class="fas fa-chevron-down"></i></span></a>
+                      <ul class="sidebar-submenu">
+                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
+                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a></li>
+                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a></li>
+                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_printer.php"><span><i class="ti ti-printer"></i></span>Printer</a></li>
+                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_cctv.php"><span><i class="ti ti-device-cctv"></i></span>CCTV</a></li>
+                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_infra.php"><span><i class="ti ti-router"></i></span>Infrastructure</a></li>
+                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_tlp.php"><span><i class="ti ti-device-landline-phone"></i></span>Telephone</a></li>
+                      </ul>
+                    </li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./about.php" aria-expanded="false"><span><i class="ti ti-exclamation-circle"></i></span><span class="hide-menu">About</span></a></li>
+                    <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Asset Management</span></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="./astmgm.php" aria-expanded="false"><span><i class="ti ti-cards"></i></span><span class="hide-menu">IT Asset Management</span></a></li>
+                </ul>
+            </nav>
         </div>
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-          <ul id="sidebarnav">
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Home</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./admin.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-layout-dashboard"></i>
-                </span>
-                <span class="hide-menu">Administrator</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Dashboard</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./dash_lap.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-area-line"></i>
-                </span>
-                <span class="hide-menu">Assessment Laptop</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./dash_pc.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-line"></i>
-                </span>
-                <span class="hide-menu">Assessment PC Desktop</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./dash_ins.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-donut"></i>
-                </span>
-                <span class="hide-menu">Inspection</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Evaluation Portal</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./assess_laptop.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-device-laptop"></i>
-                </span>
-                <span class="hide-menu">Assessment Laptop</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./assess_pc.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-device-desktop-analytics"></i>
-                </span>
-                <span class="hide-menu">Assessment PC Desktop</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="#" aria-expanded="false">
-                  <span><i class="ti ti-assembly"></i></span>
-                  <span class="hide-menu">Device Inspection</span>
-                  <span class="arrow"><i class="fas fa-chevron-down"></i></span>
-              </a>
-              <ul class="sidebar-submenu">
-                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
-                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a></li>
-                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a></li>
-                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_printer.php"><span><i class="ti ti-printer"></i></span>Printer</a></li>
-                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_cctv.php"><span><i class="ti ti-device-cctv"></i></span>CCTV</a></li>
-                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_infra.php"><span><i class="ti ti-router"></i></span>Infrastructure</a></li>
-                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_tlp.php"><span><i class="ti ti-device-landline-phone"></i></span>Telephone</a></li>
-              </ul>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./about.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-exclamation-circle"></i>
-                </span>
-                <span class="hide-menu">About</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Asset Management</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./astmgm.php" aria-expanded="false">
-                <span>
-                <i class="ti ti-cards"></i>
-              </span>
-                <span class="hide-menu">IT Asset Management</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
     </aside>
 
     <div class="body-wrapper">
