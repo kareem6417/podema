@@ -6,6 +6,7 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
   exit();
 }
 
+// Cukup satu kali koneksi di atas
 $conn_podema = mysqli_connect("mandiricoal.net", "podema", "Jam10pagi#", "podema");
 
 if (!$conn_podema) {
@@ -33,630 +34,373 @@ foreach ($users as $user) {
         'divisi' => $user['department']
     );
 }
+
+// Opsi Perusahaan untuk tampilan
+$companyOptions = [
+    'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
+    'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
+    'MKP HO' => 'PT. Mandala Karya Prima - HO',
+    'MKP Site' => 'PT. Mandala Karya Prima - Site',
+    'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
+    'MPM Site' => 'PT. Maritim Prima Mandiri - Site',
+    'MHA HO' => 'PT. Mandiri Herindo Adiperkasa - HO',
+    'MHA Site' => 'PT. Mandiri Herindo Adiperkasa - Site',
+    'PAM' => 'PT. Prima Andalan Mandiri',
+    'mandiriland' => 'PT. Mandiriland',
+    'GMS' => 'PT. Global Mining Service',
+    'eam' => 'PT. Edika Agung Mandiri',
+];
 ?>
 
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Portal Device Management Application</title>
+  <title>Inspection - PC Desktop</title>
   <link rel="shortcut icon" type="image/png" href="../assets/images/logos/icon.png" />
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
-  <link rel="stylesheet" href="../assets/css/style_assess.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  
   <style>
-    /* Gaya submenu */
-    .sidebar-submenu {
-        max-height: 0;
-        overflow: hidden;
-    }
+    .sidebar-submenu { position: static !important; max-height: 0; overflow: hidden; transition: max-height 0.35s ease-in-out; list-style: none; padding-left: 20px; background-color: #fff; }
+    .sidebar-item.active > .sidebar-submenu { max-height: 500px; }
+    .sidebar-item > a .arrow { transition: transform 0.3s ease; display: inline-block; margin-left: auto; }
+    .sidebar-item.active > a .arrow { transform: rotate(180deg); }
+    .sidebar-nav ul .sidebar-item.active > .sidebar-link { background: var(--bs-primary); color: var(--bs-white); border-radius: 7px; }
+    .sidebar-nav ul .sidebar-item.active > .sidebar-link i,
+    .sidebar-nav ul .sidebar-item.active > .sidebar-link .arrow { color: var(--bs-white); }
+      
+    .card-title { margin-bottom: 1.5rem; }
+    .form-label { font-weight: 600; }
+    .input-group-text { background-color: #f8f9fa; }
+    .form-section-card { margin-bottom: 2rem; }
+    .required-star { color: crimson; }
+    .form-textarea { height: 100px; width: 100%; border-radius: 6px; border: 1px solid #ced4da; padding: 0.5rem 0.75rem; }
 
-    .sidebar-item.active .sidebar-submenu {
-        max-height: 1000px;
-    }
+    .file-drop-zone { border: 2px dashed #0d6efd; border-radius: 6px; padding: 2rem; text-align: center; cursor: pointer; background-color: #f8f9fa; transition: background-color 0.2s ease-in-out; }
+    .file-drop-zone:hover { background-color: #e9ecef; }
+    .file-drop-zone-icon { font-size: 3rem; color: #0d6efd; }
+    .file-drop-zone p { margin-top: 1rem; color: #6c757d; }
 
-    .sidebar-submenu .sidebar-item {
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: opacity 0.4s ease, transform 0.7s ease;
-        display: flex;
-        align-items: center;
-        padding-left: 20px;
-    }
-
-    .sidebar-item.active .sidebar-submenu .sidebar-item {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .sidebar-submenu .sidebar-link i {
-        margin-right: 10px;
-    }
+    #screenshot_preview_container { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 1.5rem; }
+    .preview-image-wrapper { position: relative; width: 150px; height: 150px; }
+    .preview-image { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
   </style>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    var submenuItems = document.querySelectorAll('.sidebar-submenu');
-
-    submenuItems.forEach(function(item) {
-        item.style.maxHeight = '0';
-
-        item.closest('.sidebar-item').addEventListener('click', function(e) {
-            e.preventDefault();
-
-            this.classList.toggle('active');
-
-            submenuItems.forEach(function(subitem) {
-                if (subitem !== item) {
-                    subitem.style.maxHeight = '0';
-                }
-            });
-
-            if (this.classList.contains('active')) {
-                item.style.maxHeight = '1000px';
-            } else {
-                item.style.maxHeight = '0';
-            }
-        });
-
-        var submenuLinks = item.querySelectorAll('.sidebar-link');
-        submenuLinks.forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-    });
-});
-
-</script>
 </head>
 
 <body>
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+    
     <aside class="left-sidebar">
-      <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-center">
-          <a href="" class="text-nowrap logo-img">
-            <br>
-            <img src="../assets/images/logos/logos.png" width="160" alt="" />
-          </a>
-          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-            <i class="ti ti-x fs-8"></i>
-          </div>
+          <a href="" class="text-nowrap logo-img"><br><img src="../assets/images/logos/logos.png" width="160" alt="" /></a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse"><i class="ti ti-x fs-8"></i></div>
         </div>
-        <!-- Sidebar navigation-->
         <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
           <ul id="sidebarnav">
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Home</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./admin.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-layout-dashboard"></i>
-                </span>
-                <span class="hide-menu">Administrator</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Dashboard</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./dash_lap.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-area-line"></i>
-                </span>
-                <span class="hide-menu">Assessment Laptop</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./dash_pc.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-line"></i>
-                </span>
-                <span class="hide-menu">Assessment PC Desktop</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./dash_ins.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-chart-donut"></i>
-                </span>
-                <span class="hide-menu">Inspection</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Evaluation Portal</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./assess_laptop.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-device-laptop"></i>
-                </span>
-                <span class="hide-menu">Assessment Laptop</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./assess_pc.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-device-desktop-analytics"></i>
-                </span>
-                <span class="hide-menu">Assessment PC Desktop</span>
-              </a>
-            </li>
+            <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Home</span></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./admin.php" aria-expanded="false"><span><i class="ti ti-layout-dashboard"></i></span><span class="hide-menu">Administrator</span></a></li>
+            <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Dashboard</span></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./dash_lap.php" aria-expanded="false"><span><i class="ti ti-chart-area-line"></i></span><span class="hide-menu">Assessment Laptop</span></a></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./dash_pc.php" aria-expanded="false"><span><i class="ti ti-chart-line"></i></span><span class="hide-menu">Assessment PC Desktop</span></a></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./dash_ins.php" aria-expanded="false"><span><i class="ti ti-chart-donut"></i></span><span class="hide-menu">Inspection</span></a></li>
+            <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Evaluation Portal</span></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./assess_laptop.php" aria-expanded="false"><span><i class="ti ti-device-laptop"></i></span><span class="hide-menu">Assessment Laptop</span></a></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./assess_pc.php" aria-expanded="false"><span><i class="ti ti-device-desktop-analytics"></i></span><span class="hide-menu">Assessment PC Desktop</span></a></li>
             <li class="sidebar-item">
               <a class="sidebar-link" href="#" aria-expanded="false">
-                  <span>
-                      <i class="ti ti-assembly"></i>
-                  </span>
-                  <span class="hide-menu">Device Inspection</span>
-                  <span class="arrow">
-                    <i class="fas fa-chevron-down"></i>
-                  </span>
+                  <span><i class="ti ti-assembly"></i></span><span class="hide-menu">Device Inspection</span>
+                  <span class="arrow"><i class="fas fa-chevron-down"></i></span>
               </a>
               <ul class="sidebar-submenu">
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_laptop.php">
-                          <span>
-                              <i class="ti ti-devices"></i>
-                          </span>
-                          Laptop
-                      </a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_desktop.php">
-                          <span>
-                              <i class="ti ti-device-desktop-search"></i>
-                          </span>
-                          PC Desktop
-                      </a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_monitor.php">
-                          <span>
-                              <i class="ti ti-screen-share"></i>
-                          </span>
-                          Monitor
-                      </a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_printer.php">
-                          <span>
-                              <i class="ti ti-printer"></i>
-                          </span>
-                          Printer
-                      </a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_cctv.php">
-                          <span>
-                              <i class="ti ti-device-cctv"></i>
-                          </span>
-                          CCTV
-                      </a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_infra.php">
-                          <span>
-                              <i class="ti ti-router"></i>
-                          </span>
-                          Infrastructure
-                      </a>
-                  </li>
-                  <li class="sidebar-item">
-                      <a class="sidebar-link" href="./ins_tlp.php">
-                          <span>
-                              <i class="ti ti-device-landline-phone"></i>
-                          </span>
-                          Telephone
-                      </a>
-                  </li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_printer.php"><span><i class="ti ti-printer"></i></span>Printer</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_cctv.php"><span><i class="ti ti-device-cctv"></i></span>CCTV</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_infra.php"><span><i class="ti ti-router"></i></span>Infrastructure</a></li>
+                  <li class="sidebar-item"><a class="sidebar-link" href="./ins_tlp.php"><span><i class="ti ti-device-landline-phone"></i></span>Telephone</a></li>
               </ul>
-          </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./about.php" aria-expanded="false">
-                <span>
-                  <i class="ti ti-exclamation-circle"></i>
-                </span>
-                <span class="hide-menu">About</span>
-              </a>
             </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Asset Management</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./astmgm.php" aria-expanded="false">
-                <span>
-                <i class="ti ti-cards"></i>
-              </span>
-                <span class="hide-menu">IT Asset Management</span>
-              </a>
-            </li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./about.php" aria-expanded="false"><span><i class="ti ti-exclamation-circle"></i></span><span class="hide-menu">About</span></a></li>
+            <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Asset Management</span></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="./astmgm.php" aria-expanded="false"><span><i class="ti ti-cards"></i></span><span class="hide-menu">IT Asset Management</span></a></li>
           </ul>
-
         </nav>
-        <!-- End Sidebar navigation -->
       </div>
-      <!-- End Sidebar scroll-->
     </aside>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
+
     <div class="body-wrapper">
-      <!--  Header Start -->
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
           <ul class="navbar-nav">
-            <li class="nav-item d-block d-xl-none">
-              <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
-                <i class="ti ti-menu-2"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
-                <i class="ti ti-bell-ringing"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
-            </li>
+            <li class="nav-item d-block d-xl-none"><a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)"><i class="ti ti-menu-2"></i></a></li>
+            <li class="nav-item"><a class="nav-link nav-icon-hover" href="javascript:void(0)"><i class="ti ti-bell-ringing"></i><div class="notification bg-primary rounded-circle"></div></a></li>
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
               <li class="nav-item dropdown">
-                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  <img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle">
-                </a>
+                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false"><img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle"></a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
-                  <div class="message-body">
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-user fs-6"></i>
-                      <p class="mb-0 fs-3">My Profile</p>
-                    </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-mail fs-6"></i>
-                      <p class="mb-0 fs-3">My Account</p>
-                    </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-list-check fs-6"></i>
-                      <p class="mb-0 fs-3">My Task</p>
-                    </a>
-                    <a href="./authentication-login.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
-                  </div>
+                    <div class="message-body">
+                        <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-user fs-6"></i><p class="mb-0 fs-3">My Profile</p></a>
+                        <a href="./authentication-login.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                    </div>
                 </div>
               </li>
             </ul>
           </div>
         </nav>
       </header>
-      <!--  Header End -->
+
       <div class="container-fluid">
         <div class="card">
-          <h1 class="card-title fw-semibold mb-4">Device Inspection</h1>
-          <form id="assessmentForm" method="post" action="submit_inspeksi.php" class="content" enctype="multipart/form-data">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-              <div class="form-group">
-                <label for="date">Date<span style="color: crimson;">*</span></label>
-                <input type="date" id="date" name="date" class="form-control" required>
-              </div>
-                  <label for="nama_user">Name<span style="color: crimson;">*</span></label>
-                  <?php
-                      $conn_podema = mysqli_connect("mandiricoal.net", "podema", "Jam10pagi#", "podema");
+          <div class="card-body">
+            <h1 class="card-title fw-semibold mb-4">Device Inspection (PC Desktop)</h1>
+            <form id="assessmentForm" method="post" action="submit_ins_desktop.php" enctype="multipart/form-data">
 
-                      if (!$conn_podema) {
-                          die("Koneksi database podema gagal: " . mysqli_connect_error());
-                      }
-
-                      $result = mysqli_query($conn_podema, "SELECT * FROM users ORDER BY name ASC");
-                      if ($result) {
-                          echo '<select id="name" name="nama_user" class="form-control" required>';
-                          echo '<option value="">--- Select ---</option>';
-                          while ($row = mysqli_fetch_assoc($result)) {
-                              echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
-                          }
-                          echo '</select>';
-                          mysqli_free_result($result);
-                      }
-                  ?>
+              <div class="card form-section-card">
+                <div class="card-body">
+                  <h5 class="mb-3">Data Inspeksi</h5>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="date" class="form-label">Date<span class="required-star">*</span></label>
+                      <div class="input-group"><span class="input-group-text"><i class="ti ti-calendar"></i></span><input type="date" id="date" name="date" class="form-control" required></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="name" class="form-label">Name<span class="required-star">*</span></label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="ti ti-user"></i></span>
+                        <select id="name" name="nama_user" class="form-select" required>
+                            <option value="">--- Select User ---</option>
+                            <?php foreach ($users as $user): ?>
+                                <option value="<?php echo htmlspecialchars($user['name']); ?>"><?php echo htmlspecialchars($user['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="status">Position/Division<span style="color: crimson;">*</span></label>
-                <input type="text" id="status" name="status" class="form-control" readonly placeholder="">
+              
+              <div class="card form-section-card">
+                <div class="card-body">
+                  <h5 class="mb-3">Detail Pengguna & Perangkat</h5>
+                  <div class="row">
+                    <div class="col-md-6 mb-3"><label for="status" class="form-label">Position/Division<span class="required-star">*</span></label><input type="text" id="status" name="status" class="form-control" readonly placeholder="Auto-filled"></div>
+                    <div class="col-md-6 mb-3"><label for="lokasi" class="form-label">Location<span class="required-star">*</span></label><input type="text" id="lokasi" name="lokasi" class="form-control" readonly placeholder="Auto-filled"></div>
+                    <div class="col-md-6 mb-3"><label for="jenis" class="form-label">Device Type<span class="required-star">*</span></label><input type="text" id="jenis" name="jenis" class="form-control" value="PC Desktop" readonly></div>
+                    <div class="col-md-6 mb-3"><label for="merk" class="form-label">Merk/Type<span class="required-star">*</span></label><input type="text" id="merk" name="merk" class="form-control" required></div>
+                    <div class="col-md-6 mb-3"><label for="serialnumber" class="form-label">Serial Number</label><input type="text" id="serialnumber" name="serialnumber" class="form-control"></div>
+                  </div>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="lokasi">Location of Device Usage<span style="color: crimson;">*</span></label>
-                  <input type="text" id="lokasi" name="lokasi" class="form-control" readonly placeholder="" style="width: 205.5%;">
-              </div>
-            </div>
-            <div class="col-md-6">
-                  <div class="form-group">
-                  <div class="form-group">
-                      <label for="jenis">Device Type<span style="color: crimson;">*</span></label>
-                      <input type="jenis" id="jenis" name="jenis" class="form-control" value="PC Desktop" readonly>
+              
+              <div class="card form-section-card">
+                  <div class="card-body">
+                      <h5 class="mb-3">Parameter Inspeksi Fisik</h5>
+                      <div class="row">
+                          <div class="col-md-6 mb-3">
+                              <label for="age" class="form-label">Usia Perangkat<span class="required-star">*</span></label>
+                              <select id="age" name="age" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("device_age_pc"); foreach ($options as $opt) { echo '<option value="' . $opt['age_score'] . '">' . $opt['age_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                              <label for="casing_lap" class="form-label">Casing<span class="required-star">*</span></label>
+                              <select id="casing_lap" name="casing_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_casing_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['casing_lap_score'] . '">' . $opt['casing_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                              <label for="layar_lap" class="form-label">Layar (Monitor)<span class="required-star">*</span></label>
+                              <select id="layar_lap" name="layar_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_layar_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['layar_lap_score'] . '">' . $opt['layar_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                              <label for="keyboard_lap" class="form-label">Keyboard<span class="required-star">*</span></label>
+                              <select id="keyboard_lap" name="keyboard_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_keyboard_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['keyboard_lap_score'] . '">' . $opt['keyboard_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                      </div>
                   </div>
               </div>
-              <div class="form-group">
-                <label for="merk">Merk/Type<span style="color: crimson;">*</span></label>
-                <input type="merk" id="type" name="merk" class="form-control">
+
+              <div class="card form-section-card">
+                  <div class="card-body">
+                      <h5 class="mb-3">Parameter Inspeksi Kinerja</h5>
+                      <div class="row">
+                          <div class="col-md-6 mb-3">
+                              <label for="booting_lap" class="form-label">Proses Booting<span class="required-star">*</span></label>
+                              <select id="booting_lap" name="booting_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_booting_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['booting_lap_score'] . '">' . $opt['booting_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                              <label for="multi_lap" class="form-label">Multitasking Apps<span class="required-star">*</span></label>
+                              <select id="multi_lap" name="multi_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_multi_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['multi_lap_score'] . '">' . $opt['multi_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                              <label for="port_lap" class="form-label">Port<span class="required-star">*</span></label>
+                              <select id="port_lap" name="port_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_port_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['port_lap_score'] . '">' . $opt['port_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                              <label for="audio_lap" class="form-label">Audio<span class="required-star">*</span></label>
+                              <select id="audio_lap" name="audio_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_audio_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['audio_lap_score'] . '">' . $opt['audio_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                              <label for="software_lap" class="form-label">Software<span class="required-star">*</span></label>
+                              <select id="software_lap" name="software_lap" class="form-select" required>
+                                  <option value="">--- Pilih ---</option>
+                                  <?php $options = fetchData("ins_software_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['software_lap_score'] . '">' . $opt['software_lap_name'] . '</option>'; } ?>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
               </div>
-              <div class="form-group">
-                <label for="serialnumber">Serial Number</label>
-                <input type="text" id="serialnumber" name="serialnumber" class="form-control">
-              </div>
-            </div>
-          </div>
-              <br>
-              <div class="form-group">
-                <label for="informasi_keluhan" id="informasi_keluhan_label">Informasi Keluhan/Permasalahan yang disampaikan:<span style="color: crimson;">*</span></label>
-                <textarea id="informasi_keluhan" name="informasi_keluhan" style="height: 75px; width: 100%;" required></textarea>
-              <br>
-              <br>
-              <label for="age">Usia Perangkat<span style="color: crimson;">*</span></label>
-                <select id="age" name="age" style="height: 50px;">
-                  <option value="">--- Pilih ---</option>
-                    <?php
-                      $ageOptions = fetchData("device_age_laptop");
-                      foreach ($ageOptions as $ageOption) {
-                          echo '<option value="' . $ageOption['age_score'] . '">' . $ageOption['age_name'] . '</option>';
-                      }
-                    ?>
-                </select>
-              <br>
-              <br>
-                <label for="casing_lap">Casing<span style="color: crimson;">*</span></label>
-                <select id="casing_lap" name="casing_lap" style="height: 50px;">
-                  <option value="">--- Pilih ---</option>
-                    <?php
-                      $casingOptions = fetchData("ins_casing_lap");
-                      foreach ($casingOptions as $casingOption) {
-                          echo '<option value="' . $casingOption['casing_lap_score'] . '">' . $casingOption['casing_lap_name'] . '</option>';
-                      }
-                    ?>
-                </select>
-                <br>
-                <br>
-                <label for="layar_lap">Layar<span style="color: crimson;">*</span></label>
-                <select id="layar_lap" name="layar_lap" style="height: 50px;">
-                    <option value="">--- Pilih ---</option>
-                    <?php
-                    $layarOptions = fetchData("ins_layar_lap");
-                    foreach ($layarOptions as $layarOption) {
-                        echo '<option value="' . $layarOption['layar_lap_score'] . '">' . $layarOption['layar_lap_name'] . '</option>';
-                    }
-                    ?>
-                </select>
-                <br>
-                <br>
-                <label for="booting_lap" >Proses Booting<span style="color: crimson;">*</span></label>
-                <select id="booting_lap" name="booting_lap" style="height: 50px;">
-                    <option value="">--- Pilih ---</option>
-                    <?php
-                    $bootingOptions = fetchData("ins_booting_lap");
-                    foreach ($bootingOptions as $bootingOption) {
-                        echo '<option value="' . $bootingOption['booting_lap_score'] . '">' . $bootingOption['booting_lap_name'] . '</option>';
-                    }
-                    ?>
-                </select>
-                <br>
-                <br>
-                <label for="multi_lap">Multitasking Apps<span style="color: crimson;">*</span></label>
-                <select id="multi_lap" name="multi_lap" style="height: 50px;">
-                    <option value="">--- Pilih ---</option>
-                    <?php
-                    $multiOptions = fetchData("ins_multi_lap");
-                    foreach ($multiOptions as $multiOption) {
-                        echo '<option value="' . $multiOption['multi_lap_score'] . '">' . $multiOption['multi_lap_name'] . '</option>';
-                    }
-                    ?>
-                </select>
-                <br>
-                <br>
-                <label for="port_lap">Port<span style="color: crimson;">*</span></label>
-                <select id="port_lap" name="port_lap" style="height: 50px;">
-                    <option value="">--- Pilih ---</option>
-                    <?php
-                    $portOptions = fetchData("ins_port_lap");
-                    foreach ($portOptions as $portOption) {
-                        echo '<option value="' . $portOption['port_lap_score'] . '">' . $portOption['port_lap_name'] . '</option>';
-                    }
-                    ?>
-                </select>
-                <br>
-                <br>
-                <label for="audio_lap">Audio<span style="color: crimson;">*</span></label>
-                <select id="audio_lap" name="audio_lap" style="height: 50px;">
-                    <option value="">--- Pilih ---</option>
-                    <?php
-                    $audioOptions = fetchData("ins_audio_lap");
-                    foreach ($audioOptions as $audioOption) {
-                        echo '<option value="' . $audioOption['audio_lap_score'] . '">' . $audioOption['audio_lap_name'] . '</option>';
-                    }
-                    ?>
-                </select>
-                <br>
-                <br>
-                <label for="software_lap">Software<span style="color: crimson;">*</span></label>
-                <select id="software_lap" name="software_lap" style="height: 50px;">
-                    <option value="">--- Pilih ---</option>
-                    <?php
-                    $softwareOptions = fetchData("ins_software_lap");
-                    foreach ($softwareOptions as $softwareOption) {
-                        echo '<option value="' . $softwareOption['software_lap_score'] . '">' . $softwareOption['software_lap_name'] . '</option>';
-                    }
-                    ?>
-                </select>
-                <br>
-                <br>
-              </div>
-              <div class="form-group">
-                <label for="hasil_pemeriksaan">Hasil Pemeriksaan Lainnya:<span style="color: crimson;">*</span></label>
-                <textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" style="height: 75px; width: 100%;"></textarea>
-                <br>
-                <!-- <br>
-                <label for="screenshot">Screenshot:<span style="color: crimson;">*</span></label>
-                  <div id="screenshot" style="max-width: 100%; margin: 0;">
-                      <input type="file" id="screenshot_file" name="screenshot_file[]" accept="image/*" style="display: none;" multiple>
-                      <button type="button" id="screenshot_upload_button" class="upload-button" style="cursor: pointer; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-bottom: 10px; width: 10%; display: inline-block;">Upload</button>
-                      <button type="button" id="reset_button" class="reset-button" style="cursor: pointer; background-color: #FF5722; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-bottom: 10px; width: 10%; display: inline-block;">Reset</button>
-                      <div id="screenshot_preview_container" style="max-width: 100%; overflow-x: auto; width: 100%; display: inline-block;">
+              
+              <div class="card form-section-card">
+                <div class="card-body">
+                  <h5 class="mb-3">Laporan & Bukti</h5>
+                  <div class="mb-3">
+                    <label for="informasi_keluhan" class="form-label">Complaints / Issues<span class="required-star">*</span></label>
+                    <textarea id="informasi_keluhan" name="informasi_keluhan" class="form-textarea" required></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label for="hasil_pemeriksaan" class="form-label">Examination Findings<span class="required-star">*</span></label>
+                    <textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" class="form-textarea" required></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label for="screenshot_file" class="form-label">Screenshot Evidence</label>
+                    <div id="file-uploader" class="file-drop-zone">
+                        <i class="ti ti-cloud-upload file-drop-zone-icon"></i>
+                        <p>Drag & drop files here or click to browse</p>
+                        <input type="file" id="screenshot_file" name="screenshot_file[]" accept="image/*" multiple hidden>
                     </div>
-                  </div> -->
-
-                  <!-- <style>
-                      #screenshot_preview_container img {
-                          max-width: 100%;
-                          height: auto;
-                          display: block;
-                          margin-bottom: 10px;
-                      }
-                  </style> -->
-
-                  <!-- <script>
-                      document.getElementById('screenshot_file').addEventListener('change', function() {
-                          var input = this;
-                          var previewContainer = document.getElementById('screenshot_preview_container');
-
-                          if (input.files && input.files.length > 0) {
-                              for (var i = 0; i < input.files.length; i++) {
-                                  var reader = new FileReader();
-                                  reader.onload = function(e) {
-                                      var img = document.createElement('img');
-                                      img.src = e.target.result;
-                                      previewContainer.appendChild(img);
-                                  }
-                                  reader.readAsDataURL(input.files[i]);
-                              }
-                          }
-                      });
-
-                      document.getElementById('reset_button').addEventListener('click', function() {
-                          var previewContainer = document.getElementById('screenshot_preview_container');
-                          previewContainer.innerHTML = ''; // Menghapus semua elemen gambar dari pratinjau
-                          document.getElementById('screenshot_file').value = ''; // Menghapus file yang diunggah dari input
-                      });
-
-                      document.getElementById('screenshot_upload_button').addEventListener('click', function() {
-                          document.getElementById('screenshot_file').click(); // Trigger the file input click event
-                      });
-                  </script> -->
-                  <br>
-                  <label for="rekomendasi">Rekomendasi:<span style="color: crimson;">*</span></label>
-                  <textarea id="rekomendasi" name="rekomendasi" style="height: 75px; width: 100%;"></textarea>
-                  <br>
-                  <!-- <br>
-                  <label for="upload_file" style="margin-bottom: 10px;">Upload File<span style="color: crimson;">*</span></label>
-                  <input type="file" id="upload_file" name="upload_file" class="form-control" accept=".zip, .rar" required>
-                  <small>*Note: <br> Sebagai bahan verifikasi mohon upload file berformat .zip atau .rar dari hasil Belarc, <br>dan file tidak lebih dari 100 KB</small>
-                  <br> -->
-
+                    <div id="screenshot_preview_container"></div>
+                    <button type="button" id="reset_button" class="btn btn-outline-danger mt-3" style="display: none;">Reset Images</button>
+                  </div>
+                   <div class="mb-3">
+                    <label for="rekomendasi" class="form-label">Recommendation<span class="required-star">*</span></label>
+                    <textarea id="rekomendasi" name="rekomendasi" class="form-textarea" required></textarea>
+                  </div>
+                </div>
               </div>
-              <div class="btn-group">
-                <input type="submit" value="Submit" class="btn btn-primary">
-                <input type="reset" value="Reset" class="btn btn-secondary">
+
+              <div class="d-flex justify-content-end gap-2">
+                <button type="reset" class="btn btn-secondary">Reset Form</button>
+                <button type="submit" class="btn btn-primary">Submit Inspection</button>
               </div>
           </form>
         </div>
+        </div>
         <div class="py-6 px-6 text-center">
-          <p class="mb-0 fs-4">Fueling the Bright Future | <a href="https:mandiricoal.co.id" target="_blank" class="pe-1 text-primary text-decoration-underline">mandiricoal.co.id</a>
+          <p class="mb-0 fs-4">Fueling the Bright Future | <a href="https:mandiricoal.co.id" target="_blank" class="pe-1 text-primary text-decoration-underline">mandiricoal.co.id</a></p>
         </div>
       </div>
     </div>
   </div>
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/sidebarmenu.js"></script>
   <script src="../assets/js/app.min.js"></script>
   <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+
   <script>
-      document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
+        submenuToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                var parentItem = this.closest('.sidebar-item');
+                if (parentItem) {
+                    document.querySelectorAll('.sidebar-item.active').forEach(function(activeItem) {
+                        if (activeItem !== parentItem) activeItem.classList.remove('active');
+                    });
+                    parentItem.classList.toggle('active');
+                }
+            });
+        });
+
+        const userInfos = <?php echo json_encode($userInfos); ?>;
+        const companyOptions = <?php echo json_encode($companyOptions); ?>;
+
         document.getElementById('name').addEventListener('change', function() {
-            var selectedName = this.value;
-            var user = <?php echo json_encode($userInfos); ?>;
-            
-            if (selectedName in user) {
-                document.getElementById('status').value = user[selectedName].divisi;
-                document.getElementById('lokasi').value = user[selectedName].company;
+            const selectedName = this.value;
+            const statusInput = document.getElementById('status');
+            const lokasiInput = document.getElementById('lokasi');
+
+            if (selectedName && userInfos[selectedName]) {
+                statusInput.value = userInfos[selectedName].divisi || 'N/A';
+                const companyKey = userInfos[selectedName].company;
+                lokasiInput.value = companyOptions[companyKey] || companyKey || 'N/A';
             } else {
-                document.getElementById('status').value = '';
-                document.getElementById('lokasi').value = '';
+                statusInput.value = '';
+                lokasiInput.value = '';
             }
         });
-    });
 
-    // document.getElementById('screenshot_file').addEventListener('change', function() {
-    //     var input = this;
-    //     var previewContainer = document.getElementById('screenshot_preview_container');
+        const uploader = document.getElementById('file-uploader');
+        const fileInput = document.getElementById('screenshot_file');
+        const previewContainer = document.getElementById('screenshot_preview_container');
+        const resetButton = document.getElementById('reset_button');
 
-    //     if (input.files && input.files.length > 0) {
-    //         for (var i = 0; i < input.files.length; i++) {
-    //             var reader = new FileReader();
-    //             reader.onload = function(e) {
-    //                 var img = document.createElement('img');
-    //                 img.src = e.target.result;
-    //                 previewContainer.appendChild(img);
-    //             }
-    //             reader.readAsDataURL(input.files[i]);
-    //         }
-    //     }
-    // });
+        uploader.addEventListener('click', () => fileInput.click());
+        uploader.addEventListener('dragover', (e) => { e.preventDefault(); uploader.style.backgroundColor = '#e9ecef'; });
+        uploader.addEventListener('dragleave', () => { uploader.style.backgroundColor = '#f8f9fa'; });
+        uploader.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploader.style.backgroundColor = '#f8f9fa';
+            fileInput.files = e.dataTransfer.files;
+            handleFiles(fileInput.files);
+        });
+        fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
-    // document.getElementById('reset_button').addEventListener('click', function() {
-    //     var previewContainer = document.getElementById('screenshot_preview_container');
-    //     previewContainer.innerHTML = '';
-    //     document.getElementById('screenshot_file').value = '';
-    // });
+        function handleFiles(files) {
+            previewContainer.innerHTML = '';
+            resetButton.style.display = files.length > 0 ? 'inline-block' : 'none';
 
-    // document.getElementById('screenshot_upload_button').addEventListener('click', function() {
-    //     document.getElementById('screenshot_file').click();
-    // });
-
-    document.getElementById('jenis').addEventListener('change', function() {
-        var selectedDevice = this.value;
-        var elementsToSubmit = getElementsToSubmit(selectedDevice);
-        var allElements = ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'];
-
-        // var allElements = ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file']; ini yang awal
-
-        allElements.forEach(function(elementId) {
-            var element = document.getElementById(elementId);
-            if (elementsToSubmit.includes(elementId)) {
-                element.removeAttribute('disabled');
-            } else {
-                element.disabled = true;
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'preview-image-wrapper';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'preview-image';
+                    wrapper.appendChild(img);
+                    previewContainer.appendChild(wrapper);
+                }
+                reader.readAsDataURL(file);
             }
+        }
+
+        resetButton.addEventListener('click', () => {
+            fileInput.value = '';
+            previewContainer.innerHTML = '';
+            resetButton.style.display = 'none';
         });
     });
-
-    function getElementsToSubmit(jenisPerangkat) {
-        var relevantElements = {
-            'Laptop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'],
-            'PC Desktop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'],
-            'Monitor': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file'],
-            'Printer': ['informasi_keluhan', 'casing_lap', 'ink_pad', 'hasil_pemeriksaan', 'rekomendasi', 'upload_file']
-        };
-
-    // function getElementsToSubmit(jenisPerangkat) {
-    //     var relevantElements = {
-    //         'Laptop': ['informasi_keluhan', 'age', 'casing_lap', 'layar_lap', 'engsel_lap', 'keyboard_lap', 'touchpad_lap', 'booting_lap', 'multi_lap', 'tampung_lap', 'isi_lap', 'port_lap', 'audio_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
-    //         'PC Desktop': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'keyboard_lap', 'booting_lap', 'multi_lap', 'port_lap', 'software_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
-    //         'Monitor': ['informasi_keluhan', 'casing_lap', 'layar_lap', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file'],
-    //         'Printer': ['informasi_keluhan', 'casing_lap', 'ink_pad', 'hasil_pemeriksaan', 'screenshot', 'rekomendasi', 'upload_file']
-    //     }; ini yang lama
-
-        return relevantElements[jenisPerangkat] || [];
-    }
   </script>
 </body>
-
 </html>
