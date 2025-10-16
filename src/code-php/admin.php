@@ -110,7 +110,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>User Management - Administrator</title>
-  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/icon.png" />
+  <link rel="shortcut icon" type="image/png" href="assets/images/logos/icon.png" />
   <link rel="stylesheet" href="assets/css/styles.min.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -130,7 +130,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <aside class="left-sidebar">
         <div>
             <div class="brand-logo d-flex align-items-center justify-content-center">
-                <a href="" class="text-nowrap logo-img"><br><img src="../assets/images/logos/logos.png" width="160" alt="" /></a>
+                <a href="" class="text-nowrap logo-img"><br><img src="assets/images/logos/logos.png" width="160" alt="" /></a>
                 <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse"><i class="ti ti-x fs-8"></i></div>
             </div>
             <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
@@ -174,7 +174,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                 <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
                     <li class="nav-item dropdown">
-                        <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false"><img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle"></a>
+                        <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false"><img src="assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle"></a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                             <div class="message-body">
                                 <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-user fs-6"></i><p class="mb-0 fs-3">My Profile</p></a>
@@ -353,10 +353,10 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="notification-popup" class="notification-popup"></div>
 
-  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/js/app.min.js"></script>
-  <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+  <script src="assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/app.min.js"></script>
+  <script src="assets/libs/simplebar/dist/simplebar.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // Sidebar Submenu Toggle
