@@ -10,24 +10,19 @@ $pass = "Jam10pagi#";
 // --- Variabel untuk pesan error ---
 $error_message = '';
 
-// --- LOGIKA LOGIN ---
+// --- LOGIKA LOGIN (Tidak ada perubahan di sini) ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
     $nik = $_POST['nik'];
     $password = $_POST['password'];
 
-    // Validasi input dasar
     if (empty($nik) || empty($password)) {
         $error_message = "NIK dan Password harus diisi.";
     } else {
-        // Koneksi ke database
         $conn = new mysqli($host, $user, $pass, $db);
 
         if ($conn->connect_error) {
-            // Sebaiknya jangan tampilkan error detail ke user, cukup pesan umum.
-            // die("Koneksi gagal: " . $conn->connect_error);
             $error_message = "Terjadi masalah koneksi ke server.";
         } else {
-            // Menggunakan prepared statement untuk keamanan
             $stmt = $conn->prepare("SELECT nik, password FROM users WHERE nik = ?");
             $stmt->bind_param("s", $nik);
             $stmt->execute();
@@ -36,19 +31,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
             if ($result && $result->num_rows > 0) {
                 $row = $result->fetch_assoc();
                 
-                // --- PERUBAHAN KEAMANAN KRUSIAL ---
-                // Verifikasi password yang di-hash, bukan plain text
                 if (password_verify($password, $row['password'])) {
-                    // Jika password cocok
                     $_SESSION['nik'] = $nik;
                     header("Location: ./src/code-php/admin.php");
                     exit();
                 } else {
-                    // Jika password salah
                     $error_message = "Login gagal. Periksa kembali NIK dan Password Anda.";
                 }
             } else {
-                // Jika NIK tidak ditemukan
                 $error_message = "Login gagal. Periksa kembali NIK dan Password Anda.";
             }
             $stmt->close();
@@ -70,17 +60,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
 
   <style>
     body, .page-wrapper {
-      /* Gradien latar belakang yang lebih halus */
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      /* 1. Background disesuaikan dengan gradien warna logo */
+      background: linear-gradient(135deg, #480ca8, #4cc9f0);
     }
 
     .card {
-      /* Efek "Frosted Glass" */
-      background: rgba(255, 255, 255, 0.1);
+      /* 2. Kartu dibuat lebih terang agar kontras dengan logo gelap */
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 15px;
-      /* Bayangan yang lebih lembut */
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 20px;
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       transition: all 0.3s ease;
     }
@@ -88,82 +77,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
     .card:hover {
       box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
     }
+    
+    /* 3. Ukuran Logo diperbesar dan diberi margin bawah */
+    .logo-img img {
+        width: 250px; /* Ukuran diperbesar dari 180px */
+        height: auto; /* Menjaga rasio aspek gambar */
+        margin-bottom: 10px; /* Memberi sedikit ruang di bawah logo */
+    }
 
-    /* Mengubah warna teks label agar kontras dengan background baru */
-    .form-label, .form-check-label, p.text-center {
-      color: #e0e0e0;
+    /* 4. Warna Teks disesuaikan untuk kartu yang terang */
+    .form-label, .form-check-label {
+      color: #343a40; /* Warna diubah menjadi gelap agar terbaca */
+      font-weight: 500;
+    }
+    
+    p.text-center {
+        color: #555; /* Warna subjudul dibuat sedikit lebih lembut */
     }
 
     .form-control {
-      background-color: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: #ffffff;
+      background-color: rgba(233, 236, 239, 0.7); /* Latar belakang input dibuat abu-abu muda */
+      border: 1px solid #ced4da;
+      color: #212529; /* Warna teks input menjadi hitam */
     }
 
     .form-control:focus {
-      background-color: rgba(255, 255, 255, 0.3);
-      color: #ffffff;
-      box-shadow: none;
+      background-color: #ffffff;
+      color: #212529;
+      border-color: #4cc9f0;
+      box-shadow: 0 0 0 0.25rem rgba(76, 201, 240, 0.25);
     }
 
-    .form-control::placeholder {
-      color: #c0c0c0;
-    }
-
+    /* 5. Tombol disesuaikan dengan tema gradien */
     .btn-primary {
+      background: linear-gradient(90deg, #480ca8, #4cc9f0);
+      border: none;
       transition: all 0.3s ease;
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
 
-    /* Style untuk Pop-up */
-    .popup {
-      display: none;
-      position: fixed;
-      z-index: 1050;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.6);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .popup-content {
-      background-color: #ffffff;
-      color: #333;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-    
-    .popup-content span {
-      display: block;
-      font-size: 1.1rem;
-      margin-bottom: 20px;
-    }
-
-    .popup-close-btn {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .popup-close-btn:hover {
-      background-color: #0056b3;
-    }
+    /* Style Pop-up (tidak berubah) */
+    .popup { display: none; position: fixed; z-index: 1050; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
+    .popup-content { background-color: #ffffff; color: #333; padding: 30px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .popup-content span { display: block; font-size: 1.1rem; margin-bottom: 20px; }
+    .popup-close-btn { background-color: #480ca8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; }
+    .popup-close-btn:hover { opacity: 0.8; }
   </style>
 </head>
 
@@ -176,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
             <div class="card mb-0">
               <div class="card-body">
                 <a href="./index.php" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                  <img src="src/assets/images/logos/new_logo.png" width="180" alt="">
+                  <img src="src/assets/images/logos/new_logo.png" alt="Podema Logo">
                 </a>
                 <p class="text-center mb-4">Portal Device Management Application</p>
                 <form method="POST" action="./index.php">
@@ -214,16 +176,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
   </div>
 
   <script>
+    // JavaScript (Tidak ada perubahan)
     function togglePassword() {
       var passwordInput = document.getElementById('password');
       passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
     }
-
     function showPopup(message) {
       document.getElementById("popup-message").innerText = message;
       document.getElementById("popup").style.display = "flex";
     }
-
     function hidePopup() {
       document.getElementById("popup").style.display = "none";
     }
