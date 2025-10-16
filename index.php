@@ -1,16 +1,13 @@
 <?php
 session_start();
 
-// --- PENGATURAN KONEKSI DATABASE ---
 $host = "mandiricoal.net";
 $db   = "podema";
 $user = "podema";
 $pass = "Jam10pagi#";
 
-// --- Variabel untuk pesan error ---
 $error_message = '';
 
-// --- LOGIKA LOGIN (Tidak ada perubahan di sini) ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
     $nik = $_POST['nik'];
     $password = $_POST['password'];
@@ -60,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
 
   <style>
     body, .page-wrapper {
-      /* 1. Background disesuaikan dengan gradien warna logo */
       background: linear-gradient(135deg, #480ca8, #4cc9f0);
     }
 
