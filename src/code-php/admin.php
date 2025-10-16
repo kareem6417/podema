@@ -106,6 +106,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!doctype html>
 <html lang="en">
 <head>
+  <base href="/src/">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>User Management - Administrator</title>
