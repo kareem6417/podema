@@ -10,6 +10,6 @@ session_destroy();
 
 // Mengarahkan pengguna kembali ke halaman login (index.php)
 // Path ../../../index.php digunakan asumsi admin.php ada di dalam folder src/code-php/
-header("Location: /");
+header("Location: ../../../index.php");
 exit;
 ?>

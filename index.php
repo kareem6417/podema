@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nik'])) {
                 
                 if (password_verify($password, $row['password'])) {
                     $_SESSION['nik'] = $nik;
-                    header("Location: /admin");
+                    header("Location: ./src/code-php/admin.php");
                     exit();
                 } else {
                     $error_message = "Login gagal. Periksa kembali NIK dan Password Anda.";
