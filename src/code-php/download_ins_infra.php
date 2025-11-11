@@ -8,7 +8,8 @@ $pass = "Jam10pagi#";
 $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
 
-$query = $conn->prepare("SELECT fi.*, s.screenshot_name FROM form_inspeksi fi JOIN screenshots s ON fi.no = s.form_no WHERE fi.no = (SELECT MAX(no) FROM form_inspeksi)");
+// $query = $conn->prepare("SELECT * FROM form_inspeksi WHERE no = (SELECT MAX(no) FROM form_inspeksi)");
+$query = $conn->prepare("SELECT fi.*, s.screenshot_name FROM form_inspeksi fi LEFT JOIN screenshots s ON fi.no = s.form_no WHERE fi.no = (SELECT MAX(no) FROM form_inspeksi)");
 $query->execute();
 
 if ($query->error) {
