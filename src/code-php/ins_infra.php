@@ -202,6 +202,7 @@ $companyOptions = [
                         <label for="jenis" class="form-label">Device Type<span class="required-star">*</span></label>
                         <select id="jenis" name="jenis" class="form-select">
                             <option value="Router">Router</option>
+                            <option value="Server">Server</option>
                             <option value="Switch">Switch</option>
                             <option value="Access Point">Access Point</option>
                         </select>
