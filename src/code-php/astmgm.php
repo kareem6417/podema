@@ -320,52 +320,71 @@ $daftar_aset = $stmt_aset->fetchAll();
               </div>
               
               <div class="tab-pane fade" id="master" role="tabpanel" aria-labelledby="master-tab">
-                <h5 class="card-title fw-semibold card-title-task">Master Daftar Aset Perangkat</h5>
+                
+                <p class="mb-3">Daftar semua aset yang terdaftar dalam sistem.</p>
                 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Jenis</th>
-                                <th>Merk/Model</th>
-                                <th>Serial Number</th>
-                                <th>Pengguna</th>
-                                <th>Divisi</th>
-                                <th>Tgl. Inspeksi Terakhir</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (count($master_assets) > 0): ?>
-                                <?php $no = 1; foreach ($master_assets as $asset): ?>
-                                <tr>
-                                    <td><?php echo $no++; ?></td>
-                                    <td><?php echo htmlspecialchars($asset['jenis']); ?></td>
-                                    <td><?php echo htmlspecialchars($asset['merk']); ?></td>
-                                    <td><?php echo htmlspecialchars($asset['serial_number']); ?></td>
-                                    <td><?php echo htmlspecialchars($asset['nama_pengguna']); ?></td>
-                                    <td><?php echo htmlspecialchars($asset['divisi']); ?></td>
-                                    <td><?php echo htmlspecialchars($asset['tanggal_inspeksi_terakhir'] ?? 'Belum pernah'); ?></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="alert('Fitur edit master aset belum diimplementasikan.')">Edit</button>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="8" class="text-center">Tidak ada data aset yang ditemukan.</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                  <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                      <tr>
+                        <th>ID Aset</th>
+                        <th>Serial Number</th>
+                        <th>Jenis Perangkat</th>
+                        <th>Pemegang Aset</th>
+                        <th>Lokasi</th>
+                        <th>Inspeksi Terakhir</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php if (empty($daftar_aset)): ?>
+                        <tr>
+                          <td colspan="7" class="text-center text-muted py-4">
+                            Belum ada data di master aset.
+                          </td>
+                        </tr>
+                      <?php else: ?>
+                        <?php foreach ($daftar_aset as $aset): ?>
+                          <tr>
+                            <td><?php echo $aset['aset_id']; ?></td>
+                            <td><span class="fw-semibold"><?php echo htmlspecialchars($aset['serial_number']); ?></span></td>
+                            <td><?php echo htmlspecialchars($aset['jenis_perangkat']); ?></td>
+                            <td><?php echo htmlspecialchars($aset['nama_karyawan'] ?? '<em>(Belum di-assign)</em>'); ?></td>
+                            <td><?php echo htmlspecialchars($aset['lokasi']); ?></td>
+                            <td><?php echo $aset['tanggal_inspeksi_terakhir'] ? date('d M Y', strtotime($aset['tanggal_inspeksi_terakhir'])) : 'Belum Pernah'; ?></td>
+                            <td>
+                              <a href="#" class="btn btn-outline-primary btn-sm">Edit</a>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                      <?php endif; ?>
+                    </tbody>
+                  </table>
                 </div>
-              </div>
+                
+                <nav aria-label="Page navigation" class="mt-4 d-flex justify-content-end">
+                  <ul class="pagination">
+                    <?php if ($master_page > 1): ?>
+                      <li class="page-item"><a class="page-link" href="?master_page=<?php echo $master_page - 1; ?>#master">Previous</a></li>
+                    <?php endif; ?>
+                    
+                    <?php for ($i = 1; $i <= $total_master_pages; $i++): ?>
+                      <li class="page-item <?php if ($i == $master_page) echo 'active'; ?>">
+                        <a class="page-link" href="?master_page=<?php echo $i; ?>#master"><?php echo $i; ?></a>
+                      </li>
+                    <?php endfor; ?>
+                    
+                    <?php if ($master_page < $total_master_pages): ?>
+                      <li class="page-item"><a class="page-link" href="?master_page=<?php echo $master_page + 1; ?>#master">Next</a></li>
+                    <?php endif; ?>
+                  </ul>
+                </nav>
 
+              </div>
             </div>
-            
           </div>
-        </div>    
+        </div>
+      </div>
       
        <div class="py-6 px-6 text-center">
           <p class="mb-0 fs-4">Fueling the Bright Future | <a href="https:mandiricoal.co.id" target="_blank" class="pe-1 text-primary text-decoration-underline">mandiricoal.co.id</a></p>
@@ -390,6 +409,7 @@ $daftar_aset = $stmt_aset->fetchAll();
             });
         });
 
+      // Secara otomatis membuka submenu "IT Asset Management"
       var activeLink = document.querySelector('a[href="./astmgm.php#tugas"]');
       if (activeLink) {
           var parentSubmenu = activeLink.closest('.sidebar-submenu');
@@ -401,15 +421,24 @@ $daftar_aset = $stmt_aset->fetchAll();
           }
       }
       
-      var hash = window.location.hash || '#tugas'; // Default to #tugas
+      // ===================================================
+      // BARU: Skrip untuk mengaktifkan tab via URL hash
+      // ===================================================
+      var hash = window.location.hash; // Mendapat #tugas atau #master
       if (hash) {
           var tabToActivate = document.querySelector('.nav-tabs button[data-bs-target="' + hash + '"]');
           if (tabToActivate) {
-              // Pastikan tab yang benar aktif berdasarkan URL hash
-              var tab = new bootstrap.Tab(tabToActivate);
-              tab.show();
+              // Hapus 'active' dari tab default
+              document.querySelector('.nav-tabs .nav-link.active').classList.remove('active');
+              document.querySelector('.tab-content .tab-pane.active').classList.remove('active', 'show');
+              
+              // Aktifkan tab yang dituju
+              tabToActivate.classList.add('active');
+              var paneToActivate = document.querySelector(hash);
+              paneToActivate.classList.add('active', 'show');
           }
       }
+
     });
   </script>
 </body>
