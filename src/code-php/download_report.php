@@ -22,7 +22,7 @@ if ($conn->connect_error) {
 
 // Set header untuk memberitahu browser bahwa ini adalah file CSV
 // Saya ubah namanya agar lebih jelas
-$filename = "laporan_inspeksi_detail_SEMUA_TAHUN.csv";
+$filename = "podema_laporan_inspeksi.csv";
 header('Content-Type: text/csv; charset=utf-8');
 header("Content-Disposition: attachment; filename=\"$filename\"");
 
