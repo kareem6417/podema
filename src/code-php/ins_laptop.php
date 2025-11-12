@@ -27,6 +27,7 @@ function fetchData($table) {
     return $data;
 }
 
+// 1. Ambil data semua pengguna untuk dropdown Nama Pengguna
 $userInfos = array();
 $users = fetchData("users");
 foreach ($users as $user) {
@@ -36,15 +37,7 @@ foreach ($users as $user) {
     );
 }
 
-$it_staff = [];
-$result_staff = mysqli_query($conn_podema, "SELECT nik, name FROM users WHERE nik IS NOT NULL AND nik != '' ORDER BY name ASC");
-if ($result_staff) {
-    while ($row = mysqli_fetch_assoc($result_staff)) {
-        $it_staff[] = $row;
-    }
-    mysqli_free_result($result_staff);
-}
-
+// Opsi Perusahaan untuk tampilan (jika diperlukan)
 $companyOptions = [
     'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
     'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
@@ -60,6 +53,35 @@ $companyOptions = [
     'eam' => 'PT. Edika Agung Mandiri',
 ];
 
+
+// =================================================================
+// BARU: Dapatkan Nama Pelaksana Utama dari Database
+// =================================================================
+$pelaksana_name = 'N/A';
+$current_nik = $_SESSION['nik'] ?? '';
+
+if (!empty($current_nik)) {
+    // Ambil nama berdasarkan NIK yang login
+    $stmt_name = $conn_podema->prepare("SELECT name FROM users WHERE nik = ?");
+    $stmt_name->bind_param("s", $current_nik);
+    $stmt_name->execute();
+    $result_name = $stmt_name->get_result();
+    
+    if ($result_name->num_rows > 0) {
+        $row_name = $result_name->fetch_assoc();
+        $pelaksana_name = $row_name['name'];
+    }
+    $stmt_name->close();
+}
+
+// Gabungkan NIK dan Nama untuk ditampilkan di form
+$pelaksana_display = $current_nik . ' - ' . $pelaksana_name;
+// =================================================================
+
+
+// =================================================================
+// LOGIKA UNTUK TUGAS TERJADWAL & MANUAL (TETAP SAMA)
+// =================================================================
 $jadwal_id = (int)($_GET['jadwal_id'] ?? 0);
 $aset_id = (int)($_GET['aset_id'] ?? 0);
 $data_prefill = [];
@@ -88,6 +110,7 @@ if ($aset_id > 0 && $jadwal_id > 0) {
     }
     $stmt_prefill->close();
 }
+// =================================================================
 ?>
 
 <!doctype html>
@@ -100,85 +123,14 @@ if ($aset_id > 0 && $jadwal_id > 0) {
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-  
    <style>
+    /* ... (Gaya CSS Anda) ... */
     .sidebar-submenu { position: static !important; max-height: 0; overflow: hidden; transition: max-height 0.35s ease-in-out; list-style: none; padding-left: 25px; background-color: #f8f9fa; border-radius: 0 0 5px 5px; margin: 0 10px 5px 10px; }
     .sidebar-item.active > .sidebar-submenu { max-height: 500px; }
     .sidebar-item > a .arrow { transition: transform 0.3s ease; display: inline-block; margin-left: auto; }
     .sidebar-item.active > a .arrow { transform: rotate(180deg); }
-    .table th, .table td { vertical-align: middle; }
-    .action-icons span, .action-icons a { font-size: 1.2rem; margin: 0 5px; cursor: pointer; }
-    .modal-body table td:first-child { font-weight: bold; width: 35%; }
-      
-    .card-title {
-        margin-bottom: 1.5rem;
-    }
-    .form-label {
-        font-weight: 600;
-    }
-    .input-group-text {
-        background-color: #f8f9fa;
-    }
-    .form-section-card {
-        margin-bottom: 2rem;
-    }
-    .required-star {
-        color: crimson;
-    }
-    .form-textarea {
-        height: 100px;
-        width: 100%;
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-        padding: 0.5rem 0.75rem;
-    }
-
-    .file-drop-zone {
-        border: 2px dashed #0d6efd;
-        border-radius: 6px;
-        padding: 2rem;
-        text-align: center;
-        cursor: pointer;
-        background-color: #f8f9fa;
-        transition: background-color 0.2s ease-in-out;
-    }
-    .file-drop-zone:hover {
-        background-color: #e9ecef;
-    }
-    .file-drop-zone-icon {
-        font-size: 3rem;
-        color: #0d6efd;
-    }
-    .file-drop-zone p {
-        margin-top: 1rem;
-        color: #6c757d;
-    }
-
-    #screenshot_preview_container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 1.5rem;
-    }
-    .preview-image-wrapper {
-        position: relative;
-        width: 150px;
-        height: 150px;
-    }
-    .preview-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-    }
-    input[readonly], select[readonly], textarea[readonly] {
-        background-color: #f3f4f6;
-        cursor: not-allowed;
-    }
-    select[readonly] {
-        pointer-events: none;
-    }
+    input[readonly], select[readonly], textarea[readonly] { background-color: #f3f4f6; cursor: not-allowed; }
+    select[readonly] { pointer-events: none; }
   </style>
 </head>
 
@@ -202,10 +154,10 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                     <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Evaluation Portal</span></li>
                     <li class="sidebar-item"><a class="sidebar-link" href="./assess_laptop.php" aria-expanded="false"><span><i class="ti ti-device-laptop"></i></span><span class="hide-menu">Assessment Laptop</span></a></li>
                     <li class="sidebar-item"><a class="sidebar-link" href="./assess_pc.php" aria-expanded="false"><span><i class="ti ti-device-desktop-analytics"></i></span><span class="hide-menu">Assessment PC Desktop</span></a></li>
-                    <li class="sidebar-item">
+                    <li class="sidebar-item active">
                       <a class="sidebar-link" href="#" aria-expanded="false"><span><i class="ti ti-assembly"></i></span><span class="hide-menu">Device Inspection</span><span class="arrow"><i class="fas fa-chevron-down"></i></span></a>
                       <ul class="sidebar-submenu">
-                          <li class="sidebar-item"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
+                          <li class="sidebar-item active"><a class="sidebar-link" href="./ins_laptop.php"><span><i class="ti ti-devices"></i></span>Laptop</a></li>
                           <li class="sidebar-item"><a class="sidebar-link" href="./ins_desktop.php"><span><i class="ti ti-device-desktop-search"></i></span>PC Desktop</a></li>
                           <li class="sidebar-item"><a class="sidebar-link" href="./ins_monitor.php"><span><i class="ti ti-screen-share"></i></span>Monitor</a></li>
                           <li class="sidebar-item"><a class="sidebar-link" href="./ins_printer.php"><span><i class="ti ti-printer"></i></span>Printer</a></li>
@@ -215,46 +167,33 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                       </ul>
                     </li>
                     <li class="sidebar-item"><a class="sidebar-link" href="./about.php" aria-expanded="false"><span><i class="ti ti-exclamation-circle"></i></span><span class="hide-menu">About</span></a></li>
+                    
                     <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Asset Management</span></li>
-                    <li class="sidebar-item"><a class="sidebar-link" href="./astmgm.php" aria-expanded="false"><span><i class="ti ti-cards"></i></span><span class="hide-menu">IT Asset Management</span></a></li>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" href="#" aria-expanded="false"><span><i class="ti ti-cards"></i></span><span class="hide-menu">IT Asset Management</span><span class="arrow"><i class="fas fa-chevron-down"></i></span></a>
+                      <ul class="sidebar-submenu">
+                          <li class="sidebar-item"><a class="sidebar-link" href="./astmgm.php#tugas"><span><i class="ti ti-list-check"></i></span>Tugas Inspeksi</a></li>
+                          <li class="sidebar-item"><a class="sidebar-link" href="./astmgm.php#master"><span><i class="ti ti-database"></i></span>Master Aset</a></li>
+                      </ul>
+                    </li>
                 </ul>
             </nav>
         </div>
     </aside>
-
     <div class="body-wrapper">
       <header class="app-header">
-        <nav class="navbar navbar-expand-lg navbar-light">
-          <ul class="navbar-nav">
-            <li class="nav-item d-block d-xl-none"><a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)"><i class="ti ti-menu-2"></i></a></li>
-            <li class="nav-item"><a class="nav-link nav-icon-hover" href="javascript:void(0)"><i class="ti ti-bell-ringing"></i><div class="notification bg-primary rounded-circle"></div></a></li>
-          </ul>
-          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
-            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
-              <li class="nav-item dropdown">
-                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false"><img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle"></a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
-                  <div class="message-body">
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-user fs-6"></i><p class="mb-0 fs-3">My Profile</p></a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-mail fs-6"></i><p class="mb-0 fs-3">My Account</p></a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item"><i class="ti ti-list-check fs-6"></i><p class="mb-0 fs-3">My Task</p></a>
-                    <a href="./logout.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </header>
+        </header>
 
       <div class="container-fluid">
         <div class="card">
           <div class="card-body">
             <h1 class="card-title fw-semibold mb-4">Device Inspection (Laptop)</h1>
+            
             <form id="assessmentForm" method="post" action="submit_ins_laptop.php" enctype="multipart/form-data">
-                
-                <input type="hidden" name="jadwal_id" value="<?php echo htmlspecialchars($jadwal_id); ?>">
-                <input type="hidden" name="aset_id" value="<?php echo htmlspecialchars($aset_id); ?>">
+
+              <input type="hidden" name="jadwal_id" value="<?php echo htmlspecialchars($jadwal_id); ?>">
+              <input type="hidden" name="aset_id" value="<?php echo htmlspecialchars($aset_id); ?>">
+
               <div class="card form-section-card">
                 <div class="card-body">
                   <h5 class="mb-3">Data Inspeksi</h5>
@@ -263,7 +202,7 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                       <label for="date" class="form-label">Date<span class="required-star">*</span></label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="ti ti-calendar"></i></span>
-                        <input type="date" id="date" name="date" class="form-control" required>
+                        <input type="date" id="date" name="date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
                       </div>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -366,6 +305,7 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                   <div class="mb-3"><label for="rekomendasi" class="form-label">Recommendation<span class="required-star">*</span></label><textarea id="rekomendasi" name="rekomendasi" class="form-textarea" required></textarea></div>
                 </div>
               </div>
+
               <div class="card form-section-card">
                 <div class="card-body">
                   <h5 class="card-title mb-4">Pelaksana Inspeksi</h5>
@@ -387,6 +327,7 @@ if ($aset_id > 0 && $jadwal_id > 0) {
           </form>
         </div>
         </div>
+        
         <div class="py-6 px-6 text-center">
           <p class="mb-0 fs-4">Fueling the Bright Future | <a href="https:mandiricoal.co.id" target="_blank" class="pe-1 text-primary text-decoration-underline">mandiricoal.co.id</a></p>
         </div>
@@ -400,25 +341,23 @@ if ($aset_id > 0 && $jadwal_id > 0) {
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
+        // === Skrip untuk Submenu Sidebar (TIDAK BERUBAH) ===
         var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
         submenuToggles.forEach(function(toggle) {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 var parentItem = this.closest('.sidebar-item');
                 if (parentItem) {
-                    // Tutup submenu lain yang mungkin terbuka
                     document.querySelectorAll('.sidebar-item.active').forEach(function(activeItem) {
                         if (activeItem !== parentItem) {
                             activeItem.classList.remove('active');
                         }
                     });
-                    // Toggle submenu yang diklik
                     parentItem.classList.toggle('active');
                 }
             });
         });
-
+        
         var activeLink = document.querySelector('a[href="./ins_laptop.php"]');
         if (activeLink) {
             var parentSubmenu = activeLink.closest('.sidebar-submenu');
@@ -435,7 +374,6 @@ if ($aset_id > 0 && $jadwal_id > 0) {
 
         // Auto-fill user details on name change
         document.getElementById('name').addEventListener('change', function() {
-            // BARU: Hanya jalankan jika form tidak di-lock
             if(this.hasAttribute('readonly')) {
                 return;
             }
@@ -453,55 +391,48 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                 lokasiInput.value = '';
             }
         });
-
+        
         var nameSelect = document.getElementById('name');
         if (!nameSelect.hasAttribute('readonly') && nameSelect.value !== "") {
             nameSelect.dispatchEvent(new Event('change'));
         }
 
-        // Modern File Uploader Logic
+        // ... (Skrip File Uploader Anda tetap sama) ...
         const uploader = document.getElementById('file-uploader');
         const fileInput = document.getElementById('screenshot_file');
         const previewContainer = document.getElementById('screenshot_preview_container');
         const resetButton = document.getElementById('reset_button');
-
         uploader.addEventListener('click', () => fileInput.click());
         uploader.addEventListener('dragover', (e) => { e.preventDefault(); uploader.style.backgroundColor = '#e9ecef'; });
         uploader.addEventListener('dragleave', () => { uploader.style.backgroundColor = '#f8f9fa'; });
-        uploader.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploader.style.backgroundColor = '#f8f9fa';
-            fileInput.files = e.dataTransfer.files;
-            handleFiles(fileInput.files);
-        });
+        uploader.addEventListener('drop', (e) => { e.preventDefault(); uploader.style.backgroundColor = '#f8f9fa'; fileInput.files = e.dataTransfer.files; handleFiles(fileInput.files); });
         fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
-        function handleFiles(files) {
-            previewContainer.innerHTML = '';
-            resetButton.style.display = files.length > 0 ? 'inline-block' : 'none';
+        function handleFiles(files) { 
+             previewContainer.innerHTML = '';
+             resetButton.style.display = files.length > 0 ? 'inline-block' : 'none';
 
-            for (const file of files) {
-                if (!file.type.startsWith('image/')) continue;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'preview-image-wrapper';
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'preview-image';
-                    wrapper.appendChild(img);
-                    previewContainer.appendChild(wrapper);
-                }
-                reader.readAsDataURL(file);
-            }
+             for (const file of files) {
+                 if (!file.type.startsWith('image/')) continue;
+                 const reader = new FileReader();
+                 reader.onload = function(e) {
+                     const wrapper = document.createElement('div');
+                     wrapper.className = 'preview-image-wrapper';
+                     const img = document.createElement('img');
+                     img.src = e.target.result;
+                     img.className = 'preview-image';
+                     wrapper.appendChild(img);
+                     previewContainer.appendChild(wrapper);
+                 }
+                 reader.readAsDataURL(file);
+             }
         }
-
+        
         resetButton.addEventListener('click', () => {
             fileInput.value = '';
             previewContainer.innerHTML = '';
             resetButton.style.display = 'none';
         });
-
     });
   </script>
 </body>
