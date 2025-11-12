@@ -6,11 +6,40 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
   exit();
 }
 
-// Cukup satu kali koneksi di atas
 $conn_podema = mysqli_connect("mandiricoal.net", "podema", "Jam10pagi#", "podema");
-
 if (!$conn_podema) {
     die("Koneksi database podema gagal: " . mysqli_connect_error());
+}
+$conn_podema->set_charset("utf8mb4"); // Pastikan charset
+
+$jadwal_id = (int)($_GET['jadwal_id'] ?? 0);
+$aset_id = (int)($_GET['aset_id'] ?? 0);
+$data_prefill = [];
+$is_readonly = ""; // Flag untuk mengunci form
+
+if ($aset_id > 0 && $jadwal_id > 0) {
+    // Ini adalah TUGAS TERJADWAL
+    $stmt_prefill = $conn_podema->prepare("SELECT 
+                                            a.serial_number, 
+                                            a.merk, 
+                                            a.lokasi, 
+                                            u.name as nama_karyawan, 
+                                            u.department as divisi_karyawan,
+                                            u.user_id,
+                                            u.company
+                                          FROM master_aset a 
+                                          LEFT JOIN users u ON a.id_user = u.user_id 
+                                          WHERE a.aset_id = ?");
+    $stmt_prefill->bind_param("i", $aset_id);
+    $stmt_prefill->execute();
+    $result_prefill = $stmt_prefill->get_result();
+    
+    if ($result_prefill->num_rows > 0) {
+        $data_prefill = $result_prefill->fetch_assoc();
+        $is_readonly = "readonly"; // Kunci field agar tidak diubah
+    }
+    $stmt_prefill->close();
+} else {
 }
 
 function fetchData($table) {
@@ -35,7 +64,6 @@ foreach ($users as $user) {
     );
 }
 
-// Opsi Perusahaan untuk tampilan
 $companyOptions = [
     'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
     'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
@@ -134,6 +162,13 @@ $companyOptions = [
         border-radius: 6px;
         border: 1px solid #ddd;
     }
+    input[readonly], select[readonly], textarea[readonly] {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
+    }
+    select[readonly] {
+        pointer-events: none;
+    }
   </style>
 </head>
 
@@ -207,7 +242,9 @@ $companyOptions = [
           <div class="card-body">
             <h1 class="card-title fw-semibold mb-4">Device Inspection (Laptop)</h1>
             <form id="assessmentForm" method="post" action="submit_ins_laptop.php" enctype="multipart/form-data">
-
+                
+                <input type="hidden" name="jadwal_id" value="<?php echo htmlspecialchars($jadwal_id); ?>">
+                <input type="hidden" name="aset_id" value="<?php echo htmlspecialchars($aset_id); ?>">
               <div class="card form-section-card">
                 <div class="card-body">
                   <h5 class="mb-3">Data Inspeksi</h5>
@@ -223,10 +260,13 @@ $companyOptions = [
                       <label for="name" class="form-label">Name<span class="required-star">*</span></label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="ti ti-user"></i></span>
-                        <select id="name" name="nama_user" class="form-select" required>
+                        <select id="name" name="nama_user" class="form-select" required <?php echo $is_readonly; ?>>
                             <option value="">--- Select User ---</option>
                             <?php foreach ($users as $user): ?>
-                                <option value="<?php echo htmlspecialchars($user['name']); ?>"><?php echo htmlspecialchars($user['name']); ?></option>
+                                <option value="<?php echo htmlspecialchars($user['name']); ?>"
+                                    <?php if (!empty($data_prefill) && $data_prefill['user_id'] == $user['user_id']) echo 'selected'; ?>>
+                                    <?php echo htmlspecialchars($user['name']); ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                       </div>
@@ -239,11 +279,35 @@ $companyOptions = [
                 <div class="card-body">
                   <h5 class="mb-3">Detail Pengguna & Perangkat</h5>
                   <div class="row">
-                    <div class="col-md-6 mb-3"><label for="status" class="form-label">Position/Division<span class="required-star">*</span></label><input type="text" id="status" name="status" class="form-control" readonly placeholder="Auto-filled"></div>
-                    <div class="col-md-6 mb-3"><label for="lokasi" class="form-label">Location<span class="required-star">*</span></label><input type="text" id="lokasi" name="lokasi" class="form-control" readonly placeholder="Auto-filled"></div>
-                    <div class="col-md-6 mb-3"><label for="jenis" class="form-label">Device Type<span class="required-star">*</span></label><input type="text" id="jenis" name="jenis" class="form-control" value="Laptop" readonly></div>
-                    <div class="col-md-6 mb-3"><label for="merk" class="form-label">Merk/Type<span class="required-star">*</span></label><input type="text" id="merk" name="merk" class="form-control" required></div>
-                    <div class="col-md-6 mb-3"><label for="serialnumber" class="form-label">Serial Number</label><input type="text" id="serialnumber" name="serialnumber" class="form-control"></div>
+                    <div class="col-md-6 mb-3">
+                      <label for="status" class="form-label">Position/Division<span class="required-star">*</span></label>
+                      <input type="text" id="status" name="status" class="form-control" 
+                             value="<?php echo htmlspecialchars($data_prefill['divisi_karyawan'] ?? ''); ?>" 
+                             readonly placeholder="Auto-filled">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="lokasi" class="form-label">Location<span class="required-star">*</span></label>
+                      <input type="text" id="lokasi" name="lokasi" class="form-control" 
+                             value="<?php echo htmlspecialchars($data_prefill['lokasi'] ?? ''); ?>" 
+                             <?php echo $is_readonly; ?> 
+                             placeholder="<?php echo $is_readonly ? '' : 'Auto-filled'; ?>">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="jenis" class="form-label">Device Type<span class="required-star">*</span></label>
+                      <input type="text" id="jenis" name="jenis" class="form-control" value="Laptop" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="merk" class="form-label">Merk/Type<span class="required-star">*</span></label>
+                      <input type="text" id="merk" name="merk" class="form-control" 
+                             value="<?php echo htmlspecialchars($data_prefill['merk'] ?? ''); ?>" 
+                             <?php echo $is_readonly; ?> required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="serialnumber" class="form-label">Serial Number</label>
+                      <input type="text" id="serialnumber" name="serialnumber" class="form-control"
+                             value="<?php echo htmlspecialchars($data_prefill['serial_number'] ?? ''); ?>" 
+                             <?php echo $is_readonly; ?>>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -259,41 +323,11 @@ $companyOptions = [
                                   <?php $options = fetchData("device_age_laptop"); foreach ($options as $opt) { echo '<option value="' . $opt['age_score'] . '">' . $opt['age_name'] . '</option>'; } ?>
                               </select>
                           </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="casing_lap" class="form-label">Casing<span class="required-star">*</span></label>
-                              <select id="casing_lap" name="casing_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_casing_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['casing_lap_score'] . '">' . $opt['casing_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="layar_lap" class="form-label">Layar<span class="required-star">*</span></label>
-                              <select id="layar_lap" name="layar_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_layar_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['layar_lap_score'] . '">' . $opt['layar_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="engsel_lap" class="form-label">Engsel<span class="required-star">*</span></label>
-                              <select id="engsel_lap" name="engsel_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_engsel_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['engsel_lap_score'] . '">' . $opt['engsel_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="keyboard_lap" class="form-label">Keyboard<span class="required-star">*</span></label>
-                              <select id="keyboard_lap" name="keyboard_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_keyboard_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['keyboard_lap_score'] . '">' . $opt['keyboard_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="touchpad_lap" class="form-label">Touchpad<span class="required-star">*</span></label>
-                              <select id="touchpad_lap" name="touchpad_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_touchpad_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['touchpad_lap_score'] . '">' . $opt['touchpad_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
+                          <div class="col-md-6 mb-3"><label for="casing_lap" class="form-label">Casing<span class="required-star">*</span></label><select id="casing_lap" name="casing_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_casing_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['casing_lap_score'] . '">' . $opt['casing_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="layar_lap" class="form-label">Layar<span class="required-star">*</span></label><select id="layar_lap" name="layar_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_layar_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['layar_lap_score'] . '">' . $opt['layar_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="engsel_lap" class="form-label">Engsel<span class="required-star">*</span></label><select id="engsel_lap" name="engsel_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_engsel_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['engsel_lap_score'] . '">' . $opt['engsel_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="keyboard_lap" class="form-label">Keyboard<span class="required-star">*</span></label><select id="keyboard_lap" name="keyboard_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_keyboard_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['keyboard_lap_score'] . '">' . $opt['keyboard_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="touchpad_lap" class="form-label">Touchpad<span class="required-star">*</span></label><select id="touchpad_lap" name="touchpad_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_touchpad_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['touchpad_lap_score'] . '">' . $opt['touchpad_lap_name'] . '</option>'; } ?></select></div>
                       </div>
                   </div>
               </div>
@@ -302,55 +336,13 @@ $companyOptions = [
                   <div class="card-body">
                       <h5 class="mb-3">Parameter Inspeksi Kinerja</h5>
                       <div class="row">
-                          <div class="col-md-6 mb-3">
-                              <label for="booting_lap" class="form-label">Proses Booting<span class="required-star">*</span></label>
-                              <select id="booting_lap" name="booting_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_booting_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['booting_lap_score'] . '">' . $opt['booting_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="multi_lap" class="form-label">Multitasking Apps<span class="required-star">*</span></label>
-                              <select id="multi_lap" name="multi_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_multi_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['multi_lap_score'] . '">' . $opt['multi_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="tampung_lap" class="form-label">Kapasitas Baterai<span class="required-star">*</span></label>
-                              <select id="tampung_lap" name="tampung_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_tampung_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['tampung_lap_score'] . '">' . $opt['tampung_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="isi_lap" class="form-label">Waktu Pengisian Baterai<span class="required-star">*</span></label>
-                              <select id="isi_lap" name="isi_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_isi_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['isi_lap_score'] . '">' . $opt['isi_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="port_lap" class="form-label">Port<span class="required-star">*</span></label>
-                              <select id="port_lap" name="port_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_port_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['port_lap_score'] . '">' . $opt['port_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="audio_lap" class="form-label">Audio<span class="required-star">*</span></label>
-                              <select id="audio_lap" name="audio_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_audio_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['audio_lap_score'] . '">' . $opt['audio_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
-                          <div class="col-md-6 mb-3">
-                              <label for="software_lap" class="form-label">Software<span class="required-star">*</span></label>
-                              <select id="software_lap" name="software_lap" class="form-select" required>
-                                  <option value="">--- Pilih ---</option>
-                                  <?php $options = fetchData("ins_software_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['software_lap_score'] . '">' . $opt['software_lap_name'] . '</option>'; } ?>
-                              </select>
-                          </div>
+                          <div class="col-md-6 mb-3"><label for="booting_lap" class="form-label">Proses Booting<span class="required-star">*</span></label><select id="booting_lap" name="booting_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_booting_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['booting_lap_score'] . '">' . $opt['booting_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="multi_lap" class="form-label">Multitasking Apps<span class="required-star">*</span></label><select id="multi_lap" name="multi_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_multi_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['multi_lap_score'] . '">' . $opt['multi_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="tampung_lap" class="form-label">Kapasitas Baterai<span class="required-star">*</span></label><select id="tampung_lap" name="tampung_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_tampung_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['tampung_lap_score'] . '">' . $opt['tampung_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="isi_lap" class="form-label">Waktu Pengisian Baterai<span class="required-star">*</span></label><select id="isi_lap" name="isi_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_isi_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['isi_lap_score'] . '">' . $opt['isi_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="port_lap" class="form-label">Port<span class="required-star">*</span></label><select id="port_lap" name="port_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_port_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['port_lap_score'] . '">' . $opt['port_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="audio_lap" class="form-label">Audio<span class="required-star">*</span></label><select id="audio_lap" name="audio_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_audio_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['audio_lap_score'] . '">' . $opt['audio_lap_name'] . '</option>'; } ?></select></div>
+                          <div class="col-md-6 mb-3"><label for="software_lap" class="form-label">Software<span class="required-star">*</span></label><select id="software_lap" name="software_lap" class="form-select" required><option value="">--- Pilih ---</option><?php $options = fetchData("ins_software_lap"); foreach ($options as $opt) { echo '<option value="' . $opt['software_lap_score'] . '">' . $opt['software_lap_name'] . '</option>'; } ?></select></div>
                       </div>
                   </div>
               </div>
@@ -358,28 +350,10 @@ $companyOptions = [
               <div class="card form-section-card">
                 <div class="card-body">
                   <h5 class="mb-3">Laporan & Bukti</h5>
-                  <div class="mb-3">
-                    <label for="informasi_keluhan" class="form-label">Complaints / Issues<span class="required-star">*</span></label>
-                    <textarea id="informasi_keluhan" name="informasi_keluhan" class="form-textarea" required></textarea>
-                  </div>
-                  <div class="mb-3">
-                    <label for="hasil_pemeriksaan" class="form-label">Examination Findings<span class="required-star">*</span></label>
-                    <textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" class="form-textarea" required></textarea>
-                  </div>
-                  <div class="mb-3">
-                    <label for="screenshot_file" class="form-label">Screenshot Evidence</label>
-                    <div id="file-uploader" class="file-drop-zone">
-                        <i class="ti ti-cloud-upload file-drop-zone-icon"></i>
-                        <p>Drag & drop files here or click to browse</p>
-                        <input type="file" id="screenshot_file" name="screenshot_file[]" accept="image/*" multiple hidden>
-                    </div>
-                    <div id="screenshot_preview_container"></div>
-                    <button type="button" id="reset_button" class="btn btn-outline-danger mt-3" style="display: none;">Reset Images</button>
-                  </div>
-                   <div class="mb-3">
-                    <label for="rekomendasi" class="form-label">Recommendation<span class="required-star">*</span></label>
-                    <textarea id="rekomendasi" name="rekomendasi" class="form-textarea" required></textarea>
-                  </div>
+                  <div class="mb-3"><label for="informasi_keluhan" class="form-label">Complaints / Issues<span class="required-star">*</span></label><textarea id="informasi_keluhan" name="informasi_keluhan" class="form-textarea" required></textarea></div>
+                  <div class="mb-3"><label for="hasil_pemeriksaan" class="form-label">Examination Findings<span class="required-star">*</span></label><textarea id="hasil_pemeriksaan" name="hasil_pemeriksaan" class="form-textarea" required></textarea></div>
+                  <div class="mb-3"><label for="screenshot_file" class="form-label">Screenshot Evidence</label><div id="file-uploader" class="file-drop-zone"><i class="ti ti-cloud-upload file-drop-zone-icon"></i><p>Drag & drop files here or click to browse</p><input type="file" id="screenshot_file" name="screenshot_file[]" accept="image/*" multiple hidden></div><div id="screenshot_preview_container"></div><button type="button" id="reset_button" class="btn btn-outline-danger mt-3" style="display: none;">Reset Images</button></div>
+                  <div class="mb-3"><label for="rekomendasi" class="form-label">Recommendation<span class="required-star">*</span></label><textarea id="rekomendasi" name="rekomendasi" class="form-textarea" required></textarea></div>
                 </div>
               </div>
 
@@ -422,13 +396,28 @@ $companyOptions = [
                 }
             });
         });
-        // === AKHIR DARI JAVASCRIPT SUBMENU ===
+
+        var activeLink = document.querySelector('a[href="./ins_laptop.php"]');
+        if (activeLink) {
+            var parentSubmenu = activeLink.closest('.sidebar-submenu');
+            if (parentSubmenu) {
+                var parentItem = parentSubmenu.closest('.sidebar-item');
+                if (parentItem) {
+                    parentItem.classList.add('active');
+                }
+            }
+        }
 
         const userInfos = <?php echo json_encode($userInfos); ?>;
         const companyOptions = <?php echo json_encode($companyOptions); ?>;
 
         // Auto-fill user details on name change
         document.getElementById('name').addEventListener('change', function() {
+            // BARU: Hanya jalankan jika form tidak di-lock
+            if(this.hasAttribute('readonly')) {
+                return;
+            }
+            
             const selectedName = this.value;
             const statusInput = document.getElementById('status');
             const lokasiInput = document.getElementById('lokasi');
@@ -443,6 +432,11 @@ $companyOptions = [
             }
         });
 
+        var nameSelect = document.getElementById('name');
+        if (!nameSelect.hasAttribute('readonly') && nameSelect.value !== "") {
+            nameSelect.dispatchEvent(new Event('change'));
+        }
+        
         // Modern File Uploader Logic
         const uploader = document.getElementById('file-uploader');
         const fileInput = document.getElementById('screenshot_file');
