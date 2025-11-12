@@ -1,88 +1,144 @@
 <?php
-$host = "mandiricoal.net";
-$user = "podema"; 
-$pass = "Jam10pagi#"; 
-$db = "podema";
+session_start();
 
-$conn = new mysqli($host, $user, $pass, $db);
-
-if ($conn->connect_error) {
-    die("Koneksi database gagal: " . $conn->connect_error);
+if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
+    // Pastikan hanya staf IT yang terautentikasi yang bisa submit
+    header("location: ./index.php");
+    exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Amankan input untuk mencegah SQL Injection
-    $jenis = $conn->real_escape_string($_POST["jenis"] ?? '');
-    $date = $conn->real_escape_string($_POST["date"] ?? '');
-    $merk = $conn->real_escape_string($_POST["merk"] ?? '');
-    $lokasi = $conn->real_escape_string($_POST["lokasi"] ?? '');
-    $status = $conn->real_escape_string($_POST["status"] ?? '');
-    $serialnumber = $conn->real_escape_string($_POST["serialnumber"] ?? '');
-    $informasi_keluhan = $conn->real_escape_string($_POST["informasi_keluhan"] ?? '');
-    $hasil_pemeriksaan = $conn->real_escape_string($_POST["hasil_pemeriksaan"] ?? '');
-    $rekomendasi = $conn->real_escape_string($_POST["rekomendasi"] ?? '');
-    $nama_user = $conn->real_escape_string($_POST["nama_user"] ?? '');
-    $score = 0;
-    
-    $sql = '';
+// Koneksi Database
+$host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+$conn->set_charset("utf8mb4");
 
-    if ($jenis == "Laptop") {
-        $age = (int)($_POST["age"] ?? 0);
-        $casing_lap = (int)($_POST["casing_lap"] ?? 0);
-        $layar_lap = (int)($_POST["layar_lap"] ?? 0);
-        $engsel_lap = (int)($_POST["engsel_lap"] ?? 0);
-        $keyboard_lap = (int)($_POST["keyboard_lap"] ?? 0);
-        $touchpad_lap = (int)($_POST["touchpad_lap"] ?? 0);
-        $booting_lap = (int)($_POST["booting_lap"] ?? 0);
-        $multi_lap = (int)($_POST["multi_lap"] ?? 0);
-        $tampung_lap = (int)($_POST["tampung_lap"] ?? 0);
-        $isi_lap = (int)($_POST["isi_lap"] ?? 0);
-        $port_lap = (int)($_POST["port_lap"] ?? 0);
-        $audio_lap = (int)($_POST["audio_lap"] ?? 0);
-        $software_lap = (int)($_POST["software_lap"] ?? 0);
+// =================================================================
+// 1. AMBIL DATA DARI FORM (Termasuk ID Tugas)
+// =================================================================
+$jadwal_id = (int)($_POST['jadwal_id'] ?? 0); // ID Jadwal (jika dari To-Do List)
+$aset_id = (int)($_POST['aset_id'] ?? 0); // ID Aset (jika dari To-Do List)
+$staf_it_nik = $_POST['pelaksana_nik_final'] ?? ($_SESSION['nik'] ?? 'system'); // NIK Pelaksana Utama
 
-        $score = $age + $casing_lap + $layar_lap + $engsel_lap + $keyboard_lap + $touchpad_lap + $booting_lap + $multi_lap + $tampung_lap + $isi_lap + $port_lap + $audio_lap + $software_lap;
+// Amankan dan ambil data form lainnya
+$jenis = $_POST["jenis"] ?? '';
+$date = $_POST["date"] ?? '';
+$merk = $_POST["merk"] ?? '';
+$lokasi = $_POST["lokasi"] ?? '';
+$status = $_POST["status"] ?? ''; // Ini adalah Divisi
+$serialnumber = $_POST["serialnumber"] ?? '';
+$informasi_keluhan = $_POST["informasi_keluhan"] ?? '';
+$hasil_pemeriksaan = $_POST["hasil_pemeriksaan"] ?? '';
+$rekomendasi = $_POST["rekomendasi"] ?? '';
+$nama_user = $_POST["nama_user"] ?? '';
+
+// Ambil Skor dari setiap item inspeksi
+$age_score = !empty($_POST["age"]) ? (int)$_POST["age"] : 0;
+$casing_lap_score = !empty($_POST["casing_lap"]) ? (int)$_POST["casing_lap"] : 0;
+$layar_lap_score = !empty($_POST["layar_lap"]) ? (int)$_POST["layar_lap"] : 0;
+$engsel_lap_score = !empty($_POST["engsel_lap"]) ? (int)$_POST["engsel_lap"] : 0;
+$keyboard_lap_score = !empty($_POST["keyboard_lap"]) ? (int)$_POST["keyboard_lap"] : 0;
+$touchpad_lap_score = !empty($_POST["touchpad_lap"]) ? (int)$_POST["touchpad_lap"] : 0;
+$booting_lap_score = !empty($_POST["booting_lap"]) ? (int)$_POST["booting_lap"] : 0;
+$multi_lap_score = !empty($_POST["multi_lap"]) ? (int)$_POST["multi_lap"] : 0;
+$tampung_lap_score = !empty($_POST["tampung_lap"]) ? (int)$_POST["tampung_lap"] : 0;
+$isi_lap_score = !empty($_POST["isi_lap"]) ? (int)$_POST["isi_lap"] : 0;
+$port_lap_score = !empty($_POST["port_lap"]) ? (int)$_POST["port_lap"] : 0;
+$audio_lap_score = !empty($_POST["audio_lap"]) ? (int)$_POST["audio_lap"] : 0;
+$software_lap_score = !empty($_POST["software_lap"]) ? (int)$_POST["software_lap"] : 0;
+
+// Kalkulasi Total Skor
+$total_score = $age_score + $casing_lap_score + $layar_lap_score + $engsel_lap_score + $keyboard_lap_score + 
+               $touchpad_lap_score + $booting_lap_score + $multi_lap_score + $tampung_lap_score + 
+               $isi_lap_score + $port_lap_score + $audio_lap_score + $software_lap_score;
+
+
+// =================================================================
+// 2. INSERT KE form_inspeksi
+// =================================================================
+$sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ssssssssssiiiiiiiiiiisii", 
+    $date, $jenis, $merk, $lokasi, $nama_user, $status, $serialnumber, $informasi_keluhan, $hasil_pemeriksaan, $rekomendasi, 
+    $age_score, $casing_lap_score, $layar_lap_score, $engsel_lap_score, $keyboard_lap_score, $touchpad_lap_score, 
+    $booting_lap_score, $multi_lap_score, $tampung_lap_score, $isi_lap_score, $port_lap_score, $audio_lap_score, 
+    $software_lap_score, $total_score
+);
+
+if ($stmt->execute()) {
+    // Dapatkan ID dari form_inspeksi yang baru saja dibuat
+    $id_hasil_inspeksi = $stmt->insert_id; 
+    $stmt->close();
+
+    // =================================================================
+    // 3. UPDATE STATUS TUGAS (Hanya jika berasal dari To-Do List)
+    // =================================================================
+    if ($jadwal_id > 0 && $aset_id > 0) {
         
-        $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score)
-            VALUES ('$date', '$jenis', '$merk', '$lokasi', '$nama_user', '$status', '$serialnumber', '$informasi_keluhan', '$hasil_pemeriksaan', '$rekomendasi', '$age', '$casing_lap', '$layar_lap', '$engsel_lap', '$keyboard_lap', '$touchpad_lap', '$booting_lap', '$multi_lap', '$tampung_lap', '$isi_lap', '$port_lap', '$audio_lap', '$software_lap', '$score')";
+        // 3a. Update status task di 'jadwal_inspeksi' menjadi "Completed"
+        $update_jadwal_sql = "UPDATE jadwal_inspeksi 
+                              SET status_jadwal = 'Completed',
+                                  id_hasil_inspeksi = ?,
+                                  id_staf_it = ?, -- Menyimpan NIK Pelaksana Utama
+                                  tanggal_selesai = NOW()
+                              WHERE jadwal_id = ?";
+        $stmt_update_jadwal = $conn->prepare($update_jadwal_sql);
+        // bind_param: i(id_hasil), s(staf_nik), i(jadwal_id)
+        $stmt_update_jadwal->bind_param("isi", $id_hasil_inspeksi, $staf_it_nik, $jadwal_id);
+        $stmt_update_jadwal->execute();
+        $stmt_update_jadwal->close();
+
+        // 3b. Update tanggal inspeksi terakhir di 'master_aset'
+        $update_aset_sql = "UPDATE master_aset 
+                            SET tanggal_inspeksi_terakhir = ?
+                            WHERE aset_id = ?";
+        $stmt_update_aset = $conn->prepare($update_aset_sql);
+        // bind_param: s(date), i(aset_id)
+        $stmt_update_aset->bind_param("si", $date, $aset_id);
+        $stmt_update_aset->execute();
+        $stmt_update_aset->close();
     }
-    
-    if ($sql != '') {
-        if ($conn->query($sql) === TRUE) {
-            // 1. Dapatkan ID dari data inspeksi yang baru saja disimpan
-            $last_id = $conn->insert_id;
+    // =================================================================
+    // 4. Proses Upload File Screenshot (Logika yang Anda miliki)
+    // =================================================================
+    $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
-            // 2. Tentukan folder tujuan screenshot
-            $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
+    if (isset($_FILES['screenshot_file'])) {
+        foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
+            if ($_FILES['screenshot_file']['error'][$key] == UPLOAD_ERR_OK) {
+                // Gunakan ID inspeksi dan timestamp untuk nama file yang unik
+                $original_name = basename($_FILES['screenshot_file']['name'][$key]);
+                $file_extension = pathinfo($original_name, PATHINFO_EXTENSION);
+                $file_name = $id_hasil_inspeksi . '_' . time() . '_' . $key . '.' . $file_extension;
+                $target_screenshot_file = $target_screenshot_dir . $file_name;
 
-            // 3. Proses setiap file screenshot yang diunggah
-            if (isset($_FILES['screenshot_file'])) {
-                foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
-                    if ($_FILES['screenshot_file']['error'][$key] == UPLOAD_ERR_OK) {
-                        $file_name = time() . '_' . basename($_FILES['screenshot_file']['name'][$key]);
-                        $target_screenshot_file = $target_screenshot_dir . $file_name;
-
-                        // Pindahkan file ke folder tujuan
-                        if (move_uploaded_file($tmp_name, $target_screenshot_file)) {
-                            // 4. Simpan nama file ke tabel `screenshots` dan hubungkan dengan ID inspeksi
-                            $stmt = $conn->prepare("INSERT INTO screenshots (form_no, screenshot_name) VALUES (?, ?)");
-                            $stmt->bind_param("is", $last_id, $file_name);
-                            $stmt->execute();
-                            $stmt->close();
-                        }
-                    }
+                // Pindahkan file ke folder tujuan
+                if (move_uploaded_file($tmp_name, $target_screenshot_file)) {
+                    // Simpan nama file ke tabel `screenshots`
+                    $stmt_scr = $conn->prepare("INSERT INTO screenshots (form_no, screenshot_name) VALUES (?, ?)");
+                    $stmt_scr->bind_param("is", $id_hasil_inspeksi, $file_name);
+                    $stmt_scr->execute();
+                    $stmt_scr->close();
                 }
             }
-
-            // Arahkan ke halaman hasil
-            echo "<script>window.location.href='viewinspeksi.php';</script>";
-            exit();
-        } else {
-            $error_message = "Error: " . $sql . "<br>" . $conn->error;
-            echo $error_message;
-            error_log($error_message, 0);
         }
     }
+
+    // 5. Redirect ke halaman hasil inspeksi yang baru
+    echo "<script>alert('Inspeksi berhasil disimpan. Task telah ditandai sebagai Completed.');</script>";
+    echo "<script>window.location.href='viewinspeksi.php?no=" . $id_hasil_inspeksi . "';</script>";
+    exit();
+
+} else {
+    // Error handling
+    $error_message = "Error saat menyimpan data inspeksi: " . $stmt->error;
+    echo $error_message;
+    error_log($error_message, 0);
+    $stmt->close();
 }
 
 $conn->close();
