@@ -371,15 +371,15 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                   <h5 class="card-title mb-4">Pelaksana Inspeksi</h5>
                   
                   <div class="mb-3">
-                    <label for="pelaksana_utama" class="form-label">Staf IT yang Menginspeksi</label>
+                    <label for="pelaksana_utama" class="form-label">NIK Staf IT yang Menginspeksi</label>
                     <input type="text" class="form-control" id="pelaksana_utama" 
-                           value="<?php echo htmlspecialchars($_SESSION['nik'] . ' - ' . ($_SESSION['name'] ?? 'N/A')); ?>" 
+                           value="<?php echo htmlspecialchars($pelaksana_display); ?>" 
                            readonly>
-                    <input type="hidden" name="pelaksana_nik_final" value="<?php echo htmlspecialchars($_SESSION['nik'] ?? 'system'); ?>">
+                    <input type="hidden" name="pelaksana_nik_final" value="<?php echo htmlspecialchars($current_nik); ?>">
                     <small class="form-text text-muted">Pelaksana adalah NIK yang sedang login.</small>
                   </div>
                 </div>
-              </div> 
+              </div>
               <div class="d-flex justify-content-end gap-2">
                 <button type="reset" class="btn btn-secondary">Reset Form</button>
                 <button type="submit" class="btn btn-primary">Submit Inspection</button>
