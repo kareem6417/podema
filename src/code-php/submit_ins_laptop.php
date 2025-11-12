@@ -104,32 +104,29 @@ if ($stmt->execute()) {
         $stmt_update_aset->execute();
         $stmt_update_aset->close();
     }
-    // =================================================================
-    // 4. Proses Upload File Screenshot
-    // =================================================================
-    // Perhatikan: Pastikan folder '/dev-podema/src/screenshot/' sudah ada dan memiliki izin tulis (CHMOD 777)
-    $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
-    if (isset($_FILES['screenshot_file'])) {
-        foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
-            if ($_FILES['screenshot_file']['error'][$key] == UPLOAD_ERR_OK) {
-                $original_name = basename($_FILES['screenshot_file']['name'][$key]);
-                $file_extension = pathinfo($original_name, PATHINFO_EXTENSION);
-                // Membuat nama file unik berdasarkan ID inspeksi, timestamp, dan urutan file
-                $file_name = $id_hasil_inspeksi . '_' . time() . '_' . $key . '.' . $file_extension;
-                $target_screenshot_file = $target_screenshot_dir . $file_name;
+    // $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
-                // Pindahkan file ke folder tujuan
-                if (move_uploaded_file($tmp_name, $target_screenshot_file)) {
-                    // Simpan nama file ke tabel `screenshots`
-                    $stmt_scr = $conn->prepare("INSERT INTO screenshots (form_no, screenshot_name) VALUES (?, ?)");
-                    $stmt_scr->bind_param("is", $id_hasil_inspeksi, $file_name);
-                    $stmt_scr->execute();
-                    $stmt_scr->close();
-                }
-            }
-        }
-    }
+    // if (isset($_FILES['screenshot_file'])) {
+    //     foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
+    //         if ($_FILES['screenshot_file']['error'][$key] == UPLOAD_ERR_OK) {
+    //             $original_name = basename($_FILES['screenshot_file']['name'][$key]);
+    //             $file_extension = pathinfo($original_name, PATHINFO_EXTENSION);
+    //             // Membuat nama file unik berdasarkan ID inspeksi, timestamp, dan urutan file
+    //             $file_name = $id_hasil_inspeksi . '_' . time() . '_' . $key . '.' . $file_extension;
+    //             $target_screenshot_file = $target_screenshot_dir . $file_name;
+
+    //             // Pindahkan file ke folder tujuan
+    //             if (move_uploaded_file($tmp_name, $target_screenshot_file)) {
+    //                 // Simpan nama file ke tabel `screenshots`
+    //                 $stmt_scr = $conn->prepare("INSERT INTO screenshots (form_no, screenshot_name) VALUES (?, ?)");
+    //                 $stmt_scr->bind_param("is", $id_hasil_inspeksi, $file_name);
+    //                 $stmt_scr->execute();
+    //                 $stmt_scr->close();
+    //             }
+    //         }
+    //     }
+    // }
 
     // 5. Redirect ke halaman hasil inspeksi yang baru
     echo "<script>alert('Inspeksi berhasil disimpan. Task telah ditandai sebagai Completed.');</script>";
