@@ -1,26 +1,18 @@
 <?php
-session_start();
 
-// Aktifkan laporan error untuk debugging, hanya jika masih ada Error 500
-// error_reporting(E_ALL); 
-// ini_set('display_errors', 1);
+$host = "mandiricoal.net";
+$user = "podema"; 
+$pass = "Jam10pagi#"; 
+$db = "podema";
 
-if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
-    header("location: ./index.php");
-    exit();
-}
-
-// Koneksi Database
-$host = "mandiricoal.net"; $user = "podema"; $pass = "Jam10pagi#"; $db = "podema";
 $conn = new mysqli($host, $user, $pass, $db);
+
 if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+    die("Koneksi database gagal: " . $conn->connect_error);
 }
+
 $conn->set_charset("utf8mb4");
 
-// =================================================================
-// 1. AMBIL DATA DARI FORM (Termasuk ID Tugas)
-// =================================================================
 $jadwal_id = (int)($_POST['jadwal_id'] ?? 0); 
 $aset_id = (int)($_POST['aset_id'] ?? 0); 
 // NIK Pelaksana Utama (dari hidden field)
@@ -59,16 +51,13 @@ $total_score = $age_score + $casing_lap_score + $layar_lap_score + $engsel_lap_s
                $isi_lap_score + $port_lap_score + $audio_lap_score + $software_lap_score;
 
 
-// =================================================================
-// 2. INSERT KE form_inspeksi
-// =================================================================
+
 $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status, serialnumber, informasi_keluhan, hasil_pemeriksaan, rekomendasi, age, casing_lap, layar_lap, engsel_lap, keyboard_lap, touchpad_lap, booting_lap, multi_lap, tampung_lap, isi_lap, port_lap, audio_lap, software_lap, score)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
 
-// String Binding: 10 's' (String) diikuti 14 'i' (Integer) = 24 total
-// Ini adalah bagian yang paling rentan, harus dipastikan urutannya benar:
+
 $stmt->bind_param("ssssssssssiiiiiiiiiiiiii", 
     $date, $jenis, $merk, $lokasi, $nama_user, $status, $serialnumber, $informasi_keluhan, $hasil_pemeriksaan, $rekomendasi, 
     $age_score, $casing_lap_score, $layar_lap_score, $engsel_lap_score, $keyboard_lap_score, $touchpad_lap_score, 
@@ -80,9 +69,6 @@ if ($stmt->execute()) {
     $id_hasil_inspeksi = $conn->insert_id; 
     $stmt->close();
 
-    // =================================================================
-    // 3. UPDATE STATUS TUGAS (Task Completion Logic)
-    // =================================================================
     if ($jadwal_id > 0 && $aset_id > 0) {
         
         $update_jadwal_sql = "UPDATE jadwal_inspeksi 
