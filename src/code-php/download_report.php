@@ -20,19 +20,16 @@ if ($conn->connect_error) {
     die("Koneksi ke database gagal: " . $conn->connect_error);
 }
 
-// Tentukan tahun yang akan difilter (misal: tahun saat ini)
-// Ini akan mengambil '2025' berdasarkan waktu server Anda
-$current_year = date('Y');
-
 // Set header untuk memberitahu browser bahwa ini adalah file CSV
-$filename = "laporan_inspeksi_detail_" . $current_year . ".csv";
+// Saya ubah namanya agar lebih jelas
+$filename = "laporan_inspeksi_detail_SEMUA_TAHUN.csv";
 header('Content-Type: text/csv; charset=utf-8');
 header("Content-Disposition: attachment; filename=\"$filename\"");
 
 // Buka output stream PHP
 $output = fopen('php://output', 'w');
 
-// Tulis header kolom baru yang lebih informatif ke CSV
+// Tulis header kolom
 fputcsv($output, array(
     'Tahun', 
     'Tanggal_Inspeksi', 
@@ -47,8 +44,11 @@ fputcsv($output, array(
     'Skor_Akhir'
 ));
 
-// Query BARU untuk mengambil data detail dari form_inspeksi
-// Dikelompokkan berdasarkan tahun ini
+// ================================================================= //
+// PERBAIKAN:                                                        //
+// 1. Menghapus filter 'WHERE YEAR(date) = ?'                        //
+// 2. Mengubah 'ORDER BY' agar mengurutkan berdasarkan tahun terbaru //
+// ================================================================= //
 $sql = "SELECT 
             YEAR(date) as Tahun,
             date as Tanggal_Inspeksi,
@@ -64,16 +64,11 @@ $sql = "SELECT
             score as Skor_Akhir
         FROM 
             form_inspeksi 
-        WHERE 
-            YEAR(date) = ? 
         ORDER BY 
-            date ASC";
+            Tahun DESC, Tanggal_Inspeksi DESC"; // Urutkan: Tahun terbaru, Tanggal terbaru
 
-$stmt = $conn->prepare($sql);
-// Bind parameter tahun saat ini
-$stmt->bind_param("s", $current_year);
-$stmt->execute();
-$result = $stmt->get_result();
+// Karena tidak ada parameter, kita bisa pakai $conn->query()
+$result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     // Loop melalui data dan tulis setiap baris ke file CSV
@@ -106,12 +101,11 @@ if ($result->num_rows > 0) {
     }
 } else {
     // Jika tidak ada data
-    fputcsv($output, array('Tidak ada data inspeksi ditemukan untuk tahun ' . $current_year, '', '', '', '', '', '', '', '', '', ''));
+    fputcsv($output, array('Tidak ada data inspeksi ditemukan di database.', '', '', '', '', '', '', '', '', '', ''));
 }
 
-// Tutup file stream, statement, dan koneksi
+// Tutup file stream dan koneksi
 fclose($output);
-$stmt->close();
 $conn->close();
 exit();
 ?>
