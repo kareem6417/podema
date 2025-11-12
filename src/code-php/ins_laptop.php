@@ -444,13 +444,8 @@ if ($aset_id > 0 && $jadwal_id > 0) {
         const userInfos = <?php echo json_encode($userInfos); ?>;
         const companyOptions = <?php echo json_encode($companyOptions); ?>;
 
-        // Auto-fill user details on name change
         document.getElementById('name').addEventListener('change', function() {
-            // BARU: Hanya jalankan jika form tidak di-lock
-            if(this.hasAttribute('readonly')) {
-                return;
-            }
-            
+            if(this.hasAttribute('readonly')) { return; }
             const selectedName = this.value;
             const statusInput = document.getElementById('status');
             const lokasiInput = document.getElementById('lokasi');
@@ -464,55 +459,11 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                 lokasiInput.value = '';
             }
         });
-
+        
         var nameSelect = document.getElementById('name');
         if (!nameSelect.hasAttribute('readonly') && nameSelect.value !== "") {
             nameSelect.dispatchEvent(new Event('change'));
         }
-
-        // Modern File Uploader Logic
-        const uploader = document.getElementById('file-uploader');
-        const fileInput = document.getElementById('screenshot_file');
-        const previewContainer = document.getElementById('screenshot_preview_container');
-        const resetButton = document.getElementById('reset_button');
-
-        uploader.addEventListener('click', () => fileInput.click());
-        uploader.addEventListener('dragover', (e) => { e.preventDefault(); uploader.style.backgroundColor = '#e9ecef'; });
-        uploader.addEventListener('dragleave', () => { uploader.style.backgroundColor = '#f8f9fa'; });
-        uploader.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploader.style.backgroundColor = '#f8f9fa';
-            fileInput.files = e.dataTransfer.files;
-            handleFiles(fileInput.files);
-        });
-        fileInput.addEventListener('change', () => handleFiles(fileInput.files));
-
-        function handleFiles(files) {
-            previewContainer.innerHTML = '';
-            resetButton.style.display = files.length > 0 ? 'inline-block' : 'none';
-
-            for (const file of files) {
-                if (!file.type.startsWith('image/')) continue;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'preview-image-wrapper';
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'preview-image';
-                    wrapper.appendChild(img);
-                    previewContainer.appendChild(wrapper);
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        resetButton.addEventListener('click', () => {
-            fileInput.value = '';
-            previewContainer.innerHTML = '';
-            resetButton.style.display = 'none';
-        });
-
     });
   </script>
 </body>
