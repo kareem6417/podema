@@ -2,7 +2,6 @@
 session_start();
 
 if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
-    // Pastikan hanya staf IT yang terautentikasi yang bisa submit
     header("location: ./index.php");
     exit();
 }
@@ -20,7 +19,8 @@ $conn->set_charset("utf8mb4");
 // =================================================================
 $jadwal_id = (int)($_POST['jadwal_id'] ?? 0); // ID Jadwal (jika dari To-Do List)
 $aset_id = (int)($_POST['aset_id'] ?? 0); // ID Aset (jika dari To-Do List)
-$staf_it_nik = $_POST['pelaksana_nik_final'] ?? ($_SESSION['nik'] ?? 'system'); // NIK Pelaksana Utama
+// NIK diambil dari hidden field di form
+$staf_it_nik = $_POST['pelaksana_nik_final'] ?? ($_SESSION['nik'] ?? 'system'); 
 
 // Amankan dan ambil data form lainnya
 $jenis = $_POST["jenis"] ?? '';
@@ -34,7 +34,7 @@ $hasil_pemeriksaan = $_POST["hasil_pemeriksaan"] ?? '';
 $rekomendasi = $_POST["rekomendasi"] ?? '';
 $nama_user = $_POST["nama_user"] ?? '';
 
-// Ambil Skor dari setiap item inspeksi
+// Ambil Skor dari setiap item inspeksi (Semua ini harus di-bind sebagai INTEGER 'i')
 $age_score = !empty($_POST["age"]) ? (int)$_POST["age"] : 0;
 $casing_lap_score = !empty($_POST["casing_lap"]) ? (int)$_POST["casing_lap"] : 0;
 $layar_lap_score = !empty($_POST["layar_lap"]) ? (int)$_POST["layar_lap"] : 0;
@@ -62,7 +62,11 @@ $sql = "INSERT INTO form_inspeksi (date, jenis, merk, lokasi, nama_user, status,
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssssssssiiiiiiiiiiisii", 
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> KOREKSI FATAL ERROR ADA DI BARIS INI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// Koreksi: 10 's' diikuti 14 'i'
+$stmt->bind_param("ssssssssssiiiiiiiiiiiiii", 
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> KOREKSI FATAL ERROR ADA DI BARIS INI <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     $date, $jenis, $merk, $lokasi, $nama_user, $status, $serialnumber, $informasi_keluhan, $hasil_pemeriksaan, $rekomendasi, 
     $age_score, $casing_lap_score, $layar_lap_score, $engsel_lap_score, $keyboard_lap_score, $touchpad_lap_score, 
     $booting_lap_score, $multi_lap_score, $tampung_lap_score, $isi_lap_score, $port_lap_score, $audio_lap_score, 
@@ -87,7 +91,6 @@ if ($stmt->execute()) {
                                   tanggal_selesai = NOW()
                               WHERE jadwal_id = ?";
         $stmt_update_jadwal = $conn->prepare($update_jadwal_sql);
-        // bind_param: i(id_hasil), s(staf_nik), i(jadwal_id)
         $stmt_update_jadwal->bind_param("isi", $id_hasil_inspeksi, $staf_it_nik, $jadwal_id);
         $stmt_update_jadwal->execute();
         $stmt_update_jadwal->close();
@@ -97,22 +100,22 @@ if ($stmt->execute()) {
                             SET tanggal_inspeksi_terakhir = ?
                             WHERE aset_id = ?";
         $stmt_update_aset = $conn->prepare($update_aset_sql);
-        // bind_param: s(date), i(aset_id)
         $stmt_update_aset->bind_param("si", $date, $aset_id);
         $stmt_update_aset->execute();
         $stmt_update_aset->close();
     }
     // =================================================================
-    // 4. Proses Upload File Screenshot (Logika yang Anda miliki)
+    // 4. Proses Upload File Screenshot
     // =================================================================
+    // Perhatikan: Pastikan folder '/dev-podema/src/screenshot/' sudah ada dan memiliki izin tulis (CHMOD 777)
     $target_screenshot_dir = $_SERVER['DOCUMENT_ROOT'] . "/dev-podema/src/screenshot/";
 
     if (isset($_FILES['screenshot_file'])) {
         foreach ($_FILES['screenshot_file']['tmp_name'] as $key => $tmp_name) {
             if ($_FILES['screenshot_file']['error'][$key] == UPLOAD_ERR_OK) {
-                // Gunakan ID inspeksi dan timestamp untuk nama file yang unik
                 $original_name = basename($_FILES['screenshot_file']['name'][$key]);
                 $file_extension = pathinfo($original_name, PATHINFO_EXTENSION);
+                // Membuat nama file unik berdasarkan ID inspeksi, timestamp, dan urutan file
                 $file_name = $id_hasil_inspeksi . '_' . time() . '_' . $key . '.' . $file_extension;
                 $target_screenshot_file = $target_screenshot_dir . $file_name;
 
@@ -134,12 +137,15 @@ if ($stmt->execute()) {
     exit();
 
 } else {
-    // Error handling
+    // Error handling yang lebih detail
     $error_message = "Error saat menyimpan data inspeksi: " . $stmt->error;
-    echo $error_message;
-    error_log($error_message, 0);
+    // Log error ini agar Anda bisa melihatnya di log PHP server
+    error_log($error_message, 0); 
+    // Tampilkan pesan error sederhana (atau hapus ini di lingkungan produksi)
+    echo "<h1>Terjadi Kesalahan! (HTTP 500)</h1>";
+    echo "<p>Detail Error: " . htmlspecialchars($stmt->error) . "</p>";
+    echo "<p>Silakan periksa log server Anda untuk informasi lebih lanjut.</p>";
     $stmt->close();
+    $conn->close();
 }
-
-$conn->close();
 ?>
