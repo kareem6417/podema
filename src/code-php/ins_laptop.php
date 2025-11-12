@@ -6,11 +6,59 @@ if (!isset($_SESSION['nik']) || empty($_SESSION['nik'])) {
   exit();
 }
 
+// Cukup satu kali koneksi di atas
 $conn_podema = mysqli_connect("mandiricoal.net", "podema", "Jam10pagi#", "podema");
+
 if (!$conn_podema) {
     die("Koneksi database podema gagal: " . mysqli_connect_error());
 }
-$conn_podema->set_charset("utf8mb4"); // Pastikan charset
+$conn_podema->set_charset("utf8mb4");
+
+function fetchData($table) {
+    global $conn_podema;
+    $data = array();
+    $result = mysqli_query($conn_podema, "SELECT * FROM $table");
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+        mysqli_free_result($result);
+    }
+    return $data;
+}
+
+$userInfos = array();
+$users = fetchData("users");
+foreach ($users as $user) {
+    $userInfos[$user['name']] = array(
+        'company' => $user['company'],
+        'divisi' => $user['department']
+    );
+}
+
+$it_staff = [];
+$result_staff = mysqli_query($conn_podema, "SELECT nik, name FROM users WHERE nik IS NOT NULL AND nik != '' ORDER BY name ASC");
+if ($result_staff) {
+    while ($row = mysqli_fetch_assoc($result_staff)) {
+        $it_staff[] = $row;
+    }
+    mysqli_free_result($result_staff);
+}
+
+$companyOptions = [
+    'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
+    'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
+    'MKP HO' => 'PT. Mandala Karya Prima - HO',
+    'MKP Site' => 'PT. Mandala Karya Prima - Site',
+    'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
+    'MPM Site' => 'PT. Maritim Prima Mandiri - Site',
+    'MHA HO' => 'PT. Mandiri Herindo Adiperkasa - HO',
+    'MHA Site' => 'PT. Mandiri Herindo Adiperkasa - Site',
+    'PAM' => 'PT. Prima Andalan Mandiri',
+    'mandiriland' => 'PT. Mandiriland',
+    'GMS' => 'PT. Global Mining Service',
+    'eam' => 'PT. Edika Agung Mandiri',
+];
 
 $jadwal_id = (int)($_GET['jadwal_id'] ?? 0);
 $aset_id = (int)($_GET['aset_id'] ?? 0);
@@ -39,45 +87,7 @@ if ($aset_id > 0 && $jadwal_id > 0) {
         $is_readonly = "readonly"; // Kunci field agar tidak diubah
     }
     $stmt_prefill->close();
-} else {
 }
-
-function fetchData($table) {
-    global $conn_podema;
-    $data = array();
-    $result = mysqli_query($conn_podema, "SELECT * FROM $table");
-    if ($result) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $data[] = $row;
-        }
-        mysqli_free_result($result);
-    }
-    return $data;
-}
-
-$userInfos = array();
-$users = fetchData("users");
-foreach ($users as $user) {
-    $userInfos[$user['name']] = array(
-        'company' => $user['company'],
-        'divisi' => $user['department']
-    );
-}
-
-$companyOptions = [
-    'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
-    'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
-    'MKP HO' => 'PT. Mandala Karya Prima - HO',
-    'MKP Site' => 'PT. Mandala Karya Prima - Site',
-    'MPM HO' => 'PT. Maritim Prima Mandiri - HO',
-    'MPM Site' => 'PT. Maritim Prima Mandiri - Site',
-    'MHA HO' => 'PT. Mandiri Herindo Adiperkasa - HO',
-    'MHA Site' => 'PT. Mandiri Herindo Adiperkasa - Site',
-    'PAM' => 'PT. Prima Andalan Mandiri',
-    'mandiriland' => 'PT. Mandiriland',
-    'GMS' => 'PT. Global Mining Service',
-    'eam' => 'PT. Edika Agung Mandiri',
-];
 ?>
 
 <!doctype html>
@@ -356,7 +366,27 @@ $companyOptions = [
                   <div class="mb-3"><label for="rekomendasi" class="form-label">Recommendation<span class="required-star">*</span></label><textarea id="rekomendasi" name="rekomendasi" class="form-textarea" required></textarea></div>
                 </div>
               </div>
-
+              <div class="card form-section-card">
+                <div class="card-body">
+                  <h5 class="card-title mb-4">Pelaksana Inspeksi</h5>
+                  <div class="mb-3">
+                    <label for="pelaksana_nik" class="form-label">NIK Staf IT yang Terlibat<span class="required-star">*</span></label>
+                    <select multiple class="form-select" id="pelaksana_nik" name="pelaksana_nik[]" required>
+                      <?php 
+                      $current_nik = $_SESSION['nik'] ?? '';
+                      foreach ($it_staff as $staff): 
+                          // Pilih NIK user yang sedang login secara default
+                          $selected = ($staff['nik'] == $current_nik) ? 'selected' : '';
+                      ?>
+                          <option value="<?php echo htmlspecialchars($staff['nik']); ?>" <?php echo $selected; ?>>
+                              <?php echo htmlspecialchars($staff['nik'] . ' - ' . $staff['name']); ?>
+                          </option>
+                      <?php endforeach; ?>
+                    </select>
+                    <small class="form-text text-muted">Tekan **CTRL** (Windows) atau **CMD** (Mac) untuk memilih lebih dari satu NIK. NIK Anda sudah terpilih secara default.</small>
+                  </div>
+                </div>
+              </div>                      
               <div class="d-flex justify-content-end gap-2">
                 <button type="reset" class="btn btn-secondary">Reset Form</button>
                 <button type="submit" class="btn btn-primary">Submit Inspection</button>
@@ -378,7 +408,6 @@ $companyOptions = [
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         
-        // === JavaScript UNTUK SUBMENU DROPDOWN (DARI ins_desktop.php) ===
         var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
         submenuToggles.forEach(function(toggle) {
             toggle.addEventListener('click', function(e) {
@@ -436,7 +465,7 @@ $companyOptions = [
         if (!nameSelect.hasAttribute('readonly') && nameSelect.value !== "") {
             nameSelect.dispatchEvent(new Event('change'));
         }
-        
+
         // Modern File Uploader Logic
         const uploader = document.getElementById('file-uploader');
         const fileInput = document.getElementById('screenshot_file');
