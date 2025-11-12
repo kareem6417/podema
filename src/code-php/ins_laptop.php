@@ -383,12 +383,11 @@ if ($aset_id > 0 && $jadwal_id > 0) {
                   <h5 class="card-title mb-4">Pelaksana Inspeksi</h5>
                   
                   <div class="mb-3">
-                    <label for="pelaksana_utama" class="form-label">NIK Staf IT yang Menginspeksi</label>
                     <input type="text" class="form-control" id="pelaksana_utama" 
                            value="<?php echo htmlspecialchars($pelaksana_display); ?>" 
                            readonly>
                     <input type="hidden" name="pelaksana_nik_final" value="<?php echo htmlspecialchars($current_nik); ?>">
-                    <small class="form-text text-muted">Pelaksana adalah NIK yang sedang login.</small>
+                    <small class="form-text text-muted">Staff IT yang melakukan Inspeksi.</small>
                   </div>
                 </div>
               </div>
