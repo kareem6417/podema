@@ -27,6 +27,7 @@ function fetchData($table) {
     return $data;
 }
 
+// 1. Ambil data semua pengguna untuk dropdown Nama Pengguna
 $userInfos = array();
 $users = fetchData("users");
 foreach ($users as $user) {
@@ -36,15 +37,7 @@ foreach ($users as $user) {
     );
 }
 
-$it_staff = [];
-$result_staff = mysqli_query($conn_podema, "SELECT nik, name FROM users WHERE nik IS NOT NULL AND nik != '' ORDER BY name ASC");
-if ($result_staff) {
-    while ($row = mysqli_fetch_assoc($result_staff)) {
-        $it_staff[] = $row;
-    }
-    mysqli_free_result($result_staff);
-}
-
+// Opsi Perusahaan untuk tampilan (jika diperlukan)
 $companyOptions = [
     'MIP HO' => 'PT. Mandiri Intiperkasa - HO',
     'MIP Site' => 'PT. Mandiri Intiperkasa - Site',
@@ -59,6 +52,25 @@ $companyOptions = [
     'GMS' => 'PT. Global Mining Service',
     'eam' => 'PT. Edika Agung Mandiri',
 ];
+
+
+$pelaksana_name = 'N/A';
+$current_nik = $_SESSION['nik'] ?? '';
+
+if (!empty($current_nik)) {
+    $stmt_name = $conn_podema->prepare("SELECT name FROM users WHERE nik = ?");
+    $stmt_name->bind_param("s", $current_nik);
+    $stmt_name->execute();
+    $result_name = $stmt_name->get_result();
+    
+    if ($result_name->num_rows > 0) {
+        $row_name = $result_name->fetch_assoc();
+        $pelaksana_name = $row_name['name'];
+    }
+    $stmt_name->close();
+}
+
+$pelaksana_display = $current_nik . ' - ' . $pelaksana_name;
 
 $jadwal_id = (int)($_GET['jadwal_id'] ?? 0);
 $aset_id = (int)($_GET['aset_id'] ?? 0);
