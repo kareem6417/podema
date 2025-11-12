@@ -189,18 +189,6 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
       
       <div class="container-fluid">
         <div class="card">
-          <div class="card-body">
-            <h5 class="card-title fw-semibold mb-4">Dashboard Device Inspection</h5>
-            <div class="card shadow-none">
-                <div class="card-body p-3">
-                    <form class="row g-3 align-items-center" method="get">
-                        <div class="col-md-4"><label for="filter_jenis" class="form-label">Filter by Device Type</label><select id="filter_jenis" name="filter_jenis" class="form-select"><option value="">All Types</option><?php foreach ($all_jenis as $jenis): ?><option value="<?php echo htmlspecialchars($jenis); ?>" <?php if ($filter_jenis == $jenis) echo 'selected'; ?>><?php echo htmlspecialchars($jenis); ?></option><?php endforeach; ?></select></div>
-                        <div class="col-md-3"><label for="limit" class="form-label">Rows per page</label><select id="limit" name="limit" class="form-select"><option value="10" <?php if ($limit == 10) echo 'selected'; ?>>10</option><option value="25" <?php if ($limit == 25) echo 'selected'; ?>>25</option><option value="50" <?php if ($limit == 50) echo 'selected'; ?>>50</option></select></div>
-                        <div class="col-md-2 d-flex align-items-end"><button type="submit" class="btn btn-primary w-100">Filter</button></div>
-                    </form>
-                </div>
-            </div>
-        <div class="card">
             <div class="card-body">
                 <div class="d-sm-flex d-block align-items-center justify-content-between mb-3">
                     <h5 class="card-title fw-semibold">Visualisasi Data Inspeksi</h5>
