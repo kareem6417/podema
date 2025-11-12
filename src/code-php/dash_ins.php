@@ -307,32 +307,34 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       // Script untuk modal (sudah ada)
       var detailModal = document.getElementById('detailModal');
-      detailModal.addEventListener('show.bs.modal', function (event) {
+      
+      // Mengganti 'show.bs.modal' menjadi 'shown.bs.modal'
+      detailModal.addEventListener('shown.bs.modal', function (event) {
           var triggerElement = event.relatedTarget;
-          var modalBody = detailModal.querySelector('.modal-body');
-          modalBody.querySelector('#modal-no').textContent = triggerElement.getAttribute('data-no');
-          modalBody.querySelector('#modal-date').textContent = triggerElement.getAttribute('data-date');
-          modalBody.querySelector('#modal-nama_user').textContent = triggerElement.getAttribute('data-nama_user');
-          modalBody.querySelector('#modal-jenis').textContent = triggerElement.getAttribute('data-jenis');
-          modalBody.querySelector('#modal-merk').textContent = triggerElement.getAttribute('data-merk');
-          modalBody.querySelector('#modal-serialnumber').textContent = triggerElement.getAttribute('data-serialnumber');
-          modalBody.querySelector('#modal-status').textContent = triggerElement.getAttribute('data-status');
-          modalBody.querySelector('#modal-lokasi').textContent = triggerElement.getAttribute('data-lokasi');
-          modalBody.querySelector('#modal-keluhan').textContent = triggerElement.getAttribute('data-keluhan');
-          modalBody.querySelector('#modal-pemeriksaan').textContent = triggerElement.getAttribute('data-pemeriksaan');
-          modalBody.querySelector('#modal-rekomendasi').textContent = triggerElement.getAttribute('data-rekomendasi');
+          var modalBody = detailModal.querySelector('.modal-body'); // Sekarang ini tidak akan null
+
+          // Cek untuk memastikan modalBody ditemukan sebelum mengisinya
+          if (modalBody) {
+            modalBody.querySelector('#modal-no').textContent = triggerElement.getAttribute('data-no');
+            modalBody.querySelector('#modal-date').textContent = triggerElement.getAttribute('data-date');
+            modalBody.querySelector('#modal-nama_user').textContent = triggerElement.getAttribute('data-nama_user');
+            modalBody.querySelector('#modal-jenis').textContent = triggerElement.getAttribute('data-jenis');
+            modalBody.querySelector('#modal-merk').textContent = triggerElement.getAttribute('data-merk');
+            modalBody.querySelector('#modal-serialnumber').textContent = triggerElement.getAttribute('data-serialnumber');
+            modalBody.querySelector('#modal-status').textContent = triggerElement.getAttribute('data-status');
+            modalBody.querySelector('#modal-lokasi').textContent = triggerElement.getAttribute('data-lokasi');
+            modalBody.querySelector('#modal-keluhan').textContent = triggerElement.getAttribute('data-keluhan');
+            modalBody.querySelector('#modal-pemeriksaan').textContent = triggerElement.getAttribute('data-pemeriksaan');
+            modalBody.querySelector('#modal-rekomendasi').textContent = triggerElement.getAttribute('data-rekomendasi');
+          } else {
+            console.error("Tidak dapat menemukan .modal-body di dalam #detailModal");
+          }
       });
 
-      // =================================================================
-      // BARU: JAVASCRIPT UNTUK MENGGAMBAR CHART
-      // =================================================================
-
-      // Mengambil data dari PHP dan mengubahnya jadi JSON
       const dataJenis = <?php echo json_encode($data_jenis); ?>;
       const dataTahunan = <?php echo json_encode($data_tahunan); ?>;
       const dataBulanan = <?php echo json_encode($data_bulanan); ?>;
 
-      // Chart 1: Jenis Perangkat (Pie Chart)
       const ctxJenis = document.getElementById('chartJenisPerangkat').getContext('2d');
       new Chart(ctxJenis, {
           type: 'pie',
@@ -351,7 +353,6 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
           }
       });
 
-      // Chart 2: Inspeksi Tahunan (Bar Chart)
       const ctxTahun = document.getElementById('chartInspeksiTahunan').getContext('2d');
       new Chart(ctxTahun, {
           type: 'bar',
@@ -373,7 +374,6 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
           }
       });
 
-      // Chart 3: Tren Bulanan (Line Chart)
       const ctxBulan = document.getElementById('chartTrenBulanan').getContext('2d');
       new Chart(ctxBulan, {
           type: 'line',
