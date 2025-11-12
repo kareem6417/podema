@@ -115,7 +115,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .action-icons a, .action-icons span { font-size: 1.2rem; margin: 0 5px; cursor: pointer; }
     .modal-body table td:first-child { font-weight: bold; width: 35%; }
     
-    /* BARU: CSS untuk area chart */
+    /* CSS untuk area chart */
     .chart-container {
         width: 100%;
         height: 350px;
@@ -287,8 +287,33 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
   <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailModalLabel">Detail Device Inspection</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <table class="table table-bordered">
+                <tr><td>Inspection No</td><td id="modal-no"></td></tr>
+                <tr><td>Date</td><td id="modal-date"></td></tr>
+                <tr><td>Name</td><td id="modal-nama_user"></td></tr>
+                <tr><td>Device Type</td><td id="modal-jenis"></td></tr>
+                <tr><td>Merk</td><td id="modal-merk"></td></tr>
+                <tr><td>Serial Number</td><td id="modal-serialnumber"></td></tr>
+                <tr><td>Position/Department</td><td id="modal-status"></td></tr>
+                <tr><td>Location</td><td id="modal-lokasi"></td></tr>
+                <tr><td>Complaints / Issues</td><td id="modal-keluhan" style="white-space: pre-wrap;"></td></tr>
+                <tr><td>Examination/Findings</td><td id="modal-pemeriksaan" style="white-space: pre-wrap;"></td></tr>
+                <tr><td>Recommendation</td><td id="modal-rekomendasi" style="white-space: pre-wrap;"></td></tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
-  
+  </div>
   <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/app.min.js"></script>
@@ -308,10 +333,12 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
       // Script untuk modal (sudah ada)
       var detailModal = document.getElementById('detailModal');
       
-      // Mengganti 'show.bs.modal' menjadi 'shown.bs.modal'
+      // Menggunakan 'shown.bs.modal' agar skrip berjalan SETELAH modal tampil
       detailModal.addEventListener('shown.bs.modal', function (event) {
           var triggerElement = event.relatedTarget;
-          var modalBody = detailModal.querySelector('.modal-body'); // Sekarang ini tidak akan null
+          
+          // Sekarang modalBody tidak akan null karena HTML-nya sudah ada
+          var modalBody = detailModal.querySelector('.modal-body'); 
 
           // Cek untuk memastikan modalBody ditemukan sebelum mengisinya
           if (modalBody) {
@@ -331,6 +358,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
           }
       });
 
+      // Script untuk Chart (sudah ada)
       const dataJenis = <?php echo json_encode($data_jenis); ?>;
       const dataTahunan = <?php echo json_encode($data_tahunan); ?>;
       const dataBulanan = <?php echo json_encode($data_bulanan); ?>;
