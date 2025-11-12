@@ -23,48 +23,79 @@ $options = [
 try {
      $conn = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
+     // Gunakan die() untuk menampilkan pesan error database jika terjadi 500
      die("Koneksi ke database gagal: " . $e->getMessage());
 }
 
 // =================================================================
-// DATA UNTUK TAB 1: TUGAS INSPEKSI (TO-DO LIST)
+// 1. LOGIKA FILTER STATUS TUGAS (TUGAS AKTIF vs RIWAYAT SELESAI)
 // =================================================================
 
-$filter_bulan = isset($_GET['filter_bulan']) ? (int)$_GET['filter_bulan'] : date('m'); // Default bulan ini
-$filter_tahun = isset($_GET['filter_tahun']) ? (int)$_GET['filter_tahun'] : date('Y'); // Default tahun ini
+$current_nik = $_SESSION['nik'];
+// Ambil status dari URL. Default: 'active'
+$task_status = $_GET['status'] ?? 'active'; 
 
-$sql_tugas = "SELECT 
-            j.jadwal_id, 
-            j.tanggal_dijadwalkan, 
-            a.aset_id,
-            a.jenis_perangkat, 
-            a.serial_number,
-            u.name as nama_karyawan,
-            u.department as divisi_karyawan
-        FROM jadwal_inspeksi j
-        JOIN master_aset a ON j.aset_id = a.aset_id
-        LEFT JOIN users u ON a.id_user = u.user_id
-        WHERE 
-            j.status_jadwal = 'Pending' AND
-            MONTH(j.tanggal_dijadwalkan) = ? AND
-            YEAR(j.tanggal_dijadwalkan) = ?
-        ORDER BY 
-            j.tanggal_dijadwalkan ASC";
+$status_clause = "";
+$task_params = [];
 
-$stmt_tugas = $conn->prepare($sql_tugas);
-$stmt_tugas->execute([$filter_bulan, $filter_tahun]);
-$daftar_tugas = $stmt_tugas->fetchAll();
+if ($task_status == 'active') {
+    // Tugas Aktif: Pending atau In Progress (Tidak ada Completed)
+    $status_clause = " AND ji.status_jadwal IN ('Pending', 'In Progress')";
+    $task_title = "Tugas Inspeksi Aktif";
+} elseif ($task_status == 'completed') {
+    // Riwayat Selesai: Hanya Completed dan di-filter oleh NIK staf IT yang login
+    $status_clause = " AND ji.status_jadwal = 'Completed' AND ji.id_staf_it = :nik";
+    $task_title = "Riwayat Tugas Inspeksi Selesai";
+    $task_params[':nik'] = $current_nik;
+} else {
+    // Fallback/Default
+    $task_title = "Semua Tugas Inspeksi";
+}
+
+
+// 2. QUERY UNTUK MENGAMBIL DAFTAR TUGAS
+$sql_tasks = "
+    SELECT 
+        ji.jadwal_id,
+        ji.tanggal_jadwal,        -- Kolom yang digunakan untuk tanggal jadwal
+        ji.tanggal_selesai,
+        ji.jenis_perangkat,
+        ji.status_jadwal,
+        ji.id_hasil_inspeksi,     -- PENTING: ID Hasil Inspeksi untuk link Lihat Hasil
+        ma.merk,
+        ma.serial_number,
+        u.name AS nama_pengguna,
+        ma.aset_id,
+        staf.name AS nama_staf_it
+    FROM 
+        jadwal_inspeksi ji
+    JOIN 
+        master_aset ma ON ji.aset_id = ma.aset_id
+    LEFT JOIN 
+        users u ON ma.id_user = u.user_id
+    LEFT JOIN
+        users staf ON ji.id_staf_it = staf.nik
+    WHERE
+        1=1  -- Kondisi dasar
+        " . $status_clause . "
+    ORDER BY 
+        ji.tanggal_jadwal DESC";
+
+$stmt_tasks = $conn->prepare($sql_tasks);
+$stmt_tasks->execute($task_params);
+$tasks = $stmt_tasks->fetchAll();
+
 
 // =================================================================
-// DATA UNTUK TAB 2: MASTER ASET (DENGAN PAGINATION)
+// DATA UNTUK TAB 2: MASTER ASET (DENGAN PAGINATION) - Logika Asli
 // =================================================================
 
-$master_limit = 10; // Jumlah aset per halaman
+$master_limit = 10; 
 $master_page = isset($_GET['master_page']) && is_numeric($_GET['master_page']) ? (int)$_GET['master_page'] : 1;
 $master_offset = ($master_page - 1) * $master_limit;
 
 // Hitung total aset
-$total_aset_stmt = $conn->query("SELECT COUNT(*) FROM master_aset");
+$total_aset_stmt = $conn->query("SELECT COUNT(*) FROM master_aset WHERE jenis IS NOT NULL AND jenis != ''");
 $total_master_aset = $total_aset_stmt->fetchColumn();
 $total_master_pages = ceil($total_master_aset / $master_limit);
 
@@ -72,12 +103,13 @@ $total_master_pages = ceil($total_master_aset / $master_limit);
 $sql_aset = "SELECT 
             a.aset_id,
             a.serial_number,
-            a.jenis_perangkat,
+            a.jenis AS jenis_perangkat, -- Menggunakan kolom 'jenis' dari master_aset
             a.lokasi,
             a.tanggal_inspeksi_terakhir,
             u.name as nama_karyawan
          FROM master_aset a
          LEFT JOIN users u ON a.id_user = u.user_id
+         WHERE a.jenis IS NOT NULL AND a.jenis != ''
          ORDER BY a.aset_id DESC
          LIMIT :limit OFFSET :offset";
 
@@ -86,6 +118,12 @@ $stmt_aset->bindParam(':limit', $master_limit, PDO::PARAM_INT);
 $stmt_aset->bindParam(':offset', $master_offset, PDO::PARAM_INT);
 $stmt_aset->execute();
 $daftar_aset = $stmt_aset->fetchAll();
+
+// Array nama bulan untuk filter filter
+$bulan_nama = [
+    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+    7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+];
 
 ?>
 
@@ -101,7 +139,6 @@ $daftar_aset = $stmt_aset->fetchAll();
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   
   <style>
-    /* Perbaikan gaya submenu sidebar */
     .sidebar-submenu {
         position: static !important; 
         max-height: 0;
@@ -121,21 +158,13 @@ $daftar_aset = $stmt_aset->fetchAll();
     }
     .sidebar-item.active > a .arrow { transform: rotate(180deg); }
     .table-hover tbody tr:hover { background-color: #f1f1f1; }
-    
-    /* Gaya untuk Tab */
-    .nav-tabs .nav-link {
-        font-weight: 600;
-    }
-    .nav-tabs .nav-link.active {
-        color: #5D87FF;
-        border-bottom-width: 3px;
-    }
-    .tab-content {
-        border: 1px solid #dee2e6;
-        border-top: 0;
-        padding: 1.5rem;
-        border-radius: 0 0 0.25rem 0.25rem;
-    }
+    .nav-tabs .nav-link { font-weight: 600; }
+    .nav-tabs .nav-link.active { color: #5D87FF; border-bottom-width: 3px; }
+    .tab-content { border: 1px solid #dee2e6; border-top: 0; padding: 1.5rem; border-radius: 0 0 0.25rem 0.25rem; }
+    .status-badge { padding: 5px 10px; border-radius: 5px; font-weight: bold; }
+    .status-Pending { background-color: #ffc107; color: #343a40; }
+    .status-In-Progress { background-color: #007bff; color: white; }
+    .status-Completed { background-color: #28a745; color: white; }
   </style>
 </head>
 <body>
@@ -174,9 +203,9 @@ $daftar_aset = $stmt_aset->fetchAll();
             
             <li class="nav-small-cap"><i class="ti ti-dots nav-small-cap-icon fs-4"></i><span class="hide-menu">Asset Management</span></li>
             
-            <li class="sidebar-item"> <a class="sidebar-link" href="#" aria-expanded="false"><span><i class="ti ti-cards"></i></span><span class="hide-menu">IT Asset Management</span><span class="arrow"><i class="fas fa-chevron-down"></i></span></a>
+            <li class="sidebar-item active"> <a class="sidebar-link" href="#" aria-expanded="false"><span><i class="ti ti-cards"></i></span><span class="hide-menu">IT Asset Management</span><span class="arrow"><i class="fas fa-chevron-down"></i></span></a>
               <ul class="sidebar-submenu">
-                  <li class="sidebar-item"><a class="sidebar-link" href="./astmgm.php#tugas"><span><i class="ti ti-list-check"></i></span>Tugas Inspeksi</a></li>
+                  <li class="sidebar-item active"><a class="sidebar-link" href="./astmgm.php#tugas"><span><i class="ti ti-list-check"></i></span>Tugas Inspeksi</a></li>
                   <li class="sidebar-item"><a class="sidebar-link" href="./astmgm.php#master"><span><i class="ti ti-database"></i></span>Master Aset</a></li>
               </ul>
             </li>
@@ -184,7 +213,6 @@ $daftar_aset = $stmt_aset->fetchAll();
         </nav>
       </div>
     </aside>
-
     <div class="body-wrapper">
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
@@ -217,14 +245,12 @@ $daftar_aset = $stmt_aset->fetchAll();
             <ul class="nav nav-tabs" id="assetTabs" role="tablist">
               <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="tugas-tab" data-bs-toggle="tab" data-bs-target="#tugas" type="button" role="tab" aria-controls="tugas" aria-selected="true">
-                  <i class="ti ti-list-check me-1"></i> Tugas Inspeksi (To-Do List)
-                  <span class="badge bg-danger ms-1"><?php echo count($daftar_tugas); ?></span>
+                  <i class="ti ti-list-check me-1"></i> Tugas Inspeksi
                 </button>
               </li>
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="master-tab" data-bs-toggle="tab" data-bs-target="#master" type="button" role="tab" aria-controls="master" aria-selected="false">
                   <i class="ti ti-database me-1"></i> Master Aset
-                  <span class="badge bg-secondary ms-1"><?php echo $total_master_aset; ?></span>
                 </button>
               </li>
             </ul>
@@ -233,82 +259,75 @@ $daftar_aset = $stmt_aset->fetchAll();
               
               <div class="tab-pane fade show active" id="tugas" role="tabpanel" aria-labelledby="tugas-tab">
                 
-                <div class="card shadow-none">
-                  <div class="card-body p-3">
-                    <form class="row g-3 align-items-center" method="get">
-                      <div class="col-md-4">
-                        <label for="filter_bulan" class="form-label">Bulan</label>
-                        <select id="filter_bulan" name="filter_bulan" class="form-select">
-                          <?php for ($m = 1; $m <= 12; $m++): ?>
-                            <option value="<?php echo $m; ?>" <?php if ($m == $filter_bulan) echo 'selected'; ?>>
-                              <?php echo date('F', mktime(0, 0, 0, $m, 10)); ?>
-                            </option>
-                          <?php endfor; ?>
-                        </select>
-                      </div>
-                      <div class="col-md-3">
-                        <label for="filter_tahun" class="form-label">Tahun</label>
-                        <select id="filter_tahun" name="filter_tahun" class="form-select">
-                          <?php for ($y = date('Y') - 2; $y <= date('Y') + 2; $y++): ?>
-                            <option value="<?php echo $y; ?>" <?php if ($y == $filter_tahun) echo 'selected'; ?>>
-                              <?php echo $y; ?>
-                            </option>
-                          <?php endfor; ?>
-                        </select>
-                      </div>
-                      <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Filter</button>
-                      </div>
-                    </form>
-                  </div>
+                <h5 class="card-title fw-semibold card-title-task mt-3"><?php echo $task_title; ?></h5>
+                
+                <div class="mb-4">
+                    <a href="astmgm.php?status=active#tugas" class="btn btn-<?php echo ($task_status == 'active' ? 'primary' : 'outline-secondary'); ?> me-2">
+                        Tugas Aktif (<?php echo $task_status == 'active' ? count($tasks) : $conn->query("SELECT COUNT(*) FROM jadwal_inspeksi WHERE status_jadwal IN ('Pending', 'In Progress')")->fetchColumn(); ?>)
+                    </a>
+                    <a href="astmgm.php?status=completed#tugas" class="btn btn-<?php echo ($task_status == 'completed' ? 'primary' : 'outline-secondary'); ?>">
+                        Riwayat Selesai (<?php echo $task_status == 'completed' ? count($tasks) : $conn->query("SELECT COUNT(*) FROM jadwal_inspeksi WHERE status_jadwal = 'Completed' AND id_staf_it = '$current_nik'")->fetchColumn(); ?>)
+                    </a>
                 </div>
-
+                
                 <div class="table-responsive">
                   <table class="table table-hover table-striped">
                     <thead class="table-light">
                       <tr>
-                        <th>Tanggal Dijadwalkan</th>
-                        <th>Nama Karyawan</th>
-                        <th>Divisi</th>
-                        <th>Jenis Perangkat</th>
+                        <th>Tgl. Jadwal</th>
+                        <th>Perangkat</th>
                         <th>Serial Number</th>
+                        <th>Pengguna</th>
+                        <th>Pelaksana IT</th>
+                        <th>Status</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <?php if (empty($daftar_tugas)): ?>
+                      <?php if (empty($tasks)): ?>
                         <tr>
-                          <td colspan="6" class="text-center text-muted py-4">
-                            <i class="ti ti-circle-check fs-5 me-1"></i> Luar biasa! Tidak ada tugas inspeksi yang tertunda untuk periode ini.
+                          <td colspan="7" class="text-center text-muted py-4">
+                            <i class="ti ti-circle-check fs-5 me-1"></i> Luar biasa! Tidak ada tugas inspeksi yang ditemukan.
                           </td>
                         </tr>
                       <?php else: ?>
-                        <?php foreach ($daftar_tugas as $tugas): ?>
+                        <?php foreach ($tasks as $task): 
+                            $status_class = strtolower(str_replace(' ', '-', $task['status_jadwal']));
+                            // Menentukan link Aksi
+                            if ($task['status_jadwal'] == 'Completed') {
+                                $aksi_link = "viewinspeksi.php?no=" . $task['id_hasil_inspeksi'];
+                                $aksi_button_class = "btn-info text-white";
+                                $aksi_button_text = "Lihat Hasil";
+                            } else {
+                                // Logika untuk link 'Kerjakan'
+                                $jenis_perangkat_clean = strtolower(str_replace(' ', '_', $task['jenis_perangkat']));
+                                $form_url = 'ins_' . $jenis_perangkat_clean . '.php';
+                                // Tambahkan pengecekan untuk jenis perangkat khusus (Router/Switch/AP -> ins_infra.php)
+                                if (in_array($task['jenis_perangkat'], ['Router', 'Switch', 'Access Point'])) {
+                                    $form_url = 'ins_infra.php';
+                                } elseif ($task['jenis_perangkat'] == 'PC Desktop') {
+                                    $form_url = 'ins_desktop.php'; // Pastikan nama file submit konsisten
+                                }
+                                $aksi_link = "{$form_url}?jadwal_id={$task['jadwal_id']}&aset_id={$task['aset_id']}";
+                                $aksi_button_class = "btn-primary";
+                                $aksi_button_text = "Lakukan Inspeksi";
+                            }
+                        ?>
                           <tr>
-                            <td><span class="fw-semibold"><?php echo date('d M Y', strtotime($tugas['tanggal_dijadwalkan'])); ?></span></td>
-                            <td><?php echo htmlspecialchars($tugas['nama_karyawan'] ?? '<em>(Karyawan tdk terdaftar)</em>'); ?></td>
-                            <td><?php echo htmlspecialchars($tugas['divisi_karyawan'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($tugas['jenis_perangkat']); ?></td>
-                            <td><?php echo htmlspecialchars($tugas['serial_number']); ?></td>
+                            <td><span class="fw-semibold"><?php echo date('d M Y', strtotime($task['tanggal_jadwal'])); ?></span></td>
+                            <td><?php echo htmlspecialchars($task['jenis_perangkat'] . ' / ' . $task['merk']); ?></td>
+                            <td><?php echo htmlspecialchars($task['serial_number']); ?></td>
+                            <td><?php echo htmlspecialchars($task['nama_pengguna'] ?? '<em>(N/A)</em>'); ?></td>
+                            <td><?php echo htmlspecialchars($task['nama_staf_it'] ?? 'N/A'); ?></td>
                             <td>
-                              <?php
-                                // Logika untuk menentukan URL form yang benar
-                                $form_url = ''; $jenis = $tugas['jenis_perangkat'];
-                                if ($jenis == 'Laptop') $form_url = 'ins_laptop.php';
-                                elseif ($jenis == 'PC Desktop') $form_url = 'ins_desktop.php';
-                                elseif ($jenis == 'Monitor') $form_url = 'ins_monitor.php';
-                                elseif ($jenis == 'Printer') $form_url = 'ins_printer.php';
-                                elseif ($jenis == 'CCTV') $form_url = 'ins_cctv.php';
-                                elseif (in_array($jenis, ['Router', 'Switch', 'Access Point'])) $form_url = 'ins_infra.php';
-                                elseif ($jenis == 'Telephone') $form_url = 'ins_tlp.php';
-                                
-                                if ($form_url):
-                                  $link_inspeksi = "{$form_url}?jadwal_id={$tugas['jadwal_id']}&aset_id={$tugas['aset_id']}";
-                              ?>
-                                <a href="<?php echo $link_inspeksi; ?>" class="btn btn-primary btn-sm"><i class="ti ti-tool me-1"></i> Kerjakan</a>
-                              <?php else: ?>
-                                <span class="btn btn-secondary btn-sm disabled">Form Tdk Ada</span>
-                              <?php endif; ?>
+                                <span class="status-badge status-<?php echo $status_class; ?>">
+                                    <?php echo htmlspecialchars($task['status_jadwal']); ?>
+                                </span>
+                            </td>
+                            <td>
+                                <a href="<?php echo $aksi_link; ?>" class="btn btn-sm <?php echo $aksi_button_class; ?>">
+                                    <i class="ti ti-tool me-1"></i> <?php echo $aksi_button_text; ?>
+                                </a>
                             </td>
                           </tr>
                         <?php endforeach; ?>
@@ -320,6 +339,8 @@ $daftar_aset = $stmt_aset->fetchAll();
               </div>
               
               <div class="tab-pane fade" id="master" role="tabpanel" aria-labelledby="master-tab">
+                
+                <h5 class="card-title fw-semibold card-title-task mt-3">Master Daftar Aset Perangkat</h5>
                 
                 <p class="mb-3">Daftar semua aset yang terdaftar dalam sistem.</p>
                 
@@ -399,7 +420,52 @@ $daftar_aset = $stmt_aset->fetchAll();
   
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Skrip untuk mengaktifkan submenu sidebar
+      
+      // ===================================================
+      // BARU: Skrip untuk mengaktifkan tab via URL hash
+      // ===================================================
+      var hash = window.location.hash || '#tugas'; // Default ke #tugas
+      var tabButton = document.querySelector('.nav-tabs button[data-bs-target="' + hash + '"]');
+      
+      if (tabButton) {
+          // Hapus kelas 'active' dan 'show' dari tab/pane default (jika ada)
+          document.querySelectorAll('.nav-tabs .nav-link.active').forEach(e => e.classList.remove('active'));
+          document.querySelectorAll('.tab-content .tab-pane.active').forEach(e => e.classList.remove('active', 'show'));
+          
+          // Aktifkan tab yang dituju
+          tabButton.classList.add('active');
+          var paneToActivate = document.querySelector(hash);
+          if (paneToActivate) {
+              paneToActivate.classList.add('active', 'show');
+          }
+      }
+
+      // Logika agar URL filter status tetap berada di tab Tugas Inspeksi
+      var activeTaskLink = document.querySelector('a[href="astmgm.php?status=active#tugas"]');
+      if (activeTaskLink) {
+          // Ambil status saat ini dan hash yang benar
+          const urlParams = new URLSearchParams(window.location.search);
+          const currentStatus = urlParams.get('status') || 'active';
+          
+          // Perbarui semua link filter status agar mengarah ke hash #tugas
+          document.querySelectorAll('.mb-4 a[href^="astmgm.php?status="]').forEach(link => {
+              const originalHref = link.getAttribute('href');
+              link.setAttribute('href', originalHref.split('#')[0] + '#tugas');
+          });
+
+          // Tampilkan jumlah task di badge
+          document.querySelectorAll('.nav-tabs button').forEach(button => {
+              if (button.id === 'tugas-tab') {
+                  const activeCount = document.querySelector('a[href="astmgm.php?status=active#tugas"]').textContent.match(/\(([^)]+)\)/)?.[1] || 0;
+                  const completedCount = document.querySelector('a[href="astmgm.php?status=completed#tugas"]').textContent.match(/\(([^)]+)\)/)?.[1] || 0;
+                  
+                  // Ganti badge default di tab Tugas Inspeksi dengan total tugas aktif
+                  button.innerHTML = `<i class="ti ti-list-check me-1"></i> Tugas Inspeksi <span class="badge bg-danger ms-1">${activeCount}</span>`;
+              }
+          });
+      }
+      
+      // Skrip untuk mengaktifkan submenu sidebar (tetap)
       var submenuToggles = document.querySelectorAll('.sidebar-item > a[href="#"]');
         submenuToggles.forEach(function(toggle) {
             toggle.addEventListener('click', function(e) {
@@ -409,33 +475,14 @@ $daftar_aset = $stmt_aset->fetchAll();
             });
         });
 
-      // Secara otomatis membuka submenu "IT Asset Management"
-      var activeLink = document.querySelector('a[href="./astmgm.php#tugas"]');
-      if (activeLink) {
-          var parentSubmenu = activeLink.closest('.sidebar-submenu');
+      var activeSidebarLink = document.querySelector('a[href="./astmgm.php#tugas"]');
+      if (activeSidebarLink) {
+          var parentSubmenu = activeSidebarLink.closest('.sidebar-submenu');
           if (parentSubmenu) {
               var parentItem = parentSubmenu.closest('.sidebar-item');
               if (parentItem) {
                   parentItem.classList.add('active');
               }
-          }
-      }
-      
-      // ===================================================
-      // BARU: Skrip untuk mengaktifkan tab via URL hash
-      // ===================================================
-      var hash = window.location.hash; // Mendapat #tugas atau #master
-      if (hash) {
-          var tabToActivate = document.querySelector('.nav-tabs button[data-bs-target="' + hash + '"]');
-          if (tabToActivate) {
-              // Hapus 'active' dari tab default
-              document.querySelector('.nav-tabs .nav-link.active').classList.remove('active');
-              document.querySelector('.tab-content .tab-pane.active').classList.remove('active', 'show');
-              
-              // Aktifkan tab yang dituju
-              tabToActivate.classList.add('active');
-              var paneToActivate = document.querySelector(hash);
-              paneToActivate.classList.add('active', 'show');
           }
       }
 
